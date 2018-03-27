@@ -99,8 +99,11 @@
 
     </div>
 
-  </div>
+      <md-content>
+        <router-view/>
+      </md-content>
 
+    </div>
   
 </template>
 
