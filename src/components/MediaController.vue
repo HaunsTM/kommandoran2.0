@@ -1,26 +1,107 @@
 <template>
-    <section>
-        <div class="loading" v-if="loading">
-            Loading...
-        </div>
-        <ul>
-            <li v-for="mediaSource in registeredMediaSources">
-                {{ mediaSource.Name }}
-            </li>
-        </ul>
-    </section>
+
+    <div class="md-layout">
+        <article class="md-layout-item md-size-100 md-layout md-alignment-center-center" v-if="loading">
+            <div class="md-layout-item md-size-25">
+                <md-progress-spinner md-mode="indeterminate"></md-progress-spinner>
+            </div>
+        </article>
+
+        <article class="md-layout-item md-gutter md-layout" v-if="!loading">
+            <div class="md-layout-item md-medium-size-25 md-xsmall-size-100">           
+                <md-field>
+                    <label for="internetRadioCountry">Land</label>
+                    <md-select v-model="selectedInternetRadioCountry" name="internetRadioCountry" id="internetRadioCountry">
+                        <md-option v-for="(option, index) in internetRadioCountriesList" v-bind:value="option.ISOAlpha2" v-bind:key="index">
+                            {{ option.Name }}
+                        </md-option>
+                    </md-select>
+                </md-field>
+            </div>        
+
+            <div class="md-layout-item md-medium-size-50 md-xsmall-size-100">
+                <md-field>
+                    <label for="mediaSource">Station</label>
+                    <md-select v-model="selectedMediaSourceUrl" name="mediaSource">
+                        <md-option v-for="(option, index) in countryDependentMediaSourcesList" v-bind:value="option.Url" v-bind:key="index">
+                            {{ option.Name }}
+                        </md-option>
+                    </md-select>
+                </md-field>
+            </div>
+        </article>
+
+        <article class="md-layout-item md-size-100 md-layout md-alignment-center-center" v-if="!loading">
+            <div class="md-layout-item md-large-size-33 md-small-size-50 md-xsmall-size-100">
+                <div class="media-controls-container">
+                    <div class="controls">
+                        <div class="image-button-style">
+                            <a href="#" v-on:click.stop="playMedia">
+                                <div class="svg-image-container">
+                                    <div class="svg-image media-play"></div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="image-button-style">
+                            <a href="#" v-on:click.stop="stopMedia">
+                                <div class="svg-image-container">
+                                    <div class="svg-image media-stop"></div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="volume">
+                        <div class="image-button-style">
+                            <a href="#">
+                                <div class="svg-image-container">
+                                    <div class="svg-image volume-mute"></div>
+                                </div>
+                            </a>
+                        </div>
+                        <div>
+                            <range-slider
+                                class="slider"
+                                min="0"
+                                max="100"
+                                step="1"
+                                v-model="mediaVolume">
+                            </range-slider>
+                        </div>
+                        <div class="image-button-style">
+                            <a href="#" >
+                                <div class="svg-image-container">
+                                    <div class="svg-image volume-max"></div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </article>
+
+    </div>
 </template>
 <script>
+import RangeSlider from 'vue-range-slider'
+import 'vue-range-slider/dist/vue-range-slider.css'
 import axios from 'axios';
+
 export default {
  
   data () {
     return {
       loading: false,
-      registeredMediaSources: null,
-      internetStreamRadioRegisteredCountries: null,
+      mediaVolume: 0,
+      mediaSourcesList: null,
+      selectedMediaSourceUrl: null,
+      internetRadioCountriesList: null,
+      selectedInternetRadioCountry: null,
       error: null
     }
+  },
+  components: {
+    RangeSlider
   },
   created () {
     // fetch the data when the view is created and the data is
@@ -42,19 +123,103 @@ export default {
       Promise.all(promises)
             .then((response) => {
                 this.loading = false;
-                this.internetStreamRadioRegisteredCountries = response[0].data;
-                this.registeredMediaSources = response[1].data;                
+                this.internetRadioCountriesList = response[0].data;
+                this.mediaSourcesList = response[1].data;                
             })
             .catch((error) => {
                 this.loading = false;
                 console.log(error);
             });
 
+    },
+    playMedia: function () {
+        let mediaSourceUrl = this.selectedMediaSourceUrl;
+        let requestUrl = 'http://localhost:8525/HemsamaritenWCFService/media/PlayMedia?url=' + mediaSourceUrl;
+      axios.get(requestUrl)
+        .then((response) => {
+            this.loading = false;          
+        })
+        .catch((error) => {
+            this.loading = false;
+            console.log(error);
+        });
+
+    },
+    stopMedia: function () {
+        
+      axios.get('http://localhost:8525/HemsamaritenWCFService/media/StopMediaPlay')
+        .then((response) => {
+            this.loading = false;          
+        })
+        .catch((error) => {
+            this.loading = false;
+            console.log(error);
+        });
+
     }
-  
+  },
+  computed: {
+    countryDependentMediaSourcesList: function(event) {
+        if(this.selectedInternetRadioCountry && this.mediaSourcesList){
+            let curISOAlpha2 = this.selectedInternetRadioCountry;
+            let tempRadioList =  this.mediaSourcesList.filter(s => s.MediaSourceCountry_ISOAlpha2 === curISOAlpha2);
+            return tempRadioList;
+        }
     }
+  }
 }
 </script>
+
 <style scoped>
+    .media-controls-container {
+        display: flex;
+        flex-direction: column;
+        background: #4CAF50;
+    }
+    .media-controls-container > .controls {
+        display: flex;
+        justify-content: center;
+        flex-direction: row;
+    }
+    .media-controls-container > .volume {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: row;
+    }
+    .image-button-style{
+        margin: 0.2rem 0.5rem;
+        padding: 0.5rem;
+        text-decoration: none;
+
+        border-radius: 0.9rem;
+        transition: all 0.2s ease-in-out;
+    }
+    .image-button-style:hover {
+        background: rgba(128,214,255, .3);
+        box-shadow: 0 5px 15px rgba(66,165,245, 0.2);
+    }
+    .svg-image-container {
+        width: 3rem;
+    }
+    .svg-image {
+        background-size: cover;
+        width: 100%;
+        height: 0;
+        padding: 0; /* reset */
+        padding-bottom: 100%;
+    }
+    .media-play {
+        background-image: url('../assets/media-play.svg');
+    }
+    .media-stop {
+        background-image: url('../assets/media-stop.svg');
+    }
+    .volume-max {
+        background-image: url('../assets/volume-max.svg');
+    }
+    .volume-mute {
+        background-image: url('../assets/volume-mute.svg');
+    }
 
 </style>

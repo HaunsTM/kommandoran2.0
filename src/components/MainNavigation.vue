@@ -1,7 +1,6 @@
 <template>
-
-    <div class="flex-container-column flex-align-items-center">
-        <div class="flex-container-row">            
+    <div class="md-layout md-alignment-center">
+        <div class="md-layout-item md-xsmall-size-100 md-large-size-100">            
             <nav class="container">
                 <router-link to="scheduler" >
                     <div class="svg-image-container">
@@ -9,7 +8,29 @@
                     </div>
                 </router-link>
                 <div><span>Schedulers</span></div>
-            </nav>
+            </nav>            
+        </div>
+        <div class="md-layout-item md-xsmall-size-100 md-large-size-50">            
+            <nav class="container">
+                <router-link to="security" >
+                    <div class="svg-image-container">
+                        <div class="svg-image security-camera"></div>
+                    </div>
+                </router-link>
+                <div><span>Security</span></div>
+            </nav>            
+        </div>
+        <div class="md-layout-item md-xsmall-size-100 md-large-size-50">
+            <nav class="container">
+                <router-link to="power-switches-map" >
+                    <div class="svg-image-container">
+                        <div class="svg-image switch"></div>
+                    </div>
+                </router-link>
+                <div><span>Power Switches</span></div>
+            </nav>            
+        </div>
+        <div class="md-layout-item md-xsmall-size-100 md-large-size-100">
             <nav class="container">
                 <router-link to="media-controller" >
                     <div class="svg-image-container">
@@ -19,28 +40,7 @@
                 <div><span>Radio</span></div>
             </nav>
         </div>
-        <div class="flex-container-row">            
-            <nav class="container">
-                <router-link to="security" >
-                    <div class="svg-image-container">
-                        <div class="svg-image security-camera"></div>
-                    </div>
-                </router-link>
-                <div><span>Security</span></div>
-            </nav>
-            <nav class="container">
-                <router-link to="power-switches-map" >
-                    <div class="svg-image-container">
-                        <div class="svg-image switch"></div>
-                    </div>
-                </router-link>
-                <div><span>Power Switches</span></div>
-            </nav>
-        </div>
-        
     </div>
-
-
 </template>
 <script>
 export default {
@@ -84,31 +84,4 @@ export default {
     .radio {
         background-image: url('../assets/radio.svg');
     }
-
-    .flex-container-column {
-        display: flex;
-        flex-direction: column;
-    }
-
-
-    .flex-container-row {
-        display: flex;
-        flex-direction: row;
-    }
-
-    .flex-justify-start {
-        justify-content: flex-start;
-    }
-    .flex-justify-center {
-         justify-content: center;
-    }
-    .flex-justify-end {
-        justify-content: flex-end;
-    }
-    
-    
-    .flex-align-items-center {
-        align-items: center;
-    }
-    
 </style>

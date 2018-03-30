@@ -8,7 +8,7 @@
         <md-button class="md-icon-button" @click="showNavigation = true">
           <md-icon>menu</md-icon>
         </md-button>
-        <span class="md-title">Kommandoran™ 2.0</span>
+        <span class="md-title">Kommandoran 2.0™</span>
 
         <div class="md-toolbar-section-end">
           <md-button @click="showSidepanel = true">Favorites</md-button>
@@ -17,7 +17,7 @@
 
       <md-drawer :md-active.sync="showNavigation">
         <md-toolbar class="md-transparent" md-elevation="0">
-          <span class="md-title">Kommandoran™ 2.0</span>
+          <span class="md-title">Kommandoran</span>
         </md-toolbar>
 
         <md-list>
@@ -58,6 +58,7 @@
           </md-list>
 
 
+
         </md-list>
       </md-drawer>
 
@@ -93,17 +94,14 @@
         </md-list>
       </md-drawer>
 
-      <md-content>
+      <md-content> 
         <router-view/>
       </md-content>
 
     </div>
 
-      <md-content>
-        <router-view/>
-      </md-content>
+  </div>
 
-    </div>
   
 </template>
 
@@ -123,14 +121,14 @@ export default {
   .page-container {
     height: 100vh;
     position: relative;
-    border: 1px solid black;
   }
 
   .md-content{
-    padding-top: 1rem;
+    padding: 1rem 0.5rem 0.5rem 0.5rem;
   }
   .md-drawer {
     width: 230px;
     max-width: calc(100vw - 125px);
   }
+
 </style>
