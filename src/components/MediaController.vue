@@ -8,11 +8,12 @@
         </article>
 
         <article class="md-layout-item md-gutter md-layout" v-if="!loading">
-            <div class="md-layout-item md-medium-size-25 md-xsmall-size-100">           
+            <div class="md-layout-item md-medium-size-25 md-xsmall-size-100">  
+                      
                 <md-field>
                     <label for="internetRadioCountry">Land</label>
-                    <md-select v-model="selectedInternetRadioCountry" name="internetRadioCountry" id="internetRadioCountry">
-                        <md-option v-for="(option, index) in internetRadioCountriesList" v-bind:value="option.ISOAlpha2" v-bind:key="index">
+                    <md-select v-model="media.countries.selected.ISOAlpha2" name="internetRadioCountry" id="internetRadioCountry">
+                        <md-option v-for="(option, index) in media.countries.list" v-bind:value="option.ISOAlpha2" v-bind:key="index">
                             {{ option.Name }}
                         </md-option>
                     </md-select>
@@ -22,13 +23,13 @@
             <div class="md-layout-item md-medium-size-50 md-xsmall-size-100">
                 <md-field>
                     <label for="mediaSource">Station</label>
-                    <md-select v-model="selectedMediaSourceUrl" name="mediaSource">
+                    <md-select v-model="media.sources.selected.Url" name="mediaSource">
                         <md-option v-for="(option, index) in countryDependentMediaSourcesList" v-bind:value="option.Url" v-bind:key="index">
                             {{ option.Name }}
                         </md-option>
                     </md-select>
                 </md-field>
-            </div>
+            </div><!---->
         </article>
 
         <article class="md-layout-item md-size-100 md-layout md-alignment-center-center" v-if="!loading">
@@ -36,23 +37,23 @@
                 <div class="media-controls-container">
                     <div class="controls">
                         <div class="image-button-style">
-                            <a href="#" v-on:click.stop="playMedia">
-                                <div class="svg-image-container">
-                                    <div class="svg-image media-play"></div>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="image-button-style">
                             <a href="#" v-on:click.stop="stopMedia">
                                 <div class="svg-image-container">
                                     <div class="svg-image media-stop"></div>
                                 </div>
                             </a>
                         </div>
+                        <div class="image-button-style">
+                            <a href="#" v-on:click.stop="playMedia">
+                                <div class="svg-image-container">
+                                    <div class="svg-image media-play"></div>
+                                </div>
+                            </a>
+                        </div>
                     </div>
                     <div class="volume">
                         <div class="image-button-style">
-                            <a href="#">
+                            <a href="#" v-on:click.stop="mute">
                                 <div class="svg-image-container">
                                     <div class="svg-image volume-mute"></div>
                                 </div>
@@ -61,14 +62,14 @@
                         <div>
                             <range-slider
                                 class="slider"
-                                min="0"
-                                max="100"
-                                step="1"
-                                v-model="mediaVolume">
+                                v-bind:min="media.volume.min"
+                                v-bind:max="media.volume.max"
+                                v-bind:step="media.volume.step"
+                                v-model="media.volume.current">
                             </range-slider>
                         </div>
                         <div class="image-button-style">
-                            <a href="#" >
+                            <a href="#" v-on:click.stop="increaseMediaVolume">
                                 <div class="svg-image-container">
                                     <div class="svg-image volume-max"></div>
                                 </div>
@@ -91,13 +92,32 @@ export default {
  
   data () {
     return {
-      loading: false,
-      mediaVolume: 0,
-      mediaSourcesList: null,
-      selectedMediaSourceUrl: null,
-      internetRadioCountriesList: null,
-      selectedInternetRadioCountry: null,
-      error: null
+        loading: false,
+        media: {
+            countries: {
+                selected: {
+                    ISOAlpha2: '',
+                    Name: ''
+                },
+                list: []
+            },
+            sources: {
+                selected: {
+                    MediaCategoryType: '', 
+                    MediaSourceCountry: '', 
+                    MediaSourceCountry_ISOAlpha2: '', 
+                    Name: '', 
+                    Url: ''
+                },
+                list: []
+            },
+            volume: {
+                max: 100,
+                min: 0,
+                current: 0,
+                step: 1
+            }
+        }
     }
   },
   components: {
@@ -110,32 +130,65 @@ export default {
   },
   watch: {
     // call again the method if the route changes
-    '$route': 'fetchData'
-  },
-  methods: {
-    fetchData () {
-      this.error = this.post = null
-      this.loading = true
-      const promises = [
-          axios.get('http://localhost:8525/HemsamaritenWCFService/media/InternetStreamRadioRegisteredCountries'),
-          axios.get('http://localhost:8525/HemsamaritenWCFService/media/InternetStreamRadioSourcesList')
-      ];
-      Promise.all(promises)
-            .then((response) => {
-                this.loading = false;
-                this.internetRadioCountriesList = response[0].data;
-                this.mediaSourcesList = response[1].data;                
+    '$route': 'fetchData',
+    'media.volume': {
+        handler () {
+            let requestUrl = 'http://localhost:8525/HemsamaritenWCFService/media/SetMediaVolume?value=' + this.media.volume.current;            
+            
+            const promises = [
+                this.saveToLocalStoragePromise (),
+                axios.get(requestUrl)
+            ];
+            
+            Promise.all(promises)
+            .then((response) => {    
             })
             .catch((error) => {
                 this.loading = false;
                 console.log(error);
-            });
+            })
+        },
+        deep: true
+    }
+},
+methods: {
+    saveToLocalStoragePromise () {
+        let updatdeLocalStoragePromise = new Promise((resolve, reject) => {
+            try {
+                let mediaJSON = JSON.stringify(this.media);
+                localStorage.setItem('media', mediaJSON);
+                resolve();
+            }
+            catch (err) {
+                resolve(err);
+            }
+        });
+        return updatdeLocalStoragePromise;
+    },
+    fetchData () {
+        this.loading = true
 
+        if (localStorage.getItem('media')) this.media = JSON.parse(localStorage.getItem('media'));
+        
+        const promises = [
+            axios.get('http://localhost:8525/HemsamaritenWCFService/media/InternetStreamRadioRegisteredCountries'),
+            axios.get('http://localhost:8525/HemsamaritenWCFService/media/InternetStreamRadioSourcesList')
+        ];
+         Promise.all(promises)
+        .then((response) => {
+            this.loading = false;
+            this.media.countries.list = response[0].data;
+            this.media.sources.list = response[1].data;
+        })
+        .catch((error) => {
+            this.loading = false;
+            console.log(error);
+        });
     },
     playMedia: function () {
-        let mediaSourceUrl = this.selectedMediaSourceUrl;
-        let requestUrl = 'http://localhost:8525/HemsamaritenWCFService/media/PlayMedia?url=' + mediaSourceUrl;
-      axios.get(requestUrl)
+        let selectedMediaSourceUrl = this.media.sources.selected.Url
+        let requestUrl = 'http://localhost:8525/HemsamaritenWCFService/media/PlayMedia?url=' + selectedMediaSourceUrl;
+        axios.get(requestUrl)
         .then((response) => {
             this.loading = false;          
         })
@@ -143,7 +196,6 @@ export default {
             this.loading = false;
             console.log(error);
         });
-
     },
     stopMedia: function () {
         
@@ -156,13 +208,21 @@ export default {
             console.log(error);
         });
 
+    },
+    mute: function() {
+            this.media.volume.current = this.media.volume.min;
+    },
+    increaseMediaVolume: function() {
+        if ((this.media.volume.current + this.media.volume.step) <= this.media.volume.max) {
+            this.media.volume.current = (this.media.volume.current + this.media.volume.step);
+        }        
     }
   },
   computed: {
     countryDependentMediaSourcesList: function(event) {
-        if(this.selectedInternetRadioCountry && this.mediaSourcesList){
-            let curISOAlpha2 = this.selectedInternetRadioCountry;
-            let tempRadioList =  this.mediaSourcesList.filter(s => s.MediaSourceCountry_ISOAlpha2 === curISOAlpha2);
+        if(this.media.countries.selected.ISOAlpha2 !== '' && this.media.sources.list){
+            let curISOAlpha2 = this.media.countries.selected.ISOAlpha2;
+            let tempRadioList =  this.media.sources.list.filter(s => s.MediaSourceCountry_ISOAlpha2 === curISOAlpha2);
             return tempRadioList;
         }
     }
