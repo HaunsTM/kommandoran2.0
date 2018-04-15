@@ -1,5 +1,7 @@
 <template>
-  <SchedulerComponent />
+  <SchedulerComponent v-bind:initialCronexpressions="[
+'0 41 3 * * MON',
+'0 41 3 * * FRI']"/>
 </template>
 <script>
 import SchedulerComponent from './SchedulerComponent.vue';

@@ -1,167 +1,281 @@
 <template>
-    <article class="scheduler-component-column">
-        <section class="scheduler-component-row max-width">
+    <article class="scheduler-component-container">
+      <section class="column">
+        <section class="time-picker">
+          <v-menu ref="menu"
+                  lazy
+                  :close-on-content-click="false"
+                  v-model="showTimepickerDialog"
+                  transition="scale-transition"
+                  offset-y
+                  full-width
+                  :nudge-right="40"
+                  max-width="290px"
+                  min-width="290px"
+                  :return-value.sync="time">
+            <v-text-field slot="activator"
+                          label="Picker in menu"
+                          v-model="time"
+                          prepend-icon="access_time"
+                          readonly>
+            </v-text-field>
+            <v-time-picker v-model="time" color="red accent-2" format="24hr" @change="$refs.menu.save(time)"></v-time-picker>
+          </v-menu>
+        </section>
+        <h4>sdfhg</h4>
+        <section class="row flex-wrap">
             <md-checkbox v-model="days.monday.checked">{{days.monday.name}}</md-checkbox>
             <md-checkbox v-model="days.tuesday.checked">{{days.tuesday.name}}</md-checkbox>
             <md-checkbox v-model="days.wednesday.checked">{{days.wednesday.name}}</md-checkbox>
             <md-checkbox v-model="days.thursday.checked">{{days.thursday.name}}</md-checkbox>
             <md-checkbox v-model="days.friday.checked">{{days.friday.name}}</md-checkbox>
         </section>
-        <section class="scheduler-component-row max-width">
-            <md-checkbox v-model="days.saturday.checked">{{days.saturday.name}}</md-checkbox>
-            <md-checkbox v-model="days.sunday.checked">{{days.sunday.name}}</md-checkbox>
-            <section class="scheduler-component-column">
+        <section class="row space-between">
+            <section>
+              <md-checkbox v-model="days.saturday.checked">{{days.saturday.name}}</md-checkbox>
+              <md-checkbox v-model="days.sunday.checked">{{days.sunday.name}}</md-checkbox>
+            </section>
+            <section class="column multi-checker">
                 <md-checkbox v-model="wholeWorkWeek_checked">{{wholeWorkWeek_name}}</md-checkbox>
                 <md-checkbox v-model="weekend_checked">{{weekend_name}}</md-checkbox>
-            </section>
+            </section>          
         </section>
-            
+      </section>
     </article>
 </template>
 
 <script>
-  export default {
-      name: 'SchedulerComponent',
-      data: () => ({
-          days: {
-              monday: {
-                checked: false,
-                cronExpressionPartName : "MON",
-                name: "Mon"
-              },
-              tuesday: {
-                checked: false,
-                cronExpressionPartName : "TUE",
-                name: "Tue"
-              },
-              wednesday: {
-                checked: false,
-                cronExpressionPartName : "WED",
-                name: "Wed"
-              },
-              thursday: {
-                checked: false,
-                cronExpressionPartName : "THU",
-                name: "Thu"
-              },
-              friday: {
-                checked: false,
-                cronExpressionPartName : "FRI",
-                name: "Fri"
-              },
-              saturday: {
-                checked: false,
-                cronExpressionPartName : "SAT",
-                name: "Sat"
-              },
-              sunday: {
-                checked: false,
-                cronExpressionPartName : "SUN",
-                name: "Sun"
-              },
-          },
-          wholeWorkWeek_name:  "Mon - Fri",      
-          weekend_name: "Sat - Sun"          
-      }),
-      /*
-      watch: {
-
-          'days.monday.checked': 'setWholeWorkWeekCheckboxChecked',
-          'days.tuesday.checked': 'setWholeWorkWeekCheckboxChecked',
-          'days.wednesday.checked': 'setWholeWorkWeekCheckboxChecked',
-          'days.thursday.checked': 'setWholeWorkWeekCheckboxChecked',
-          'days.friday.checked': 'setWholeWorkWeekCheckboxChecked',
-
-          'days.saturday.checked': 'setWheekendCheckboxChecked',
-          'days.sunday.checked': 'setWheekendCheckboxChecked',
+const ENOUGH_CORRECT_TIME_REG = /(?:0?(\d{1,2})):(?:0?(\d{1,2}))/;
+const CRON_REG = /^([0-9]{1,2}|[*?])\s([0-9]{1,2}|[*?])\s([0-9]{1,2}|[*?])\s([0-9]{1,2}|[*?])\s([0-9]{1,2}|[*?])\s([*?]|MON|TUE|WED|THU|FRI|SAT|SUN)$/;
+export default {
+  name: "SchedulerComponent",
+  props: ["initialCronexpressions"],
+  created() {
+    // fetch the data when the view is created and the data is
+    //console.log(JSON.stringify(this.initialCronexpressions));
+    this.currentCrons = this.initialCronexpressions;
+  },
+  data: () => ({
+    time: null,
+    showTimepickerDialog: false,
+    days: {
+      monday: {
+        checked: false,
+        cronExpressionPartName: "MON",
+        name: "Mon"
       },
-      methods: {
-          setWholeWorkWeekChecked : function(event) {
-            this.days.monday.checked = this.wholeWorkWeek.checked;
-            this.days.tuesday.checked = this.wholeWorkWeek.checked;
-            this.days.wednesday.checked = this.wholeWorkWeek.checked;
-            this.days.thursday.checked = this.wholeWorkWeek.checked;
-            this.days.friday.checked = this.wholeWorkWeek.checked;
-          },
-          setWeekendChecked : function(event) {
-            this.days.saturday.checked = this.weekend.checked;
-            this.days.sunday.checked = this.weekend.checked;
-          },
-          setWholeWorkWeekCheckboxChecked: function(event) {
-            this.wholeWorkWeek.checked = 
-            this.days.monday.checked &&
-            this.days.tuesday.checked && 
-            this.days.wednesday.checked &&
-            this.days.thursday.checked &&
-            this.days.friday.checked;
-          },
-          setWheekendCheckboxChecked: function(event, noo) {
-            console.log('4');
-            this.weekend.checked = 
-              this.days.saturday.checked &&
-              this.days.sunday.checked;
-          }
-      },*/
-      computed: {
-        'weekend_checked' : {
-          get: function () {
-              let shouldBeChecked = 
-              this.days.saturday.checked &&
-              this.days.sunday.checked;
+      tuesday: {
+        checked: false,
+        cronExpressionPartName: "TUE",
+        name: "Tue"
+      },
+      wednesday: {
+        checked: false,
+        cronExpressionPartName: "WED",
+        name: "Wed"
+      },
+      thursday: {
+        checked: false,
+        cronExpressionPartName: "THU",
+        name: "Thu"
+      },
+      friday: {
+        checked: false,
+        cronExpressionPartName: "FRI",
+        name: "Fri"
+      },
+      saturday: {
+        checked: false,
+        cronExpressionPartName: "SAT",
+        name: "Sat"
+      },
+      sunday: {
+        checked: false,
+        cronExpressionPartName: "SUN",
+        name: "Sun"
+      }
+    },
+    wholeWorkWeek_name: "Mon - Fri",
+    weekend_name: "Sat - Sun"
+  }),
+  computed: {
+    weekend_checked: {
+      get: function() {
+        let shouldBeChecked =
+          this.days.saturday.checked && this.days.sunday.checked;
 
-              return shouldBeChecked; 
-          },
-          set: function (value) {
-              this.days.saturday.checked = value;
-              this.days.sunday.checked = value;
-          }
-        },
-        'wholeWorkWeek_checked' : {
-          get: function () {
-              let shouldBeChecked = 
-              this.days.monday.checked &&
-              this.days.tuesday.checked &&
-              this.days.wednesday.checked &&
-              this.days.thursday.checked &&
-              this.days.friday.checked;
+        return shouldBeChecked;
+      },
+      set: function(value) {
+        this.days.saturday.checked = value;
+        this.days.sunday.checked = value;
+      }
+    },
+    wholeWorkWeek_checked: {
+      get: function() {
+        let shouldBeChecked =
+          this.days.monday.checked &&
+          this.days.tuesday.checked &&
+          this.days.wednesday.checked &&
+          this.days.thursday.checked &&
+          this.days.friday.checked;
 
-              return shouldBeChecked; 
-          },
-          set: function (value) {
-              this.days.monday.checked = value;
-              this.days.tuesday.checked = value;
-              this.days.wednesday.checked = value;
-              this.days.thursday.checked = value;
-              this.days.friday.checked = value;
+        return shouldBeChecked;
+      },
+      set: function(value) {
+        this.days.monday.checked = value;
+        this.days.tuesday.checked = value;
+        this.days.wednesday.checked = value;
+        this.days.thursday.checked = value;
+        this.days.friday.checked = value;
+      }
+    },
+    currentCrons: {
+      get: function() {
+        let crons = [];
+        if (!this.time) return;
+
+        let currentTime = this.time.match(ENOUGH_CORRECT_TIME_REG);
+        let currentHour = currentTime[1];
+        let currentMinute = currentTime[2];
+
+        if (this.wholeWeekIsChecked()) {
+          crons.push(
+            "0" + " " + currentMinute + " " + currentHour + " " + "*" + " " +  "*" + " " + "?"
+          );
+        } else {
+          this.currentSelectedDaysCronExpressionPartName().forEach(
+            cronExpressionPartName => {
+              crons.push(
+                "0" + " " + currentMinute + " " + currentHour + " " + "*" + " " + "*" + " " + cronExpressionPartName
+              );
+            }
+          );
+        }
+        return crons;
+      },
+      set: function(value) {
+        if (!value) return;
+        let crons = value;
+        let index = crons.length;
+
+        while (index--) {
+          let currentCron = crons[index];
+          let cronMatches = currentCron.match(CRON_REG);
+          let day = cronMatches[6];
+
+          this.check(day);
+
+          if (index == 0) {
+            let minutes = cronMatches[2];
+            let hour = cronMatches[3];
+            this.time = hour.padStart(2,"0") + ":" + minutes.padStart(2,"0");
           }
         }
       }
+    }
+  },
+  methods: {
+    check(day) {
+      if (new RegExp("^MON$", "i").test(day)) {
+        this.days.monday.checked = true;
+      } else if (new RegExp("^TUE$", "i").test(day)) {
+        this.days.tuesday.checked = true;
+      } else if (new RegExp("^WED$", "i").test(day)) {
+        this.days.wednesday.checked = true;
+      } else if (new RegExp("^THU$", "i").test(day)) {
+        this.days.thursday.checked = true;
+      } else if (new RegExp("^FRI$", "i").test(day)) {
+        this.days.friday.checked = true;
+      } else if (new RegExp("^SAT$", "i").test(day)) {
+        this.days.saturday.checked = true;
+      } else if (new RegExp("^SUN$", "i").test(day)) {
+        this.days.sunday.checked = true;
+      } else if (new RegExp("^[?*]$", "i").test(day)) {
+        //do nothing
+      } else {
+        throw { 'message' : 'Unrecognized day-part in cronexpression.'}
+      }
+    },
+    wholeWorkWeekIsChecked() {
+      return (
+        this.days.monday.checked &&
+        this.days.tuesday.checked &&
+        this.days.wednesday.checked &&
+        this.days.thursday.checked &&
+        this.days.friday.checked
+      );
+    },
+    weekendIsChecked() {
+      return this.days.saturday.checked && this.days.sunday.checked;
+    },
+    wholeWeekIsChecked() {
+      return this.wholeWorkWeekIsChecked() && this.weekendIsChecked();
+    },
+    currentSelectedDaysCronExpressionPartName() {
+      let selectedDays = [];
+      if (this.days.monday.checked)
+        selectedDays.push(this.days.monday.cronExpressionPartName);
+      if (this.days.tuesday.checked)
+        selectedDays.push(this.days.tuesday.cronExpressionPartName);
+      if (this.days.wednesday.checked)
+        selectedDays.push(this.days.wednesday.cronExpressionPartName);
+      if (this.days.thursday.checked)
+        selectedDays.push(this.days.thursday.cronExpressionPartName);
+      if (this.days.friday.checked)
+        selectedDays.push(this.days.friday.cronExpressionPartName);
+      if (this.days.saturday.checked)
+        selectedDays.push(this.days.saturday.cronExpressionPartName);
+      if (this.days.sunday.checked)
+        selectedDays.push(this.days.sunday.cronExpressionPartName);
+      return selectedDays;
+    }
   }
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
-  .md-checkbox  {
-    margin:  0.2rem 0.2rem!important;
-    padding-bottom: 0.2rem !important;
-    padding-left: 0.4rem !important;
-  }
 
-  .md-checkbox .md-checkbox-label {
-    padding-left: 0.2rem !important;
-    white-space: nowrap !important;
-  }
+.scheduler-component-container {
+  background-color: #E8F5E9;
+  padding: 1.6rem;
+}
 
-  .scheduler-component-column { 
-    display: flex;
-    flex-direction: column;
-  }
-  .max-width { 
-    width: 12rem;
-  }
-  .scheduler-component-row { 
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+.column {
+  display: flex;
+  flex-direction: column;
+}
+
+.time-picker{
+  padding-left: 0.6rem;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.space-between {
+  justify-content: space-between;
+}
+.multi-checker {
+  background-color: #E3F2FD;
+  padding: 0.2rem
+}
+
+.md-checkbox {
+  margin: 0.2rem 0.2rem !important;
+  padding-bottom: 0.2rem !important;
+  padding-left: 0.4rem !important;
+}
+
+.md-checkbox .md-checkbox-label {
+  padding-left: 0.2rem !important;
+  white-space: nowrap !important;
+}
 </style>
