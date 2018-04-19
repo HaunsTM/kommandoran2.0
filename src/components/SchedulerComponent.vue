@@ -238,7 +238,7 @@ export default {
 <style>
 
 .scheduler-component-container {
-  background-color: #E8F5E9;
+  /*background-color: #E8F5E9;*/
   padding: 1.6rem;
 }
 
