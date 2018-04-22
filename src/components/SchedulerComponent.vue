@@ -1,15 +1,17 @@
 <template>
     <article class="scheduler-component-container">
       <section class="column">
+        
+      <section class="row space-between">
         <section class="time-picker">
           <v-menu ref="menu"
-                  lazy
+                  lazy                  
                   :close-on-content-click="false"
                   v-model="showTimepickerDialog"
                   transition="scale-transition"
-                  offset-y
                   full-width
-                  :nudge-right="40"
+                  nudge-top="40"
+                  nudge-left="40"
                   max-width="290px"
                   min-width="290px"
                   :return-value.sync="time">
@@ -21,34 +23,44 @@
             </v-text-field>
             <v-time-picker v-model="time" color="red accent-2" format="24hr" @change="$refs.menu.save(time)"></v-time-picker>
           </v-menu>
+          <ActionTypeComponent></ActionTypeComponent>
         </section>
-        <h4>sdfhg</h4>
-        <section class="row flex-wrap">
-            <md-checkbox v-model="days.monday.checked">{{days.monday.name}}</md-checkbox>
-            <md-checkbox v-model="days.tuesday.checked">{{days.tuesday.name}}</md-checkbox>
-            <md-checkbox v-model="days.wednesday.checked">{{days.wednesday.name}}</md-checkbox>
-            <md-checkbox v-model="days.thursday.checked">{{days.thursday.name}}</md-checkbox>
-            <md-checkbox v-model="days.friday.checked">{{days.friday.name}}</md-checkbox>
-        </section>
-        <section class="row space-between">
-            <section>
-              <md-checkbox v-model="days.saturday.checked">{{days.saturday.name}}</md-checkbox>
-              <md-checkbox v-model="days.sunday.checked">{{days.sunday.name}}</md-checkbox>
-            </section>
-            <section class="column multi-checker">
-                <md-checkbox v-model="wholeWorkWeek_checked">{{wholeWorkWeek_name}}</md-checkbox>
-                <md-checkbox v-model="weekend_checked">{{weekend_name}}</md-checkbox>
-            </section>          
+
+      </section>
+        <section class="day-picker">
+          <h4>sdfhg</h4>
+          <section class="row flex-wrap">
+              <md-checkbox v-model="days.monday.checked">{{days.monday.name}}</md-checkbox>
+              <md-checkbox v-model="days.tuesday.checked">{{days.tuesday.name}}</md-checkbox>
+              <md-checkbox v-model="days.wednesday.checked">{{days.wednesday.name}}</md-checkbox>
+              <md-checkbox v-model="days.thursday.checked">{{days.thursday.name}}</md-checkbox>
+              <md-checkbox v-model="days.friday.checked">{{days.friday.name}}</md-checkbox>
+          </section>
+          <section class="row space-between">
+              <section>
+                <md-checkbox v-model="days.saturday.checked">{{days.saturday.name}}</md-checkbox>
+                <md-checkbox v-model="days.sunday.checked">{{days.sunday.name}}</md-checkbox>
+              </section>
+              <section class="column multi-checker">
+                  <md-checkbox v-model="wholeWorkWeek_checked">{{wholeWorkWeek_name}}</md-checkbox>
+                  <md-checkbox v-model="weekend_checked">{{weekend_name}}</md-checkbox>
+              </section>          
+          </section>
         </section>
       </section>
     </article>
 </template>
 
 <script>
+import ActionTypeComponent from "./ActionTypeComponent.vue";
+
 const ENOUGH_CORRECT_TIME_REG = /(?:0?(\d{1,2})):(?:0?(\d{1,2}))/;
 const CRON_REG = /^([0-9]{1,2}|[*?])\s([0-9]{1,2}|[*?])\s([0-9]{1,2}|[*?])\s([0-9]{1,2}|[*?])\s([0-9]{1,2}|[*?])\s([*?]|MON|TUE|WED|THU|FRI|SAT|SUN)$/;
 export default {
   name: "SchedulerComponent",
+  components: {
+    ActionTypeComponent
+  },
   props: ["initialCronexpressions"],
   created() {
     // fetch the data when the view is created and the data is
@@ -141,13 +153,33 @@ export default {
 
         if (this.wholeWeekIsChecked()) {
           crons.push(
-            "0" + " " + currentMinute + " " + currentHour + " " + "*" + " " +  "*" + " " + "?"
+            "0" +
+              " " +
+              currentMinute +
+              " " +
+              currentHour +
+              " " +
+              "*" +
+              " " +
+              "*" +
+              " " +
+              "?"
           );
         } else {
           this.currentSelectedDaysCronExpressionPartName().forEach(
             cronExpressionPartName => {
               crons.push(
-                "0" + " " + currentMinute + " " + currentHour + " " + "*" + " " + "*" + " " + cronExpressionPartName
+                "0" +
+                  " " +
+                  currentMinute +
+                  " " +
+                  currentHour +
+                  " " +
+                  "*" +
+                  " " +
+                  "*" +
+                  " " +
+                  cronExpressionPartName
               );
             }
           );
@@ -169,7 +201,7 @@ export default {
           if (index == 0) {
             let minutes = cronMatches[2];
             let hour = cronMatches[3];
-            this.time = hour.padStart(2,"0") + ":" + minutes.padStart(2,"0");
+            this.time = hour.padStart(2, "0") + ":" + minutes.padStart(2, "0");
           }
         }
       }
@@ -194,7 +226,7 @@ export default {
       } else if (new RegExp("^[?*]$", "i").test(day)) {
         //do nothing
       } else {
-        throw { 'message' : 'Unrecognized day-part in cronexpression.'}
+        throw { message: "Unrecognized day-part in cronexpression." };
       }
     },
     wholeWorkWeekIsChecked() {
@@ -236,10 +268,10 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
-
 .scheduler-component-container {
   /*background-color: #E8F5E9;*/
   padding: 1.6rem;
+  max-width: 24rem;
 }
 
 .column {
@@ -247,8 +279,11 @@ export default {
   flex-direction: column;
 }
 
-.time-picker{
+.time-picker {
   padding-left: 0.6rem;
+}
+.time-picker .picker__body {
+  background-color: #FFFFFF
 }
 
 .row {
@@ -264,8 +299,8 @@ export default {
   justify-content: space-between;
 }
 .multi-checker {
-  background-color: #E3F2FD;
-  padding: 0.2rem
+  background-color: #e3f2fd;
+  padding: 0.2rem;
 }
 
 .md-checkbox {

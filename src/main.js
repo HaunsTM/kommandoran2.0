@@ -6,9 +6,13 @@ import VueMaterial from 'vue-material'
 import 'vue-material/dist/vue-material.css'
 import 'vue-material/dist/theme/default.css'
 
+import Vuetify from 'vuetify'
+import 'vuetify/dist/vuetify.min.css'
+
 import App from './App'
 
 Vue.use(VueMaterial)
+Vue.use(Vuetify)
 import router from './router'
 import axios from 'axios';
 Vue.use(axios)
