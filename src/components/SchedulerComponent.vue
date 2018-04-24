@@ -9,11 +9,7 @@
                   :close-on-content-click="false"
                   v-model="showTimepickerDialog"
                   transition="scale-transition"
-                  full-width
-                  nudge-top="40"
-                  nudge-left="40"
-                  max-width="290px"
-                  min-width="290px"
+                  top
                   :return-value.sync="time">
             <v-text-field slot="activator"
                           label="Picker in menu"
@@ -21,7 +17,8 @@
                           prepend-icon="access_time"
                           readonly>
             </v-text-field>
-            <v-time-picker v-model="time" color="red accent-2" format="24hr" @change="$refs.menu.save(time)"></v-time-picker>
+            <v-time-picker v-model="time" 
+                  max-width="20rem" color="red accent-2" format="24hr" @change="$refs.menu.save(time)"></v-time-picker>
           </v-menu>
           <ActionTypeComponent></ActionTypeComponent>
         </section>
