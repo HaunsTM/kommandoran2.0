@@ -4,19 +4,23 @@
         
       <section class="row space-between">
         <section class="time-picker">
+            <v-text-field label="Picker in menu"
+                          v-model="time"
+                          prepend-icon="access_time"
+                          v-on:click.native="showTimepickerDialog"
+                          readonly>
+            </v-text-field>
           <v-menu ref="menu"
                   lazy                  
                   :close-on-content-click="false"
-                  v-model="showTimepickerDialog"
+                  v-model="displayTimePicker"
                   transition="scale-transition"
-                  top
+                  
+        offset-y
+        absolute
+        :position-x="timePickerPosition.x"
+        :position-y="timePickerPosition.y"
                   :return-value.sync="time">
-            <v-text-field slot="activator"
-                          label="Picker in menu"
-                          v-model="time"
-                          prepend-icon="access_time"
-                          readonly>
-            </v-text-field>
             <v-time-picker v-model="time" 
                   max-width="20rem" color="red accent-2" format="24hr" @change="$refs.menu.save(time)"></v-time-picker>
           </v-menu>
@@ -66,7 +70,11 @@ export default {
   },
   data: () => ({
     time: null,
-    showTimepickerDialog: false,
+    displayTimePicker: false,
+    timePickerPosition: {
+      x: -1,
+      y: -1
+    },
     days: {
       monday: {
         checked: false,
@@ -258,6 +266,15 @@ export default {
       if (this.days.sunday.checked)
         selectedDays.push(this.days.sunday.cronExpressionPartName);
       return selectedDays;
+    },
+    showTimepickerDialog (e) {
+      e.preventDefault()
+      this.showMenu = false
+      this.x = e.clientX
+      this.y = e.clientY
+      this.$nextTick(() => {
+        this.displayTimePicker = true
+      })
     }
   }
 };
