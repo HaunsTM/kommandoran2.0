@@ -16,7 +16,7 @@
                   v-model="displayTimePicker"
                   transition="scale-transition"
                   
-        offset-y
+        
         absolute
         :position-x="timePickerPosition.x"
         :position-y="timePickerPosition.y"
@@ -24,9 +24,9 @@
             <v-time-picker v-model="time" 
                   max-width="20rem" color="red accent-2" format="24hr" @change="$refs.menu.save(time)"></v-time-picker>
           </v-menu>
-          <ActionTypeComponent></ActionTypeComponent>
         </section>
 
+          <ActionTypeComponent></ActionTypeComponent>
       </section>
         <section class="day-picker">
           <h4>sdfhg</h4>
@@ -268,10 +268,11 @@ export default {
       return selectedDays;
     },
     showTimepickerDialog (e) {
-      e.preventDefault()
-      this.showMenu = false
-      this.x = e.clientX
-      this.y = e.clientY
+      e.preventDefault();
+      this.showMenu = false;
+      this.x = e.clientX;
+      this.y = e.clientY;
+      console.log(""+"");
       this.$nextTick(() => {
         this.displayTimePicker = true
       })
@@ -298,6 +299,10 @@ export default {
 }
 .time-picker .picker__body {
   background-color: #FFFFFF
+}
+.time-picker .input-group__details {
+  display: none;
+  background-color: black;
 }
 
 .row {
