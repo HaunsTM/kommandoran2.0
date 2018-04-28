@@ -4,22 +4,20 @@
         
       <section class="row space-between">
         <section class="time-picker">
-            <v-text-field label="Picker in menu"
-                          v-model="time"
-                          prepend-icon="access_time"
-                          v-on:click.native="showTimepickerDialog"
-                          readonly>
-            </v-text-field>
+          <v-text-field label="Picker in menu"
+                        v-model="time"
+                        prepend-icon="access_time"
+                        v-on:click.native="showTimepickerDialog"
+                        readonly>
+          </v-text-field>
           <v-menu ref="menu"
                   lazy                  
                   :close-on-content-click="false"
                   v-model="displayTimePicker"
-                  transition="scale-transition"
-                  
-        
-        absolute
-        :position-x="timePickerPosition.x"
-        :position-y="timePickerPosition.y"
+                  transition="scale-transition"                  
+                  absolute
+                  :position-x="timePickerPosition.x"
+                  :position-y="timePickerPosition.y"
                   :return-value.sync="time">
             <v-time-picker v-model="time" 
                   max-width="20rem" color="red accent-2" format="24hr" @change="$refs.menu.save(time)"></v-time-picker>
@@ -29,7 +27,7 @@
           <ActionTypeComponent></ActionTypeComponent>
       </section>
         <section class="day-picker">
-          <h4>sdfhg</h4>
+          <h4>Action days</h4>
           <section class="row flex-wrap">
               <md-checkbox v-model="days.monday.checked">{{days.monday.name}}</md-checkbox>
               <md-checkbox v-model="days.tuesday.checked">{{days.tuesday.name}}</md-checkbox>
