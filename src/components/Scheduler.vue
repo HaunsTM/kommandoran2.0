@@ -3,9 +3,27 @@
   <SchedulerComponent v-bind:initialCronexpressions="[
 '0 41 3 * * MON',
 '0 41 3 * * FRI']"/>
+<md-divider></md-divider>
   <SchedulerComponent v-bind:initialCronexpressions="[
 '0 41 13 * * TUE',
 '0 41 13 * * FRI']"/>
+<md-divider></md-divider>
+  <SchedulerComponent v-bind:initialCronexpressions="[
+'0 41 13 * * TUE',
+'0 41 13 * * FRI']"/>
+<md-divider></md-divider>
+  <SchedulerComponent v-bind:initialCronexpressions="[
+'0 41 13 * * TUE',
+'0 41 13 * * FRI']"/>
+<md-divider></md-divider>
+  <SchedulerComponent v-bind:initialCronexpressions="[
+'0 41 13 * * TUE',
+'0 41 13 * * FRI']"/>
+<md-divider></md-divider>
+  <SchedulerComponent v-bind:initialCronexpressions="[
+'0 41 13 * * TUE',
+'0 41 13 * * FRI']"/>
+<md-divider></md-divider>
 
   </article>
 </template>

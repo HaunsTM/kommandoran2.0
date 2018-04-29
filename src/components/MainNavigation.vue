@@ -27,7 +27,7 @@
                         <div class="svg-image switch"></div>
                     </div>
                 </router-link>
-                <div><span>Power Switches</span></div>
+                <div><span>Manual Power Switches</span></div>
             </nav>            
         </div>
         <div class="md-layout-item md-xsmall-size-100 md-large-size-100">
