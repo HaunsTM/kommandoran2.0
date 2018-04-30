@@ -1,31 +1,33 @@
 <template>
     <article class="scheduler-component-container">
       <section class="column">
-        
-      <section class="row space-between">
-        <section class="time-picker">
-          <v-text-field label="Picker in menu"
-                        v-model="time"
-                        prepend-icon="access_time"
-                        v-on:click.native="showTimepickerDialog"
-                        readonly>
-          </v-text-field>
-          <v-menu ref="menu"
-                  lazy                  
-                  :close-on-content-click="false"
-                  v-model="displayTimePicker"
-                  transition="scale-transition"                  
-                  absolute
-                  :position-x="timePickerPosition.x"
-                  :position-y="timePickerPosition.y"
-                  :return-value.sync="time">
-            <v-time-picker v-model="time" 
-                  max-width="20rem" color="red accent-2" format="24hr" @change="$refs.menu.save(time)"></v-time-picker>
-          </v-menu>
+        <section class="row">
+          <PowerSwitchesMap></PowerSwitchesMap>
         </section>
+        <section class="row space-between">
+          <section class="time-picker">
+            <v-text-field label="Picker in menu"
+                          v-model="time"
+                          prepend-icon="access_time"
+                          v-on:click.native="showTimepickerDialog"
+                          readonly>
+            </v-text-field>
+            <v-menu ref="menu"
+                    lazy                  
+                    :close-on-content-click="false"
+                    v-model="displayTimePicker"
+                    transition="scale-transition"                  
+                    absolute
+                    :position-x="timePickerPosition.x"
+                    :position-y="timePickerPosition.y"
+                    :return-value.sync="time">
+              <v-time-picker v-model="time" 
+                    max-width="20rem" color="red accent-2" format="24hr" @change="$refs.menu.save(time)"></v-time-picker>
+            </v-menu>
+          </section>
 
-          <ActionTypeComponent></ActionTypeComponent>
-      </section>
+            <ActionTypeComponent></ActionTypeComponent>
+        </section>
         <section class="day-picker">
           <h4>Action days</h4>
           <section class="row flex-wrap">
@@ -52,13 +54,15 @@
 
 <script>
 import ActionTypeComponent from "./ActionTypeComponent.vue";
+import PowerSwitchesMap from "./PowerSwitchesMap.vue";
 
 const ENOUGH_CORRECT_TIME_REG = /(?:0?(\d{1,2})):(?:0?(\d{1,2}))/;
 const CRON_REG = /^([0-9]{1,2}|[*?])\s([0-9]{1,2}|[*?])\s([0-9]{1,2}|[*?])\s([0-9]{1,2}|[*?])\s([0-9]{1,2}|[*?])\s([*?]|MON|TUE|WED|THU|FRI|SAT|SUN)$/;
 export default {
   name: "SchedulerComponent",
   components: {
-    ActionTypeComponent
+    ActionTypeComponent,
+    PowerSwitchesMap
   },
   props: ["initialCronexpressions"],
   created() {
