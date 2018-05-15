@@ -2,7 +2,8 @@
     <article class="scheduler-component-container">
       <section class="column">
         <section class="row">
-          <PowerSwitchesMap></PowerSwitchesMap>
+          <PowerSwitchesMap v-bind:devicesMapSVGjsMarkup = "devicesMapSVGjsMarkup">
+          </PowerSwitchesMap>
         </section>
         <section class="row space-between">
           <section class="time-picker">
@@ -64,11 +65,13 @@ export default {
     ActionTypeComponent,
     PowerSwitchesMap
   },
-  props: ["initialCronexpressions"],
+  props: [
+    "initialCronexpressions",
+    "devicesMapSVGjsMarkup"
+  ],
   created() {
     // fetch the data when the view is created and the data is
     //console.log(JSON.stringify(this.initialCronexpressions));
-    this.currentCrons = this.initialCronexpressions;
   },
   data: () => ({
     time: null,
@@ -279,6 +282,7 @@ export default {
         this.displayTimePicker = true
       })
     }
+
   }
 };
 </script>

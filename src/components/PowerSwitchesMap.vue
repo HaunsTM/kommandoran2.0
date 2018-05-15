@@ -1,25 +1,29 @@
 <template>
   <div>
-    <div id="drawing"></div>
-      <div class="svg-image-container" >
+    <div id="svgimage"></div>
+      <!--<div class="svg-image-container" >
         <div class="svg-image devices-map"></div>
-      </div>
+      </div>-->
   </div>
 </template>
 <script>
 
 import SVG from 'svg.js'
+
 export default {
   name: "PowerSwitchesMap",
-  mounted () {
-		// fetch the data when the view is created and the data is
-		// already being observed
-    debugger;
+  data: () => ({
+    devicesMapSVGjsObject: {},
     
-// draw pink square// initialize SVG.js
-var draw = SVG('drawing')
-draw.rect(100, 100).move(100, 50).fill('#f06')
-	},
+  }),
+  props: ['devicesMapSVGjsMarkup'],
+  watch: {
+    devicesMapSVGjsMarkup(newVal) {
+      debugger;
+      var draw = SVG('svgimage')
+      draw.svg(newVal)
+    }
+  }
 }
 </script>
 <style scoped>
@@ -34,6 +38,6 @@ draw.rect(100, 100).move(100, 50).fill('#f06')
     padding-bottom: 100%;
   }
   .devices-map {
-    background-image: url("../assets/devices-map.svg");
+    background-image: url("/static/devices-map.svg");
   }
 </style>
