@@ -56,7 +56,7 @@ export default {
 			
 			Promise.all(promises)
 			.then((response) => {
-				that.devicesMapSVGjsMarkup = response[0];
+				that.devicesMapSVGjsMarkup = response[0].data;
 			})
 			.catch((error) => {
 					console.log(error);
