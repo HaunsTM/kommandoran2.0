@@ -1,10 +1,11 @@
 <template>
   <div>
-    <div id="powerSwitchesMapDiv" ref="powerSwitchesMapDiv"
+    <!--<div id="powerSwitchesMapDiv" ref="powerSwitchesMapDiv"
+    v-html="devicesMapSVGjsMarkup"></div>-->
+      <div class="svg-image-container" >
+        <div class="svg-image"  id="powerSwitchesMapDiv" ref="powerSwitchesMapDiv"
     v-html="devicesMapSVGjsMarkup"></div>
-      <!--<div class="svg-image-container" >
-        <div class="svg-image devices-map"></div>
-      </div>-->
+      </div>
   </div>
 </template>
 <script>
@@ -15,7 +16,8 @@ export default {
   data: () => ({
     devicesMapSVGjsObject: {},
     domElement: {},
-    svgMounted: false
+    svgMounted: false,
+    tellstickElements: {}
   }),
   props: ['devicesMapSVGjsMarkup'],
   watch: {
@@ -29,33 +31,49 @@ export default {
       if (this.svgMounted) {
         var svgDivRef = this.$refs.powerSwitchesMapDiv;
         
-        this.getMapReferences(svgDivRef)
+        this.tellstickElements =  this.getMapReferences(svgDivRef)
         this.svgMounted = false;
         
-        debugger;
-
+        this.setPowerSwitchColor(this.tellstickElements[0], "red")
+        
+        this.setPowerSwitchText(this.tellstickElements[0], "sdfgsxdfg")
+        
+        this.addPowerSwitchEventHandlers(this.tellstickElements[0])
       }
   },
   methods: {
     getMapReferences: function(refToSVGDiv) {
-        var svgDOMX = Array.from(refToSVGDiv.childNodes).filter(curNode => curNode.nodeName === "svg")[0];
+        let svgDOMX = Array.from(refToSVGDiv.childNodes).filter(curNode => curNode.nodeName === "svg")[0];
          
-        var gDOMX = Array.from(svgDOMX.childNodes).filter(curNode => curNode.nodeName === "g")[0];
-        var gElements = Array.from(gDOMX.childNodes).filter(curNode => curNode.nodeName === "g" && /^shape.+/.test(curNode.id));
+        let gDOMX = Array.from(svgDOMX.childNodes).filter(curNode => curNode.nodeName === "g")[0];
+        let gElements = Array.from(gDOMX.childNodes).filter(curNode => curNode.nodeName === "g" && /^shape.+/.test(curNode.id));
 
-        var tellstickElements = gElements.map( node => ({ 
-               
-            id: node.id,
-            htmlNodes: {
-                desc: Array.from(node.children).filter(node => node.nodeName === "desc")[0],
+        let tellstickElements = gElements.map( node => ({               
+            element: node,
+            children: {
+                path: Array.from(node.children).filter(node => node.nodeName === "path")[0],
                 text: Array.from(node.children).filter(node => node.nodeName === "text")[0]
              }
           })
         );
-        debugger;
-        gElements[11].addEventListener("mouseup", () => {alert("Hello")});
-tellstickElements[5].htmlNodes.text.textContent="45654";
-        gElements[4].children[5].setAttribute("style","fill: yellow")
+        /**
+         *         tellstickElements[0].element.addEventListener("mouseup", () => {alert("Hello")});
+        tellstickElements[0].children.text.textContent="5";
+        
+        tellstickElements[0].children.path.setAttribute("style","fill: yellow");
+         */
+        return tellstickElements;
+    },
+    setPowerSwitchColor: function(tellstickElement, color) {
+      tellstickElement.children.path.setAttribute("style","fill: " + color);
+    },
+    setPowerSwitchText: function(tellstickElement, text) {
+      tellstickElement.children.text.textContent=text;
+    },
+    addPowerSwitchEventHandlers: function(tellstickElement) {
+        tellstickElement.element.addEventListener("mouseup", () => {alert("Hello")});
+    },
+    removePowerSwitchEventHandlers: function(tellstickElement) {
 
     }
   }
@@ -66,7 +84,6 @@ tellstickElements[5].htmlNodes.text.textContent="45654";
     width: 20rem;
   } 
   .svg-image {
-    background-size: cover;
     width: 100%;
     height: 0;
     padding: 0; /* reset */
