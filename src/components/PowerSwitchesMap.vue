@@ -15,9 +15,7 @@ export default {
   name: "PowerSwitchesMap",
   data: () => ({
     devicesMapSVGjsObject: {},
-    domElement: {},
-    svgMounted: false,
-    tellstickElements: {}
+    svgMounted: false
   }),
   props: ['devicesMapSVGjsMarkup'],
   watch: {
@@ -31,38 +29,51 @@ export default {
       if (this.svgMounted) {
         var svgDivRef = this.$refs.powerSwitchesMapDiv;
         
-        this.tellstickElements =  this.getMapReferences(svgDivRef)
+        this.devicesMapSVGjsObject =  this.getSVGReferences(svgDivRef)
         this.svgMounted = false;
         
-        this.setPowerSwitchColor(this.tellstickElements[0], "red")
+        this.setSVGViewPortSize(this.devicesMapSVGjsObject, "100%", "100%");
+        this.setSVGDisplayStyle("block");
+        this.setPowerSwitchColor(this.devicesMapSVGjsObject.tellstickElements[0], "red")
         
-        this.setPowerSwitchText(this.tellstickElements[0], "sdfgsxdfg")
+        this.setPowerSwitchText(this.devicesMapSVGjsObject.tellstickElements[0], "19")
+        this.setPowerSwitchHoverText(this.devicesMapSVGjsObject.tellstickElements[0], "235235")
+        this.setPowerSwitchCursor(this.devicesMapSVGjsObject.tellstickElements[0], "pointer")
         
-        this.addPowerSwitchEventHandlers(this.tellstickElements[0])
+        this.addPowerSwitchEventHandlers(this.devicesMapSVGjsObject.tellstickElements[0])
       }
   },
   methods: {
-    getMapReferences: function(refToSVGDiv) {
+    getSVGReferences: function(refToSVGDiv) {
         let svgDOMX = Array.from(refToSVGDiv.childNodes).filter(curNode => curNode.nodeName === "svg")[0];
          
         let gDOMX = Array.from(svgDOMX.childNodes).filter(curNode => curNode.nodeName === "g")[0];
         let gElements = Array.from(gDOMX.childNodes).filter(curNode => curNode.nodeName === "g" && /^shape.+/.test(curNode.id));
-
         let tellstickElements = gElements.map( node => ({               
-            element: node,
+            node: node,
             children: {
                 path: Array.from(node.children).filter(node => node.nodeName === "path")[0],
-                text: Array.from(node.children).filter(node => node.nodeName === "text")[0]
+                text: Array.from(node.children).filter(node => node.nodeName === "text")[0],
+                title: Array.from(node.children).filter(node => node.nodeName === "title")[0]
              }
           })
         );
-        /**
-         *         tellstickElements[0].element.addEventListener("mouseup", () => {alert("Hello")});
-        tellstickElements[0].children.text.textContent="5";
-        
-        tellstickElements[0].children.path.setAttribute("style","fill: yellow");
-         */
-        return tellstickElements;
+
+        svgDOMX.tellstickElements = tellstickElements;
+        return svgDOMX;
+    },
+    setSVGViewPortSize: function(SVGDOMX, height, width) {
+      if(height)
+      {
+        SVGDOMX.setAttribute("height", height);
+      }
+      if(width)
+      {
+        SVGDOMX.setAttribute("width", width);
+      }
+    },
+    setSVGDisplayStyle: function(displayStyle) {
+      this.devicesMapSVGjsObject.setAttribute("style", "display: " + displayStyle);
     },
     setPowerSwitchColor: function(tellstickElement, color) {
       tellstickElement.children.path.setAttribute("style","fill: " + color);
@@ -70,9 +81,16 @@ export default {
     setPowerSwitchText: function(tellstickElement, text) {
       tellstickElement.children.text.textContent=text;
     },
-    addPowerSwitchEventHandlers: function(tellstickElement) {
-        tellstickElement.element.addEventListener("mouseup", () => {alert("Hello")});
+    setPowerSwitchHoverText: function(tellstickElement, text) {
+      tellstickElement.children.title.textContent=text;
+    },    
+    setPowerSwitchCursor: function(tellstickElement, cursor) {
+      tellstickElement.node.setAttribute("cursor", cursor);
     },
+    addPowerSwitchEventHandlers: function(tellstickElement) {
+        tellstickElement.node.addEventListener("mouseup", () => {alert("Hello")});
+    },
+
     removePowerSwitchEventHandlers: function(tellstickElement) {
 
     }
@@ -81,14 +99,9 @@ export default {
 </script>
 <style scoped>
  .svg-image-container {
-    width: 20rem;
+    width: 24rem;
   } 
-  .svg-image {
-    width: 100%;
-    height: 0;
-    padding: 0; /* reset */
-    padding-bottom: 100%;
-  }
+  
   .devices-map {
     background-image: url("/static/devices-map.svg");
   }
