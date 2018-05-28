@@ -2,7 +2,7 @@
     <article class="scheduler-component-container">
       <section class="column">
         <section class="row">
-          <PowerSwitchesMap v-bind:devicesMapSVGjsMarkup = "devicesMapSVGjsMarkup">
+          <PowerSwitchesMap v-bind:devicesMapSVGjsMarkup = "devicesMapSVGjsMarkup" v-bind:devices="devices">
           </PowerSwitchesMap>
         </section>
         <section class="row space-between">
@@ -67,7 +67,8 @@ export default {
   },
   props: [
     "initialCronexpressions",
-    "devicesMapSVGjsMarkup"
+    "devicesMapSVGjsMarkup",
+    "devices"
   ],
   created() {
     // fetch the data when the view is created and the data is

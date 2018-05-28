@@ -1,10 +1,11 @@
 <template>
   <div>
-    <!--<div id="powerSwitchesMapDiv" ref="powerSwitchesMapDiv"
-    v-html="devicesMapSVGjsMarkup"></div>-->
       <div class="svg-image-container" >
-        <div class="svg-image"  id="powerSwitchesMapDiv" ref="powerSwitchesMapDiv"
-    v-html="devicesMapSVGjsMarkup"></div>
+        <div id="powerSwitchesMapDiv"
+             class="svg-image"  
+             ref="powerSwitchesMapDiv"
+             v-html="devicesMapSVGjsMarkup">
+        </div>
       </div>
   </div>
 </template>
@@ -17,7 +18,8 @@ export default {
     devicesMapSVGjsObject: {},
     svgMounted: false
   }),
-  props: ['devicesMapSVGjsMarkup'],
+  props: ['devicesMapSVGjsMarkup',  
+          'devices'],
   watch: {
     devicesMapSVGjsMarkup(newVal, oldVal) {
       
@@ -30,15 +32,18 @@ export default {
         var svgDivRef = this.$refs.powerSwitchesMapDiv;
         
         this.devicesMapSVGjsObject =  this.getSVGReferences(svgDivRef)
+        this.updateDevicesStatuses();
         this.svgMounted = false;
-        
+
         this.setSVGViewPortSize(this.devicesMapSVGjsObject, "100%", "100%");
         this.setSVGDisplayStyle("block");
-        this.setPowerSwitchColor(this.devicesMapSVGjsObject.tellstickElements[0], "red")
-        
+        this.setPowerSwitchCursor(this.devicesMapSVGjsObject.tellstickElements[0], "pointer")
+
+
+        let t = this.getTellstickElement("10");
+        this.setPowerSwitchColor(this.devicesMapSVGjsObject.tellstickElements[0], "red")        
         this.setPowerSwitchText(this.devicesMapSVGjsObject.tellstickElements[0], "19")
         this.setPowerSwitchHoverText(this.devicesMapSVGjsObject.tellstickElements[0], "235235")
-        this.setPowerSwitchCursor(this.devicesMapSVGjsObject.tellstickElements[0], "pointer")
         
         this.addPowerSwitchEventHandlers(this.devicesMapSVGjsObject.tellstickElements[0])
       }
@@ -51,6 +56,7 @@ export default {
         let gElements = Array.from(gDOMX.childNodes).filter(curNode => curNode.nodeName === "g" && /^shape.+/.test(curNode.id));
         let tellstickElements = gElements.map( node => ({               
             node: node,
+            textContent: Array.from(node.children).filter(node => node.nodeName === "text")[0].textContent,
             children: {
                 path: Array.from(node.children).filter(node => node.nodeName === "path")[0],
                 text: Array.from(node.children).filter(node => node.nodeName === "text")[0],
@@ -58,9 +64,13 @@ export default {
              }
           })
         );
-
         svgDOMX.tellstickElements = tellstickElements;
         return svgDOMX;
+    },
+    getTellstickElement: function(textContent) {
+      //returns first found element based on textContent 
+      let foundTellstickElement = this.devicesMapSVGjsObject.tellstickElements.find(x => x.textContent === textContent);
+      return foundTellstickElement;
     },
     setSVGViewPortSize: function(SVGDOMX, height, width) {
       if(height)
@@ -90,7 +100,15 @@ export default {
     addPowerSwitchEventHandlers: function(tellstickElement) {
         tellstickElement.node.addEventListener("mouseup", () => {alert("Hello")});
     },
+    updateDevicesStatuses : function() {
+      let that = this;
+      that.devices.tellstickElements.forEach(element => {
+        var currentTellstickElement = that.getTellstickElement(element.textContentIdentifier);
 
+        this.setPowerSwitchColor(currentTellstickElement, element.color);
+        this.setPowerSwitchHoverText(currentTellstickElement, element.hoverText);
+      });
+    },
     removePowerSwitchEventHandlers: function(tellstickElement) {
 
     }
