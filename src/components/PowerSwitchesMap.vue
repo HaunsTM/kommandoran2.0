@@ -27,28 +27,36 @@ export default {
     }  
   },
   updated: function() {
-    
+    console.log('Updated!  ')
       if (this.svgMounted) {
+      }
+      this.$nextTick(function () {
+        this.initialize();
+    })
+  },
+  methods: {
+    initialize: function(){
+
         var svgDivRef = this.$refs.powerSwitchesMapDiv;
         
         this.devicesMapSVGjsObject =  this.getSVGReferences(svgDivRef)
         this.updateDevicesStatuses();
         this.svgMounted = false;
 
-        this.setSVGViewPortSize(this.devicesMapSVGjsObject, "100%", "100%");
-        this.setSVGDisplayStyle("block");
+        this.setSVGViewPortSize();
+        //this.setSVGPreserveAspectRatio("xMaxYMax");
+        //this.setSVGDisplayStyle("inline");
         this.setPowerSwitchCursor(this.devicesMapSVGjsObject.tellstickElements[0], "pointer")
 
 
         let t = this.getTellstickElement("10");
         this.setPowerSwitchColor(this.devicesMapSVGjsObject.tellstickElements[0], "red")        
         this.setPowerSwitchText(this.devicesMapSVGjsObject.tellstickElements[0], "19")
-        this.setPowerSwitchHoverText(this.devicesMapSVGjsObject.tellstickElements[0], "235235")
+        this.setPowerSwitchHoverText(this.devicesMapSVGjsObject.tellstickElements[0], "235235")        
         
-        this.addPowerSwitchEventHandlers(this.devicesMapSVGjsObject.tellstickElements[0])
-      }
-  },
-  methods: {
+        window.addEventListener('resize', this.setSVGViewPortSize);
+
+    },
     getSVGReferences: function(refToSVGDiv) {
         let svgDOMX = Array.from(refToSVGDiv.childNodes).filter(curNode => curNode.nodeName === "svg")[0];
          
@@ -72,15 +80,20 @@ export default {
       let foundTellstickElement = this.devicesMapSVGjsObject.tellstickElements.find(x => x.textContent === textContent);
       return foundTellstickElement;
     },
-    setSVGViewPortSize: function(SVGDOMX, height, width) {
-      if(height)
-      {
-        SVGDOMX.setAttribute("height", height);
-      }
-      if(width)
-      {
-        SVGDOMX.setAttribute("width", width);
-      }
+
+    setSVGViewPortSize: function() {
+      
+      let height = "100%";//document.documentElement.clientHeight;
+      let width = "100%"; // document.documentElement.clientWidth;
+      
+      height = //height * 0.5;
+      width = width * 0.5;
+      
+      this.devicesMapSVGjsObject.setAttribute("height", height);
+      this.devicesMapSVGjsObject.setAttribute("width", width);
+    },
+    setSVGPreserveAspectRatio: function(value) {
+      this.devicesMapSVGjsObject.setAttribute("preserveAspectRatio", value);
     },
     setSVGDisplayStyle: function(displayStyle) {
       this.devicesMapSVGjsObject.setAttribute("style", "display: " + displayStyle);
@@ -112,15 +125,20 @@ export default {
     removePowerSwitchEventHandlers: function(tellstickElement) {
 
     }
+  },
+  
+  beforeDestroy() {
+    window.removeEventListener('resize', this.setSVGViewPortSize);
   }
 }
 </script>
 <style scoped>
  .svg-image-container {
     width: 24rem;
+    border: 1px solid red;
+
   } 
-  
-  .devices-map {
-    background-image: url("/static/devices-map.svg");
+  #powerSwitchesMapDiv{
+    border: 1px solid blue;
   }
 </style>
