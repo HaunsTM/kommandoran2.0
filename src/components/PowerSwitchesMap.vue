@@ -23,7 +23,9 @@ export default {
   watch: {
     devicesMapSVGjsMarkup(newVal, oldVal) {
       
+
       this.svgMounted = true;
+      //this.$forceUpdate();
     }  
   },
   updated: function() {
@@ -44,8 +46,6 @@ export default {
         this.svgMounted = false;
 
         this.setSVGViewPortSize();
-        //this.setSVGPreserveAspectRatio("xMaxYMax");
-        //this.setSVGDisplayStyle("inline");
         this.setPowerSwitchCursor(this.devicesMapSVGjsObject.tellstickElements[0], "pointer")
 
 
@@ -83,14 +83,23 @@ export default {
 
     setSVGViewPortSize: function() {
       
-      let height = "100%";//document.documentElement.clientHeight;
-      let width = "100%"; // document.documentElement.clientWidth;
-      
-      height = //height * 0.5;
-      width = width * 0.5;
-      
+      let svgDivRef = this.$refs.powerSwitchesMapDiv;
+      let svgOriginalBox = this.devicesMapSVGjsObject.getBBox();
+
+      let originalWidth = svgOriginalBox.width;
+      let originalHeight = svgOriginalBox.height;
+
+      let divWidth = svgDivRef.clientWidth;
+      let divHeight = svgDivRef.clientHeight;
+
+      let f = originalWidth > divWidth ? divWidth/originalWidth : 1;
+      let width = originalWidth*f;
+      let height = originalHeight*f;
+debugger;
+      this.devicesMapSVGjsObject.setAttribute("style", "height: 100%; width: 100%;");
       this.devicesMapSVGjsObject.setAttribute("height", height);
       this.devicesMapSVGjsObject.setAttribute("width", width);
+      this.devicesMapSVGjsObject.setAttribute("viewBox", "0 0 " + originalWidth + " " + originalHeight) ;
     },
     setSVGPreserveAspectRatio: function(value) {
       this.devicesMapSVGjsObject.setAttribute("preserveAspectRatio", value);
