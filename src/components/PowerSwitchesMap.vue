@@ -50,10 +50,11 @@ export default {
 
 
         let t = this.getIdentifiedSVGNodeBy("A1");
-        this.setPowerSwitchColor(t, "red")        
-        this.setPowerSwitchText(t, "19")
-        this.setPowerSwitchHoverText(t, "235235")        
-        
+        this.setPowerSwitchColor("A1", "red")        
+        this.setPowerSwitchColor("7", "red")        
+        //this.setPowerSwitchText(t, "19")
+        //this.setPowerSwitchHoverText(t, "235235")        
+        debugger;
         window.addEventListener('resize', this.setSVGViewPortSize);
 
     },
@@ -92,32 +93,20 @@ export default {
       let found = false;
 
       if (!found) {
-        var array = this.devicesMapSVGjsObject.powerSwitches.tellstick;
+          console.log("search for " + name);
+        var array = this.devicesMapSVGjsObject.interactiveElements;
         var numberOfElements = array.length;
 
         for (let i = 0; i < numberOfElements; i++) {
           found = array[i].name === name;
+          console.log("array["+i+"].name: " + array[i].name + ";" + " name: " + name + ";" );
           if (found) {
             return array[i];
           }
         }
       }
-      
-      if (!found) {
-        var array = this.devicesMapSVGjsObject.powerSwitches.zWave;
-        var numberOfElements = array.length;
-
-        for (let i = 0; i < numberOfElements; i++) {
-          found = array[i].name === name;
-          if (found){
-            return array[i];
-          }
-        }
-      }
-
       return null;
     },
-
     setSVGViewPortSize: function() {
       
       let svgDivRef = this.$refs.powerSwitchesMapDiv;
@@ -141,11 +130,22 @@ export default {
     setSVGPreserveAspectRatio: function(value) {
       this.devicesMapSVGjsObject.svgDOMX.setAttribute("preserveAspectRatio", value);
     },
-    setSVGDisplayStyle: function(displayStyle) {
+    /*setSVGDisplayStyle: function(displayStyle) {
       this.devicesMapSVGjsObject.svgDOMX.setAttribute("style", "display: " + displayStyle);
-    },
-    setPowerSwitchColor: function(svgNode, color) {
-      svgNode.path.setAttribute("style","fill: " + color);
+    },*/
+    setPowerSwitchColor: function(name, color) {
+      
+      let svgNode = this.getIdentifiedSVGNodeBy(name);
+      
+      switch (svgNode.type)
+      {
+        case "tellstick":
+          svgNode.path.setAttribute("style","fill: " + color);
+          break;
+        case "zWave":
+          svgNode.rect.setAttribute("style","fill: " + color);
+          break;        
+      }
     },
     setPowerSwitchText: function(tellstickElement, text) {
       tellstickElement.text.textContent=text;
