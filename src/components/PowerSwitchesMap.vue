@@ -5,13 +5,13 @@
              class="svg-image"  
              ref="powerSwitchesMapDiv"
              v-html="devicesMapSVGjsMarkup">
-        </div>
+        </div>      
       </div>
   </div>
 </template>
 <script>
 
-
+/*https://www.npmjs.com/package/vue-simple-svg*/
 export default {
   name: "PowerSwitchesMap",
   data: () => ({
@@ -22,10 +22,8 @@ export default {
           'devices'],
   watch: {
     devicesMapSVGjsMarkup(newVal, oldVal) {
-      
 
       this.svgMounted = true;
-      //this.$forceUpdate();
     }  
   },
   updated: function() {
@@ -42,19 +40,20 @@ export default {
         var svgDivRef = this.$refs.powerSwitchesMapDiv;
         
         this.devicesMapSVGjsObject =  this.getSVGReferences(svgDivRef)
-        //this.updateDevicesStatuses();
+        this.updateDevicesStatuses();
         this.svgMounted = false;
 
         this.setSVGViewPortSize();
         //this.setPowerSwitchCursor(this.devicesMapSVGjsObject.powerSwitches.tellstick[0], "pointer")
 
 
-        let t = this.getIdentifiedSVGNodeBy("A1");
-        this.setPowerSwitchColor("A1", "red")        
-        this.setPowerSwitchColor("7", "red")        
+        //let t = this.getIdentifiedSVGNodeBy("A1");
+        //this.setPowerSwitchColor("A1", "red")        
+        //this.setPowerSwitchColor("7", "red")        
         //this.setPowerSwitchText(t, "19")
         //this.setPowerSwitchHoverText(t, "235235")        
-        debugger;
+        
+
         window.addEventListener('resize', this.setSVGViewPortSize);
 
     },
@@ -93,13 +92,10 @@ export default {
       let found = false;
 
       if (!found) {
-          console.log("search for " + name);
         var array = this.devicesMapSVGjsObject.interactiveElements;
         var numberOfElements = array.length;
-
         for (let i = 0; i < numberOfElements; i++) {
           found = array[i].name === name;
-          console.log("array["+i+"].name: " + array[i].name + ";" + " name: " + name + ";" );
           if (found) {
             return array[i];
           }
@@ -121,11 +117,12 @@ export default {
       let f = originalWidth > divWidth ? divWidth/originalWidth : 1;
       let width = originalWidth*f;
       let height = originalHeight*f;
-      
-      this.devicesMapSVGjsObject.svgDOMX.setAttribute("style", "height: 100%; width: 100%;");
+
+     /* this.devicesMapSVGjsObject.svgDOMX.setAttribute("style", "height: 100%; width: 100%;");*/
       this.devicesMapSVGjsObject.svgDOMX.setAttribute("height", height);
       this.devicesMapSVGjsObject.svgDOMX.setAttribute("width", width);
       this.devicesMapSVGjsObject.svgDOMX.setAttribute("viewBox", "0 0 " + originalWidth + " " + originalHeight) ;
+      
     },
     setSVGPreserveAspectRatio: function(value) {
       this.devicesMapSVGjsObject.svgDOMX.setAttribute("preserveAspectRatio", value);
@@ -150,11 +147,12 @@ export default {
     setPowerSwitchText: function(tellstickElement, text) {
       tellstickElement.text.textContent=text;
     },
-    setPowerSwitchHoverText: function(tellstickElement, text) {
-      tellstickElement.title.textContent=text;
+    setPowerSwitchHoverText: function(name, text) {
+      
+      let svgNode = this.getIdentifiedSVGNodeBy(name);
+      svgNode.title.textContent=text;
     },    
     setPowerSwitchCursor: function(element, cursor) {
-      debugger;
       element.node.setAttribute("cursor", cursor);
     },
     addPowerSwitchEventHandlers: function(tellstickElement) {
@@ -162,11 +160,13 @@ export default {
     },
     updateDevicesStatuses : function() {
       let that = this;
-      that.devicesMapSVGjsObject.tellstickElements.forEach(element => {
-        var currentTellstickElement = that.getIdentifiedSVGNodeBy(element.textContentIdentifier);
 
-        this.setPowerSwitchColor(currentTellstickElement, element.color);
-        this.setPowerSwitchHoverText(currentTellstickElement, element.hoverText);
+      this.devices.forEach(element => {
+        
+        var currentInteractiveNode = that.getIdentifiedSVGNodeBy(element.name);
+        
+        this.setPowerSwitchColor(element.name, element.color);
+        this.setPowerSwitchHoverText(element.name, element.hoverText);
       });
     },
     removePowerSwitchEventHandlers: function(tellstickElement) {

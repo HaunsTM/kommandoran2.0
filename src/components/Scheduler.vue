@@ -47,130 +47,129 @@ export default {
 	computed: {
 		fakeDevicesData: function () {
 			
-			let devices = {};
-			devices.tellstickElements = [
+			let devices = [
 				{
-					textContentIdentifier : "1",
+					name : "1",
 					color : "yellow",
 					hoverText : "on"
 				},
 				{
-					textContentIdentifier : "2",
+					name : "2",
 					color : "yellow",
 					hoverText : "on"
 				},
 				{
-					textContentIdentifier : "3",
+					name : "3",
 					color : "yellow",
 					hoverText : "on"
 				},
 				{
-					textContentIdentifier : "4",
+					name : "4",
 					color : "yellow",
 					hoverText : "on"
 				},
 				{
-					textContentIdentifier : "5",
+					name : "5",
 					color : "gray",
 					hoverText : "off"
 				},
 				{
-					textContentIdentifier : "6",
+					name : "6",
 					color : "gray",
 					hoverText : "off"
 				},
 				{
-					textContentIdentifier : "7",
+					name : "7",
 					color : "gray",
 					hoverText : "off"
 				},
 				{
-					textContentIdentifier : "8",
+					name : "8",
 					color : "gray",
 					hoverText : "off"
 				},
 				{
-					textContentIdentifier : "9",
+					name : "9",
 					color : "gray",
 					hoverText : "off"
 				},
 				{
-					textContentIdentifier : "10",
+					name : "10",
 					color : "yellow",
 					hoverText : "on"
 				},
 				{
-					textContentIdentifier : "11",
+					name : "11",
 					color : "gray",
 					hoverText : "off"
 				},
 				{
-					textContentIdentifier : "12",
+					name : "12",
 					color : "gray",
 					hoverText : "on"
 				},
 				{
-					textContentIdentifier : "13",
+					name : "13",
 					color : "gray",
 					hoverText : "off"
 				},
 				{
-					textContentIdentifier : "14",
+					name : "14",
 					color : "gray",
 					hoverText : "on"
 				},
 				{
-					textContentIdentifier : "15",
+					name : "15",
 					color : "gray",
 					hoverText : "off"
 				},
 				{
-					textContentIdentifier : "16",
+					name : "16",
 					color : "gray",
 					hoverText : "off"
 				},
 				{
-					textContentIdentifier : "17",
+					name : "17",
 					color : "gray",
 					hoverText : "off"
 				},
 				{
-					textContentIdentifier : "18",
+					name : "18",
 					color : "gray",
 					hoverText : "off"
 				},
 				{
-					textContentIdentifier : "19",
+					name : "19",
 					color : "gray",
 					hoverText : "off"
 				},
 				{
-					textContentIdentifier : "20",
+					name : "20",
 					color : "gray",
 					hoverText : "off"
 				},
 				{
-					textContentIdentifier : "21",
+					name : "21",
 					color : "yellow",
 					hoverText : "on"
 				},
 				{
-					textContentIdentifier : "22",
+					name : "22",
 					color : "yellow",
 					hoverText : "off"
 				},
 				{
-					textContentIdentifier : "23",
+					name : "23",
 					color : "gray",
 					hoverText : "off"
 				},
 				{
-					textContentIdentifier : "24",
+					name : "24",
 					color : "yellow",
 					hoverText : "on"
 				},
 				{
-					textContentIdentifier : "25",
+					name : "25",
 					color : "yellow",
 					hoverText : "on"
 				},
