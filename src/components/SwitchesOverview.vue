@@ -15,6 +15,7 @@ export default {
     PowerSwitchesMap
   },
   data: () => ({
+    baseUrl: process.env.BASE_URL,
     devicesMapSVGjsMarkup: ""
   }),  
 	created () {
@@ -26,9 +27,9 @@ export default {
 		fetchData : function () {
 			let that = this;
 			const promises = [
-					Vue.axios.get('/static/devices-map.svg')
+					Vue.axios.get(this.baseUrl + 'devices-map.svg')
 			];
-			
+			debugger;
 			Promise.all(promises)
 			.then((response) => {
         that.devicesMapSVGjsMarkup = response[0].data;
