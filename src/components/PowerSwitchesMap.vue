@@ -46,13 +46,12 @@ export default {
         this.setSVGViewPortSize();
         //this.setPowerSwitchCursor(this.devicesMapSVGjsObject.powerSwitches.tellstick[0], "pointer")
 
-
-        //let t = this.getIdentifiedSVGNodeBy("A1");
+        let t = this.getIdentifiedSVGNodeBy("A1");
         //this.setPowerSwitchColor("A1", "red")        
         //this.setPowerSwitchColor("7", "red")        
         //this.setPowerSwitchText(t, "19")
         //this.setPowerSwitchHoverText(t, "235235")        
-        
+        this.addPowerSwitchesEventHandlers();
 
         window.addEventListener('resize', this.setSVGViewPortSize);
 
@@ -134,43 +133,57 @@ export default {
       
       let svgNode = this.getIdentifiedSVGNodeBy(name);
       
-      switch (svgNode.type)
-      {
-        case "tellstick":
-          svgNode.path.setAttribute("style","fill: " + color);
-          break;
-        case "zWave":
-          svgNode.rect.setAttribute("style","fill: " + color);
-          break;        
+      if (svgNode) {
+        switch (svgNode.type) {
+          case "tellstick":
+            svgNode.path.setAttribute("style","fill: " + color);
+            break;
+          case "zWave":
+            svgNode.rect.setAttribute("style","fill: " + color);
+            break;        
+        }
       }
     },
     setPowerSwitchText: function(tellstickElement, text) {
-      tellstickElement.text.textContent=text;
+      tellstickElement.text.textContent = text;
     },
-    setPowerSwitchHoverText: function(name, text) {
-      
+    setPowerSwitchHoverText: function(name, text) {      
       let svgNode = this.getIdentifiedSVGNodeBy(name);
-      svgNode.title.textContent=text;
+      
+      if (svgNode) {
+        svgNode.title.textContent = text;
+      }
     },    
     setPowerSwitchCursor: function(element, cursor) {
       element.node.setAttribute("cursor", cursor);
     },
-    addPowerSwitchEventHandlers: function(tellstickElement) {
-        tellstickElement.node.addEventListener("mouseup", () => {alert("Hello")});
+    addPowerSwitchesEventHandlers: function() {
+      this.devicesMapSVGjsObject.interactiveElements.forEach(
+        (tellstickElement) => {
+          tellstickElement.node.addEventListener("mouseup", () => {this.$emit('powerSwitchClick', tellstickElement)});
+        }
+      );
     },
     updateDevicesStatuses : function() {
       let that = this;
+      if (this.devices.length)
+      {
+        this.devices.forEach(element => {
+          
+          var currentInteractiveNode = that.getIdentifiedSVGNodeBy(element.name);
+          
+          this.setPowerSwitchColor(element.name, element.color);
+          this.setPowerSwitchHoverText(element.name, element.hoverText);
+        });
 
-      this.devices.forEach(element => {
-        
-        var currentInteractiveNode = that.getIdentifiedSVGNodeBy(element.name);
-        
-        this.setPowerSwitchColor(element.name, element.color);
-        this.setPowerSwitchHoverText(element.name, element.hoverText);
-      });
+      }
     },
-    removePowerSwitchEventHandlers: function(tellstickElement) {
-
+    removePowerSwitchesEventHandlers: function() {
+      this.devicesMapSVGjsObject.interactiveElements.forEach(
+        (tellstickElement) => {
+          tellstickElement.node.removeEventListener("mouseup", () => {this.$emit('powerSwitchClick', tellstickElement)});        
+        }
+      );
     }
   },
   

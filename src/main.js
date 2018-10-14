@@ -13,8 +13,8 @@ Vue.use(VueRouter)
 Vue.use(VueAxios, axios)
 Vue.use(Vuetify)
 
-Vue.config.productionTip = false
-
+Vue.config.productionTip = false;
+Vue.prototype.$API_BASE_URL = (Vue.config.productionTip) ? 'https://www.your-api.com' : 'http://10.0.0.4/iot/kommandoran2.0/api';
 new Vue({
   router,
   render: h => h(App)

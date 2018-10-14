@@ -2,7 +2,12 @@
     
     <v-app id="app">
       <v-navigation-drawer app></v-navigation-drawer>
-      <v-toolbar app></v-toolbar>
+      <v-toolbar app>
+        <v-spacer></v-spacer>
+        <section v-if="loading===true">
+          <v-progress-circular color="green" indeterminate></v-progress-circular>
+        </section>
+      </v-toolbar>
       <v-content>
         <v-container fluid>
           <router-view></router-view>
@@ -14,8 +19,26 @@
 </template>
 
 <script>
+
+import { EventBus } from './components/event-bus.js';
+
 export default {
-  name: 'App'
+  name: 'App',  
+  data: function data() {
+    return {
+      loading: false,
+      loadingError: ""
+    }
+  },
+  created(){
+    EventBus.$on('loading', this.setLoadingState);
+  },
+  methods: {
+    setLoadingState(data) {
+      this.loading = data.isLoading;
+      this.loadingError=JSON.stringify(data.error);
+    }
+  }
 }
 </script>
 
