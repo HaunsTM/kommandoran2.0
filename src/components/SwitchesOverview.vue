@@ -2,7 +2,7 @@
     
     <v-layout column>
       
-          <PowerSwitchesMap v-bind:devicesMapSVGjsMarkup = "devicesMapSVGjsMarkup" v-bind:devices="preparedCurrentDevicesData" v-on:powerSwitchClick="onPowerSwitchClick">
+          <PowerSwitchesMap v-bind:devicesMapSVGjsMarkup = "devicesMapSVGjsMarkup" v-bind:devices="devicesData" v-on:powerSwitchClick="onPowerSwitchClick">
           </PowerSwitchesMap>
     </v-layout>
 </template>
@@ -14,14 +14,14 @@ import PowerSwitchesMap from "./PowerSwitchesMap.vue";
 import { EventBus } from './event-bus.js';
 
 export default {    
-	name: "SwitchesOverview",
+	name: "SwitchesOverview", 
 	components: {
 		PowerSwitchesMap
 	},
 	data: () => ({
 		baseUrl: process.env.BASE_URL,
 		devicesMapSVGjsMarkup: "",
-		unpreparedCurrentDevicesData: {}
+		bufferDevicesData: {}
 	}),  
 	created () {
 		// fetch the data when the view is created and the data is
@@ -40,7 +40,7 @@ export default {
 			.then((response) => {
             	this.setLoadingState(false);
 				that.devicesMapSVGjsMarkup = response[0].data;
-				that.unpreparedCurrentDevicesData = response[1].data;
+				that.devicesData = response[1].data.successResult;
 			})
 			.catch((error) => {
             	this.setLoadingState(false, error);
@@ -67,7 +67,7 @@ export default {
 			}
 		},
 		onPowerSwitchClick : function (currentTellstickElement)  {
-			let currentDevice = this.preparedCurrentDevicesData.find( (e) => {
+			let currentDevice = this.devicesData.find( (e) => {
 				if (e.name === currentTellstickElement.name) {
 					return e;
 				}
@@ -77,8 +77,7 @@ export default {
 			this.onOffDevice(currentDevice, toggledState);
 		},	
 		onOffDevice: function (currentDevice, setPointState) {
-			let that = this;
-			
+			let that = this;			
         	this.setLoadingState(true);
 
 			const promises = [    
@@ -89,11 +88,19 @@ export default {
 				.then((response) => {
 					that.setLoadingState(false);
 					let performedTelldusAction = response[0].data.TelldusAction;
-
-					that.unpreparedCurrentDevicesData.successResult = 
-						that.unpreparedCurrentDevicesData.successResult.map( (d) => {
+					
+					that.devicesData = that.devicesData.map( (d) => {
 							if (d.name === performedTelldusAction.TelldusUnit.Name) {
-								d.state = performedTelldusAction.TelldusActionValue.ActionValue === 'on' ? 1 : 2;
+								
+								let curUTC = new Date().getTime();
+								let state = performedTelldusAction.TelldusActionValue.ActionValue === 'on' ? 1 : 2;
+
+								d.state = state;
+								d.color = that.getDisplayColor(state);
+								d.hoverText = that.getHoverText(state);
+								d.updatedTime = new Date().getTime();
+
+								return d;
 							}
 							return d;
 						});
@@ -109,27 +116,47 @@ export default {
 		}
 	},
 	computed: {
-		preparedCurrentDevicesData : function() {
-			if (this.unpreparedCurrentDevicesData.successResult)
-			{	
+		devicesData : {
+			get : function ()  {
+				return this.bufferDevicesData;
+			},
+			
+			set : function (newDevicesData) {
 				let curUTC = new Date().getTime();
-				let preparedCurrentDevicesData = this.unpreparedCurrentDevicesData.successResult.map( (e) => {
-
-					return {
-						"id" : e.id,
-						"methods" : e.methods,
-						"name" : e.name,
-						"state" : e.state,
-						"statevalue" : e.statevalue,
-						"type" : e.type,
-						"color" : this.getDisplayColor(e.state), 
-						"hoverText" : this.getHoverText(e.state),
-						"updatedTime" : curUTC
-					}
-				});
-				return preparedCurrentDevicesData;
+				let that = this;
+				if (that.bufferDevicesData.length) {
+					that.bufferDevicesData = newDevicesData.map( (curDevData) => {
+						let previousDeviceData = that.bufferDevicesData.find( (bufferedElement) => { 
+							if (bufferedElement.id === curDevData.id) return bufferedElement; });
+						let shouldUseOldData = (curUTC - previousDeviceData.updatedTime) < 5*1000;
+						return {
+							"id" : shouldUseOldData ? previousDeviceData.id : curDevData.id,
+							"methods" : curDevData.methods,
+							"name" : curDevData.name,
+							"state" : shouldUseOldData ? previousDeviceData.state : curDevData.state,
+							"statevalue" : shouldUseOldData ? previousDeviceData.statevalue : curDevData.statevalue,
+							"type" : curDevData.type,
+							"color" : shouldUseOldData ? previousDeviceData.color : that.getDisplayColor(curDevData.state), 
+							"hoverText" : shouldUseOldData ? previousDeviceData.hoverText : that.getHoverText(curDevData.state),
+							"updatedTime" : shouldUseOldData ? previousDeviceData.updatedTime : curUTC
+						}
+					});
+				} else {
+					that.bufferDevicesData = newDevicesData.map( (curDevData) => {						
+						return {
+							"id" : curDevData.id,
+							"methods" : curDevData.methods,
+							"name" : curDevData.name,
+							"state" : curDevData.state,
+							"statevalue" : curDevData.statevalue,
+							"type" : curDevData.type,
+							"color" : that.getDisplayColor(curDevData.state), 
+							"hoverText" : that.getHoverText(curDevData.state),
+							"updatedTime" : curUTC
+						}
+					});
+				}
 			}
-			return {};
 		}
 	},
 	mqtt: {
@@ -137,7 +164,7 @@ export default {
 		'nodered/performed_TelldusAction/listDevices' (data, topic) {
 			let decoded = new TextDecoder("utf-8").decode(data);
 			let decodedJSON = JSON.parse(decoded);
-			this.unpreparedCurrentDevicesData = decodedJSON;			
+			this.devicesData = decodedJSON.successResult;			
 		}
 	}
 }
