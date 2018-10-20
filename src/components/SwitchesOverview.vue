@@ -114,6 +114,7 @@ export default {
 			{	
 				let curUTC = new Date().getTime();
 				let preparedCurrentDevicesData = this.unpreparedCurrentDevicesData.successResult.map( (e) => {
+
 					return {
 						"id" : e.id,
 						"methods" : e.methods,
