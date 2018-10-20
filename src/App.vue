@@ -38,6 +38,9 @@ export default {
       this.loading = data.isLoading;
       this.loadingError=JSON.stringify(data.error);
     }
+  },
+  mounted () {
+    this.$mqtt.subscribe('nodered/#')
   }
 }
 </script>
