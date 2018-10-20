@@ -26,7 +26,7 @@ export default {
 	created () {
 		// fetch the data when the view is created and the data is
 		// already being observed
-		this.fetchData();
+		this.fetchData(); 
 	},
 	methods: {
 		fetchData : function () {
@@ -44,7 +44,6 @@ export default {
 			})
 			.catch((error) => {
             	this.setLoadingState(false, error);
-				console.log(error);
 			});
 		},
 		getDisplayColor : function (state){
@@ -72,21 +71,49 @@ export default {
 				if (e.name === currentTellstickElement.name) {
 					return e;
 				}
-			} )
-			console.log('Clicked on ' + currentTellstickElement.name + ' (state: ' + currentDevice.state + ')');			
-		},		
+			});
+			
+			let toggledState = currentDevice.state === 2 ? 'on' : 'off';
+			this.onOffDevice(currentDevice, toggledState);
+		},	
+		onOffDevice: function (currentDevice, setPointState) {
+			let that = this;
+			
+        	this.setLoadingState(true);
+
+			const promises = [    
+				Vue.axios.get(this.$API_BASE_URL + '?telldusActionTypeActionTypeOption=onOffDevice&telldusUnitName=' + currentDevice.name + '&telldusActionValueTypeName=command&telldusActionValueActionValue=' + setPointState)
+			];
+
+			Promise.all(promises)
+				.then((response) => {
+					that.setLoadingState(false);
+					let performedTelldusAction = response[0].data.TelldusAction;
+
+					that.unpreparedCurrentDevicesData.successResult = 
+						that.unpreparedCurrentDevicesData.successResult.map( (d) => {
+							if (d.name === performedTelldusAction.TelldusUnit.Name) {
+								d.state = performedTelldusAction.TelldusActionValue.ActionValue === 'on' ? 1 : 2;
+							}
+							return d;
+						});
+				})
+				.catch((error) => {
+					that.setLoadingState(false, error);
+				});
+		},
 		setLoadingState: function (loading, error) {
 			this.loading = loading;
 			let payLoad =  { "isLoading" : loading, "error" : error };
 			EventBus.$emit('loading', payLoad);
 		}
-  	},  
+	},
 	computed: {
 		preparedCurrentDevicesData : function() {
 			if (this.unpreparedCurrentDevicesData.successResult)
-			{
+			{	
+				let curUTC = new Date().getTime();
 				let preparedCurrentDevicesData = this.unpreparedCurrentDevicesData.successResult.map( (e) => {
-					//console.log("Name: " + e.name + "; State: "+ e.state + " (" + this.getDisplayColor(e.state) + ");")
 					return {
 						"id" : e.id,
 						"methods" : e.methods,
@@ -95,12 +122,21 @@ export default {
 						"statevalue" : e.statevalue,
 						"type" : e.type,
 						"color" : this.getDisplayColor(e.state), 
-						"hoverText" : this.getHoverText(e.state)
+						"hoverText" : this.getHoverText(e.state),
+						"updatedTime" : curUTC
 					}
 				});
 				return preparedCurrentDevicesData;
 			}
 			return {};
+		}
+	},
+	mqtt: {
+		// subscribe to this topic for updates 
+		'nodered/performed_TelldusAction/listDevices' (data, topic) {
+			let decoded = new TextDecoder("utf-8").decode(data);
+			let decodedJSON = JSON.parse(decoded);
+			this.unpreparedCurrentDevicesData = decodedJSON;			
 		}
 	}
 }

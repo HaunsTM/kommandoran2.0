@@ -22,18 +22,23 @@ export default {
           'devices'],
   watch: {
     devicesMapSVGjsMarkup(newVal, oldVal) {
-
-      this.svgMounted = true;
-    }  
+      
+      
+    },
+    devices(newVal, oldVal) {
+      if (this.svgMounted) {
+        this.updateDevicesStatuses();
+      }
+    }
   },
   updated: function() {
-    console.log('Updated!  ')
       if (this.svgMounted) {
       }
       this.$nextTick(function () {
         this.initialize();
     })
   },
+ 
   methods: {
     initialize: function(){
 
@@ -41,12 +46,12 @@ export default {
         
         this.devicesMapSVGjsObject =  this.getSVGReferences(svgDivRef)
         this.updateDevicesStatuses();
-        this.svgMounted = false;
+        this.svgMounted = true;
 
         this.setSVGViewPortSize();
         //this.setPowerSwitchCursor(this.devicesMapSVGjsObject.powerSwitches.tellstick[0], "pointer")
 
-        let t = this.getIdentifiedSVGNodeBy("A1");
+        //let t = this.getIdentifiedSVGNodeBy("A1");
         //this.setPowerSwitchColor("A1", "red")        
         //this.setPowerSwitchColor("7", "red")        
         //this.setPowerSwitchText(t, "19")
@@ -54,7 +59,7 @@ export default {
         this.addPowerSwitchesEventHandlers();
 
         window.addEventListener('resize', this.setSVGViewPortSize);
-
+        this.svgMounted = true;
     },
     getSVGReferences: function(refToSVGDiv) {
       let svgDOMX = Array.from(refToSVGDiv.childNodes).filter(curNode => curNode.nodeName === "svg")[0];        
@@ -169,7 +174,9 @@ export default {
       if (this.devices.length)
       {
         this.devices.forEach(element => {
-          
+          /*if(element.name === "15") {
+            debugger;
+          }*/
           var currentInteractiveNode = that.getIdentifiedSVGNodeBy(element.name);
           
           this.setPowerSwitchColor(element.name, element.color);
@@ -185,9 +192,9 @@ export default {
         }
       );
     }
-  },
-  
+  },  
   beforeDestroy() {
+    this.removePowerSwitchesEventHandlers();
     window.removeEventListener('resize', this.setSVGViewPortSize);
   }
 }
