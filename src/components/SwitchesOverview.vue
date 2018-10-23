@@ -110,8 +110,11 @@ export default {
 				});
 		},
 		setLoadingState: function (loading, error) {
-			this.loading = loading;
 			let payLoad =  { "isLoading" : loading, "error" : error };
+			EventBus.$emit('loading', payLoad);
+		},		
+		setReceivedMQTTState: function (receiving, error) {
+			let payLoad =  { "isReceiving" : receiving, "error" : error };
 			EventBus.$emit('loading', payLoad);
 		}
 	},
