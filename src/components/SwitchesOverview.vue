@@ -22,7 +22,7 @@ export default {
 		baseUrl: process.env.BASE_URL,
 		devicesMapSVGjsMarkup: "",
 		bufferDevicesData: {}
-	}),  
+	}),
 	created () {
 		// fetch the data when the view is created and the data is
 		// already being observed
@@ -34,7 +34,7 @@ export default {
 			let that = this;
 			const promises = [
          		Vue.axios.get(this.baseUrl + 'devices-map.svg'),          
-				Vue.axios.get(this.$API_BASE_URL + '?telldusActionTypeActionTypeOption=listDevices')
+				Vue.axios.get(this.$TELLDUS_API_BASE_URL + '?telldusActionTypeActionTypeOption=listDevices')
 			];
 			Promise.all(promises)
 			.then((response) => {
@@ -81,7 +81,7 @@ export default {
         	this.setLoadingState(true);
 
 			const promises = [    
-				Vue.axios.get(this.$API_BASE_URL + '?telldusActionTypeActionTypeOption=onOffDevice&telldusUnitName=' + currentDevice.name + '&telldusActionValueTypeName=command&telldusActionValueActionValue=' + setPointState)
+				Vue.axios.get(this.$TELLDUS_API_BASE_URL + '?telldusActionTypeActionTypeOption=onOffDevice&telldusUnitName=' + currentDevice.name + '&telldusActionValueTypeName=command&telldusActionValueActionValue=' + setPointState)
 			];
 
 			Promise.all(promises)

@@ -3,6 +3,11 @@ module.exports = {
   // options...
   
   baseUrl: process.env.NODE_ENV === 'production'
-    ? '/kommmandoran2.0/'
+    ? '/'
     : '/'
+
+    /*
+    ? '/kommandoran2.0/'
+    : '/'
+    */
 }
