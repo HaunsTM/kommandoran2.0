@@ -51,11 +51,6 @@ export default {
         this.setSVGViewPortSize();
         //this.setPowerSwitchCursor(this.devicesMapSVGjsObject.powerSwitches.tellstick[0], "pointer")
 
-        //let t = this.getIdentifiedSVGNodeBy("A1");
-        //this.setPowerSwitchColor("A1", "red")        
-        //this.setPowerSwitchColor("7", "red")        
-        //this.setPowerSwitchText(t, "19")
-        //this.setPowerSwitchHoverText(t, "235235")        
         this.addPowerSwitchesEventHandlers();
 
         window.addEventListener('resize', this.setSVGViewPortSize);
@@ -131,33 +126,22 @@ export default {
     setSVGPreserveAspectRatio: function(value) {
       this.devicesMapSVGjsObject.svgDOMX.setAttribute("preserveAspectRatio", value);
     },
-    /*setSVGDisplayStyle: function(displayStyle) {
-      this.devicesMapSVGjsObject.svgDOMX.setAttribute("style", "display: " + displayStyle);
-    },*/
-    setPowerSwitchColor: function(name, color) {
+    setPowerSwitchColor: function(svgNode, color) {
       
-      let svgNode = this.getIdentifiedSVGNodeBy(name);
-      
-      if (svgNode) {
-        switch (svgNode.type) {
-          case "tellstick":
-            svgNode.path.setAttribute("style","fill: " + color);
-            break;
-          case "zWave":
-            svgNode.rect.setAttribute("style","fill: " + color);
-            break;        
-        }
+      switch (svgNode.type) {
+        case "tellstick":
+          svgNode.path.setAttribute("style","fill: " + color);
+          break;
+        case "zWave":
+          svgNode.rect.setAttribute("style","fill: " + color);
+          break;
       }
     },
     setPowerSwitchText: function(tellstickElement, text) {
       tellstickElement.text.textContent = text;
     },
-    setPowerSwitchHoverText: function(name, text) {      
-      let svgNode = this.getIdentifiedSVGNodeBy(name);
-      
-      if (svgNode) {
+    setPowerSwitchHoverText: function(svgNode, text) {
         svgNode.title.textContent = text;
-      }
     },    
     setPowerSwitchCursor: function(element, cursor) {
       element.node.setAttribute("cursor", cursor);
@@ -177,10 +161,13 @@ export default {
           /*if(element.name === "15") {
             debugger;
           }*/
-          var currentInteractiveNode = that.getIdentifiedSVGNodeBy(element.name);
           
-          this.setPowerSwitchColor(element.name, element.color);
-          this.setPowerSwitchHoverText(element.name, element.hoverText);
+          let svgNode = this.getIdentifiedSVGNodeBy(element.name);
+          if (svgNode) {
+            this.setPowerSwitchColor(svgNode, element.color);
+            this.setPowerSwitchHoverText(svgNode, element.hoverText);
+            this.setPowerSwitchCursor(svgNode, element.cursor);
+          }
         });
 
       }

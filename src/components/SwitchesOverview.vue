@@ -141,7 +141,8 @@ export default {
 							"type" : curDevData.type,
 							"color" : shouldUseOldData ? previousDeviceData.color : that.getDisplayColor(curDevData.state), 
 							"hoverText" : shouldUseOldData ? previousDeviceData.hoverText : that.getHoverText(curDevData.state),
-							"updatedTime" : shouldUseOldData ? previousDeviceData.updatedTime : curUTC
+							"updatedTime" : shouldUseOldData ? previousDeviceData.updatedTime : curUTC,
+							"cursor" : "pointer"
 						}
 					});
 				} else {
