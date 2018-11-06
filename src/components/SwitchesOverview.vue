@@ -47,24 +47,76 @@ export default {
 			});
 		},
 		getDisplayColor : function (state){
-			switch (state) {
-				case 1 :
-					return "yellow";
-				case 2 :
-					return "gray";
-				default :
-					return "red";
+			//https://vuetifyjs.com/en/style/colors
+			let color = "";
+			if (state === 1) {
+				//on yellow 
+				color = "#FFEB3B";
+			} else if (state === 2) {
+				//off grey lighten-1
+				color = "#BDBDBD";
+			} else if (2 < state && state < 10)  {
+				// yellow lighten-5
+				color = "#FFFDE7";
+			} else if (10 <= state && state < 20)  {
+				// yellow lighten-5
+				color = "#FFFDE7";
+			} else if (20 <= state && state < 30)  {
+				// yellow lighten-4
+				color = "#FFF9C4";
+			} else if (30 <= state && state < 40)  {
+				// yellow lighten-4
+				color = "#FFF9C4";
+			} else if (40 <= state && state < 50)  {
+				// yellow lighten-3
+				color = "#FFF59D";
+			} else if (50 <= state && state < 60)  {
+				// yellow lighten-3
+				color = "#FFF59D";
+			} else if (60 <= state && state < 70)  {
+				// yellow lighten-2
+				color = "#FFF176";
+			} else if (70 <= state && state < 80)  {
+				// yellow lighten-2
+				color = "#FFF176";
+			} else if (80 <= state && state < 90)  {
+				// yellow lighten-1
+				color = "#FFEE58";
+			} else if (90 <= state && state < 100) {
+				// yellow lighten-1
+				color = "#FFEE58";
+			} else {
+				// red
+				color = "#F44336";
 			}
+			return color;
 		},
-		getHoverText : function (state) {
-			switch (state) {
-				case 1 :
-					return "on";
-				case 2 :
-					return "off";
-				default :
-					return "unknown state";
-			}
+		
+		getHoverText : function (name, state, statevalue, type, curUTC) {
+			let hoverText = "";
+			
+			hoverText += "Name: " + name + "\n";
+
+			hoverText += "State: ";
+				if (state === 1) {
+					//on 
+					hoverText += "on (full)";
+				} else if (state === 2) {
+					//off
+					hoverText += "off";
+				} else if (2 < state && state <= 100)  {
+					// on
+					hoverText += "partially on (" + state + " %)";
+				} else {
+					// red
+					hoverText += "unknown state (" + state + ")";
+				}			
+			hoverText += "\n";
+			
+			hoverText += "Type: " + type + "\n";
+			hoverText += "Last updated: " + new Date(curUTC).toLocaleString('sv-SE', { timeZone: 'Europe/Stockholm' });
+
+			return hoverText;
 		},
 		onPowerSwitchClick : function (currentTellstickElement)  {
 			let currentDevice = this.devicesData.find( (e) => {
@@ -140,7 +192,7 @@ export default {
 							"statevalue" : shouldUseOldData ? previousDeviceData.statevalue : curDevData.statevalue,
 							"type" : curDevData.type,
 							"color" : shouldUseOldData ? previousDeviceData.color : that.getDisplayColor(curDevData.state), 
-							"hoverText" : shouldUseOldData ? previousDeviceData.hoverText : that.getHoverText(curDevData.state),
+							"hoverText" : shouldUseOldData ? that.getHoverText(previousDeviceData.name, previousDeviceData.state, previousDeviceData.statevalue, previousDeviceData.type, curUTC): that.getHoverText(curDevData.name, curDevData.state, curDevData.statevalue, curDevData.type, curUTC),
 							"updatedTime" : shouldUseOldData ? previousDeviceData.updatedTime : curUTC,
 							"cursor" : "pointer"
 						}
@@ -155,7 +207,7 @@ export default {
 							"statevalue" : curDevData.statevalue,
 							"type" : curDevData.type,
 							"color" : that.getDisplayColor(curDevData.state), 
-							"hoverText" : that.getHoverText(curDevData.state),
+							"hoverText" : that.getHoverText(curDevData.name, curDevData.state, curDevData.statevalue, curDevData.type, curUTC),
 							"updatedTime" : curUTC
 						}
 					});

@@ -157,11 +157,7 @@ export default {
       let that = this;
       if (this.devices.length)
       {
-        this.devices.forEach(element => {
-          /*if(element.name === "15") {
-            debugger;
-          }*/
-          
+        this.devices.forEach(element => {          
           let svgNode = this.getIdentifiedSVGNodeBy(element.name);
           if (svgNode) {
             this.setPowerSwitchColor(svgNode, element.color);
@@ -169,7 +165,6 @@ export default {
             this.setPowerSwitchCursor(svgNode, element.cursor);
           }
         });
-
       }
     },
     removePowerSwitchesEventHandlers: function() {
