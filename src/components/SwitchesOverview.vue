@@ -1,9 +1,25 @@
 <template>
     
-    <v-layout column>
-      
-          <PowerSwitchesMap v-bind:devicesMapSVGjsMarkup = "devicesMapSVGjsMarkup" v-bind:devices="devicesData" v-on:powerSwitchClick="onPowerSwitchClick">
-          </PowerSwitchesMap>
+    <v-layout row wrap>
+        <v-flex d-flex xs12 md6>         
+			<PowerSwitchesMap 
+				v-bind:devicesMapSVGjsMarkup = "devicesMapSVGjsMarkup" 
+				v-bind:devices = "devicesData"
+				v-bind:visibleItems = "visiblePowerswitchMapItems"
+				v-on:powerSwitchClick="onPowerSwitchClick">
+			</PowerSwitchesMap>
+        </v-flex>
+		 <v-flex xs12 md6 class="py-2">
+            <p>Display System</p>
+            <v-btn-toggle v-model="visiblePowerswitchMapItems" multiple>
+              <v-btn flat value="telldus433MHz">
+                 433 MHz
+              </v-btn>
+              <v-btn flat value="zWave">
+                Z-Wave
+              </v-btn>
+            </v-btn-toggle>
+          </v-flex>
     </v-layout>
 </template>
 
@@ -20,8 +36,9 @@ export default {
 	},
 	data: () => ({
 		baseUrl: process.env.BASE_URL,
+		bufferDevicesData: {},
 		devicesMapSVGjsMarkup: "",
-		bufferDevicesData: {}
+		visiblePowerswitchMapItems: ["telldus433MHz"]
 	}),
 	created () {
 		// fetch the data when the view is created and the data is
