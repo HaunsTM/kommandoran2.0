@@ -28,8 +28,8 @@ Vue.use(Vuetify);
 Vue.use(FullCalendar);
 
 Vue.config.productionTip = false;
-Vue.prototype.$TELLDUS_API_BASE_URL = (Vue.config.productionTip) ? 'https://www.your-api.com' : 'http://10.0.0.4/iot/kommandoran2.0/telldus-api';
-Vue.prototype.$DB_API_BASE_URL = (Vue.config.productionTip) ? 'https://www.your-api.com' : 'http://10.0.0.4/iot/kommandoran2.0/db-api';
+Vue.prototype.$TELLDUS_API_BASE_URL = 'http://10.0.0.4/iot/kommandoran2.0/telldus-api';
+Vue.prototype.$DB_API_BASE_URL = 'http://10.0.0.4/iot/kommandoran2.0/db-api';
 Object.defineProperty(Vue.prototype, '$_', { value: _ });
 
 new Vue({
