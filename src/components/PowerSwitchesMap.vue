@@ -203,10 +203,8 @@
 		width: 100%;
         overflow-y: scroll;
         overflow-x: scroll;
-		border: 1px solid red;
 	} 
 	#powerSwitchesMapDiv{
-		border: 1px solid blue;
     	display: block;
 	}
 </style>
