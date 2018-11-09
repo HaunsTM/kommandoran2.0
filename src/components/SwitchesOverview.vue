@@ -1,7 +1,7 @@
 <template>
     
     <v-layout row wrap>
-        <v-flex d-flex xs12 md6>         
+        <v-flex d-flex xs12 sm6>         
 			<PowerSwitchesMap 
 				v-bind:devicesMapSVGjsMarkup = "devicesMapSVGjsMarkup" 
 				v-bind:devices = "devicesData"
@@ -9,7 +9,7 @@
 				v-on:powerSwitchClick="onPowerSwitchClick">
 			</PowerSwitchesMap>
         </v-flex>
-		 <v-flex xs12 md6 class="py-2">
+		 <v-flex xs12 sm6 class="py-2">
             <p>Display System</p>
             <v-btn-toggle v-model="visiblePowerswitchMapItems" multiple>
               <v-btn flat value="telldus433MHz">
@@ -53,6 +53,7 @@ export default {
          		Vue.axios.get(this.baseUrl + 'devices-map.svg'),          
 				Vue.axios.get(this.$TELLDUS_API_BASE_URL + '?telldusActionTypeActionTypeOption=listDevices')
 			];
+			debugger;
 			Promise.all(promises)
 			.then((response) => {
             	this.setLoadingState(false);

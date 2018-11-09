@@ -37,13 +37,23 @@ export default {
 				let permanentConfiguration = {
 					locale: "sv",					
 					schedulerLicenseKey: "GPL-My-Project-Is-Open-Source",
-					height: "auto",
+					//height: "auto",
 					slotLabelFormat: [
 						'MMMM YYYY', // top level of text
 						'HH:mm'        // lower level of text
 					],
 					defaultView: "timelineWeek",
 					slotDuration: "01:00:00",
+					
+					validRange: {
+						start: this.$FULLCALENDAR_DEFAULT_START_DATE_MONDAY,//start date here
+						end: this. FULLCALENDAR_DEFAULT_END_DATE_SUNDAY //end date here
+					},
+					visibleRange: {
+						start: this.$FULLCALENDAR_DEFAULT_START_DATE_MONDAY,//start date here
+						end: this. FULLCALENDAR_DEFAULT_END_DATE_SUNDAY //end date here
+					},
+					defaultDate: '2018-07-06',
 					header: {
 						left: "",
 						center: "",
@@ -55,7 +65,7 @@ export default {
 					selectable: "true"
 				}
 
-				let resources = this.$_(this.bufferTelldusSchedulerOverview)
+				let variableResources = this.$_(this.bufferTelldusSchedulerOverview)
 					.sortBy(['TelldusUnitLocation_Name', 'TelldusUnitType_Name', 'TelldusUnit_Name', 'TelldusUnit_LocationDesciption'])
 					.map( (u) => {
 						let unit = {
@@ -73,9 +83,9 @@ export default {
 					})
 					.value();
 
-				if(resources && resources.length > 1) {
+				if(variableResources && variableResources.length > 1) {
 					let merged = permanentConfiguration;
-					merged.resources = resources;
+					merged.resources = variableResources;
 					return merged;
 				}
 		},
@@ -98,6 +108,7 @@ export default {
 	data() {
 		return {
 			bufferTelldusSchedulerOverview : {}
+
 		};
 	},
 	methods: {
