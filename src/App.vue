@@ -6,9 +6,8 @@
         fixed
         v-model="drawer"
         app
-    >
-	
-		<NavigationList/>
+    >	
+		<NavigationList v-on:navigateTo="navigateTo"/>
     </v-navigation-drawer>
 		<v-toolbar app fixed clipped-left>
 			<v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
