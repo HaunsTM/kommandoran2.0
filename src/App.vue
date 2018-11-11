@@ -1,38 +1,15 @@
 <template>
 	
 	<v-app id="app" dark>
-		<v-navigation-drawer app></v-navigation-drawer>
-		
 		<v-navigation-drawer
-			clipped
-			fixed
-			v-model="drawer"
-			app
-		>
-			<v-list dense>
-				<v-list-tile @click="navigateTo('scheduler')">
-					<v-list-tile-content>
-						<v-list-tile-title>Schedulers</v-list-tile-title>
-					</v-list-tile-content>
-				</v-list-tile>
-				<v-list-tile @click="navigateTo('security')">
-					<v-list-tile-content>
-						<v-list-tile-title>Camera</v-list-tile-title>
-					</v-list-tile-content>
-				</v-list-tile>
-				<v-list-tile @click="navigateTo('switches-overview')">
-					<v-list-tile-content>
-						<v-list-tile-title>Switches</v-list-tile-title>
-					</v-list-tile-content>
-				</v-list-tile>
-				<v-list-tile @click="navigateTo('media-controller')">
-					<v-list-tile-content>
-						<v-list-tile-title>Radio</v-list-tile-title>
-					</v-list-tile-content>
-				</v-list-tile>
-			</v-list>
-		</v-navigation-drawer>
-
+        clipped
+        fixed
+        v-model="drawer"
+        app
+    >
+	
+		<NavigationList/>
+    </v-navigation-drawer>
 		<v-toolbar app fixed clipped-left>
 			<v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
 			<v-toolbar-title>Kommandoran&trade; 2.0</v-toolbar-title>
@@ -59,6 +36,7 @@
 
 import { EventBus } from './components/event-bus.js';
 
+import NavigationList from './components/NavigationList.vue'
 export default {
 name: 'App',
 data: () => ({
@@ -69,6 +47,10 @@ data: () => ({
 }),
 created(){
 	EventBus.$on('loading', this.setLoadingState);
+},
+components: {
+	//NavigationDrawer
+	NavigationList
 },
 methods: {
 	navigateTo(route) {
@@ -87,44 +69,6 @@ mounted () {
 
 <style scope>
 	.page-container {
-		height: 90vh;
-		position: relative;
+		height: 80vh;
 	}
-
-    nav.container {        
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 1rem;
-        
-        border-radius: 2rem;
-        transition: all 0.2s ease-in-out;
-    }
-    nav.container:hover {
-        background: rgba(128,214,255, .3);
-        box-shadow: 0 5px 15px rgba(66,165,245, 0.2);
-    }
-    .svg-image-container {
-        width: 6rem;
-    }
-    .svg-image {
-        background-size: cover;
-        width: 100%;
-        height: 0;
-        padding: 0; /* reset */
-        padding-bottom: 100%;
-    }
-    .switch {
-        background-image: url('assets/switch.svg');
-    }
-    .time {
-        background-image: url('assets/time.svg');
-    }
-    .security-camera {
-        background-image: url('assets/security-camera.svg');
-    }
-    .radio {
-        background-image: url('assets/radio.svg');
-    }
-
 </style>
