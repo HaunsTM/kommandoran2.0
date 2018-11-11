@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import './plugins/vuetify'
 import App from './App.vue'
 import VueRouter from 'vue-router'
 import router from './router.js'
@@ -10,11 +11,6 @@ import _ from 'lodash';
 
 import VueMqtt from 'vue-mqtt';
 
-import Vuetify from 'vuetify'
-import 'vuetify/dist/vuetify.min.css'
-import 'roboto-fontface/css/roboto/roboto-fontface.css'
-import 'material-design-icons-iconfont/dist/material-design-icons.css'
-
 import FullCalendar from "vue-full-calendar";
 
 import "fullcalendar-scheduler";
@@ -25,7 +21,6 @@ import "fullcalendar-scheduler/dist/scheduler.min.css";
 Vue.use(VueRouter);
 Vue.use(VueAxios, axios);
 Vue.use(VueMqtt, "ws://10.0.0.4:9001", {clientId: 'WebClient-' + parseInt(Math.random() * 100000)});
-Vue.use(Vuetify);
 
 Vue.use(FullCalendar);
 
