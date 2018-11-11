@@ -1,5 +1,5 @@
 <template>
-	<div class="super">
+	<div>
 		<div class="svg-image-container" >
 			<div id="powerSwitchesMapDiv"
 				class="svg-image"  
@@ -125,6 +125,7 @@
 			let divHeight = svgDivRef.clientHeight;
 
 			let f = originalWidth > divWidth ? divWidth/originalWidth : 1;
+			f = 1.2;
 			let width = originalWidth*f;
 			let height = originalHeight*f;
 
@@ -201,8 +202,6 @@
 	}
 	.svg-image-container {
 		width: 100%;
-        overflow-y: scroll;
-        overflow-x: scroll;
 	} 
 	#powerSwitchesMapDiv{
     	display: block;

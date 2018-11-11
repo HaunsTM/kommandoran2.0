@@ -1,26 +1,57 @@
 <template>
     
-    <v-layout row wrap>
-        <v-flex d-flex xs12 sm6>         
-			<PowerSwitchesMap 
-				v-bind:devicesMapSVGjsMarkup = "devicesMapSVGjsMarkup" 
-				v-bind:devices = "devicesData"
-				v-bind:visibleItems = "visiblePowerswitchMapItems"
-				v-on:powerSwitchClick="onPowerSwitchClick">
-			</PowerSwitchesMap>
-        </v-flex>
-		 <v-flex xs12 sm6 class="py-2">
-            <p>Display System</p>
-            <v-btn-toggle v-model="visiblePowerswitchMapItems" multiple>
-              <v-btn flat value="telldus433MHz">
-                 433 MHz
-              </v-btn>
-              <v-btn flat value="zWave">
-                Z-Wave
-              </v-btn>
-            </v-btn-toggle>
-          </v-flex>
-    </v-layout>
+	<div>
+
+		<v-layout row wrap class="hidden-sm-and-up">
+			<v-flex d-flex xs12>
+				<div class="powerSwitchesMap-parent-xs">
+					<PowerSwitchesMap
+						class="powerSwitchesMap-child"
+						v-bind:devicesMapSVGjsMarkup = "devicesMapSVGjsMarkup" 
+						v-bind:devices = "devicesData"
+						v-bind:visibleItems = "visiblePowerswitchMapItems"
+						v-on:powerSwitchClick="onPowerSwitchClick">
+					</PowerSwitchesMap>
+				</div>
+			</v-flex>
+			<v-flex xs12 class="py-2">
+				<p>Display System</p>
+				<v-btn-toggle v-model="visiblePowerswitchMapItems" multiple>
+					<v-btn flat value="telldus433MHz">433 MHz</v-btn>
+					<v-btn flat value="zWave">Z-Wave</v-btn>
+				</v-btn-toggle>
+			</v-flex>
+		</v-layout>
+
+
+
+
+		
+		<v-layout class="hidden-xs-and-down">
+			
+			<v-flex d-flex sm6>
+				<div class="powerSwitchesMap-parent-sm">
+					<PowerSwitchesMap
+						class="powerSwitchesMap-child"
+						v-bind:devicesMapSVGjsMarkup = "devicesMapSVGjsMarkup" 
+						v-bind:devices = "devicesData"
+						v-bind:visibleItems = "visiblePowerswitchMapItems"
+						v-on:powerSwitchClick="onPowerSwitchClick">
+					</PowerSwitchesMap>
+				</div>
+			</v-flex>
+			<v-flex xs12 class="py-2">
+				<p>Display System</p>
+				<v-btn-toggle v-model="visiblePowerswitchMapItems" multiple>
+					<v-btn flat value="telldus433MHz">433 MHz</v-btn>
+					<v-btn flat value="zWave">Z-Wave</v-btn>
+				</v-btn-toggle>
+			</v-flex>
+
+		</v-layout>
+		
+	</div>
+
 </template>
 
 <script>
@@ -53,7 +84,6 @@ export default {
          		Vue.axios.get(this.baseUrl + 'devices-map.svg'),          
 				Vue.axios.get(this.$TELLDUS_API_BASE_URL + '?telldusActionTypeActionTypeOption=listDevices')
 			];
-			debugger;
 			Promise.all(promises)
 			.then((response) => {
             	this.setLoadingState(false);
@@ -244,5 +274,24 @@ export default {
 }
 </script>
 <style scoped>
-
+	.powerSwitchesMap-parent-sm {
+		
+        height: calc(100vh - 30vh);
+		overflow-y: hidden;
+		overflow-x: hidden;
+	}
+	.powerSwitchesMap-parent-xs {
+		
+        height: calc(100vh - 30vh);
+		overflow-y: hidden;
+		overflow-x: hidden;
+	}
+	.powerSwitchesMap-child {
+		height: 100%;
+		margin-bottom: -50px; /* maximum width of scrollbar */
+		padding-bottom: 50px; /* maximum width of scrollbar */
+		margin-right: -50px; /* maximum width of scrollbar */
+		padding-right: 50px; /* maximum width of scrollbar */
+		overflow: scroll;
+	}
 </style>

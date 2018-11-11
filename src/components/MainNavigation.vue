@@ -66,4 +66,7 @@ export default {
         background: rgba(128,214,255, .3);
         box-shadow: 0 5px 15px rgba(66,165,245, 0.2);
     }
+    .container img {
+        width: 4rem;
+    }
 </style>
