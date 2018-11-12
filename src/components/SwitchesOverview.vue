@@ -43,41 +43,66 @@
 
 					<v-layout row wrap class="scroll-child">
 						<v-flex sm12>
-
 							<v-card>
-								<v-img
-									class="white--text"
-									height="200px"
-									src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
-								>
-									<v-container fill-height fluid>
-									<v-layout fill-height>
-										<v-flex xs12 align-end flexbox>
-										<span class="headline">Top 10 Australian beaches</span>
-										</v-flex>
-									</v-layout>
-									</v-container>
-								</v-img>
 								<v-card-title>
 									<div>
-									<span class="grey--text">Number 10</span><br>
-									<span>Whitehaven Beach</span><br>
-									<span>Whitsunday Island, Whitsunday Islands</span>
+										<div class="title">Visible system</div>
+										<div class="caption">System(-s) to be displayed</div>
 									</div>
 								</v-card-title>
+								<v-divider light></v-divider>
 								<v-card-actions>
-									<v-btn flat color="orange">Share</v-btn>
-									<v-btn flat color="orange">Explore</v-btn>
+									<v-btn-toggle v-model="visiblePowerswitchMapItems" multiple>
+										<v-btn flat value="telldus433MHz">433 MHz</v-btn>
+										<v-btn flat value="zWave">Z-Wave</v-btn>
+									</v-btn-toggle>
 								</v-card-actions>
 							</v-card>
-
 						</v-flex>
-						<v-flex sm12>						
-							<p>Display System</p>
-							<v-btn-toggle v-model="visiblePowerswitchMapItems" multiple>
-								<v-btn flat value="telldus433MHz">433 MHz</v-btn>
-								<v-btn flat value="zWave">Z-Wave</v-btn>
-							</v-btn-toggle>
+						<v-flex sm12>							
+							<div class="scroll-parent-multi-switch-sm-and-up">
+								<v-card class="scroll-child">
+									<v-card-title>
+										<div>
+											<div class="title">Multi switch</div>
+											<div class="caption">Affect multiple switches</div>
+										</div>
+									</v-card-title>
+									<v-divider light></v-divider>
+									<v-card-actions>
+										<div class="caption">All</div>
+										<v-spacer></v-spacer>
+										<v-btn-toggle v-model="turnAllSwitches">
+											<v-btn color="success" value="on">On</v-btn>
+											<v-btn color="error" value="off">Off</v-btn>
+										</v-btn-toggle>
+									</v-card-actions>								
+									<v-card-actions>
+										<div class="caption">Comfort</div>
+										<v-spacer></v-spacer>
+										<v-btn-toggle v-model="turnAllComfortSwitches">
+											<v-btn color="success" value="on">On</v-btn>
+											<v-btn color="error" value="off">Off</v-btn>
+										</v-btn-toggle>
+									</v-card-actions>
+									<v-card-actions>
+										<div class="caption">All Z-Wawe</div>
+										<v-spacer></v-spacer>
+										<v-btn-toggle v-model="turnAllZWaveSwitches">
+											<v-btn color="success" value="on">On</v-btn>
+											<v-btn color="error" value="off">Off</v-btn>
+										</v-btn-toggle>
+									</v-card-actions>
+									<v-card-actions>
+										<div class="caption">All 433 MHz</div>
+										<v-spacer></v-spacer>
+										<v-btn-toggle v-model="turnAll433MHzSwitches">
+											<v-btn color="success" value="on">On</v-btn>
+											<v-btn color="error" value="off">Off</v-btn>
+										</v-btn-toggle>
+									</v-card-actions>
+								</v-card>
+							</div>
 						</v-flex>
 					</v-layout>
 				</div>
@@ -103,7 +128,12 @@ export default {
 		baseUrl: process.env.BASE_URL,
 		bufferDevicesData: {},
 		devicesMapSVGjsMarkup: "",
-		visiblePowerswitchMapItems: ["telldus433MHz"]
+		visiblePowerswitchMapItems: ["telldus433MHz"],
+
+		turnAllSwitches: "",
+		turnAllComfortSwitches: "",
+		turnAllZWaveSwitches: "",
+		turnAll433MHzSwitches: ""
 	}),
 	created () {
 		// fetch the data when the view is created and the data is
@@ -319,4 +349,10 @@ export default {
 		height: 100%;
 		overflow: scroll;
 	}
+
+	.scroll-parent-multi-switch-sm-and-up {
+
+        height: 16rem;
+	}
+	
 </style>
