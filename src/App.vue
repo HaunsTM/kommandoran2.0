@@ -68,6 +68,8 @@ mounted () {
 
 <style scope>
 	.page-container {
-		height: 80vh;
+        max-height: calc(100vh - 150px);
+		border: 1px solid red;
+		overflow-y: scroll;
 	}
 </style>

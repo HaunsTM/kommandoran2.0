@@ -125,7 +125,7 @@
 			let divHeight = svgDivRef.clientHeight;
 
 			let f = originalWidth > divWidth ? divWidth/originalWidth : 1;
-			f = 1.2;
+			f *= 1.2;
 			let width = originalWidth*f;
 			let height = originalHeight*f;
 
@@ -154,7 +154,7 @@
 			svgNode.title.textContent = text;
 		},    
 		setPowerSwitchCursor: function(element, cursor) {
-		element.node.setAttribute("cursor", cursor);
+			element.node.setAttribute("cursor", cursor);
 		},
 		addPowerSwitchesEventHandlers: function() {			
 			let that = this;
@@ -174,8 +174,8 @@
 						that.setPowerSwitchColor(svgNode, element.color);
 						
 						let visible = that.visibleItems.includes(svgNode.type);
-						console.log(visible)
 						that.setPowerswitchVisibility(svgNode, visible);
+						that.setPowerSwitchHoverText(svgNode, element.hoverText);
 						that.setPowerSwitchCursor(svgNode, element.cursor);
 					}
 				});

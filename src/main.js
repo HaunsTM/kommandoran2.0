@@ -17,6 +17,7 @@ import "fullcalendar-scheduler";
 import "fullcalendar/dist/fullcalendar.min.css";
 import "fullcalendar-scheduler/dist/scheduler.min.css";
 
+import "./assets/scroll.css";
 
 Vue.use(VueRouter);
 Vue.use(VueAxios, axios);

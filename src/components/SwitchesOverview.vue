@@ -1,12 +1,11 @@
 <template>
     
 	<div>
-
 		<v-layout row wrap class="hidden-sm-and-up">
 			<v-flex d-flex xs12>
-				<div class="powerSwitchesMap-parent-xs">
+				<div class="scroll-parent-xs">
 					<PowerSwitchesMap
-						class="powerSwitchesMap-child"
+						class="scroll-child"
 						v-bind:devicesMapSVGjsMarkup = "devicesMapSVGjsMarkup" 
 						v-bind:devices = "devicesData"
 						v-bind:visibleItems = "visiblePowerswitchMapItems"
@@ -24,15 +23,13 @@
 		</v-layout>
 
 
-
-
 		
-		<v-layout class="hidden-xs-and-down">
+		<v-layout row wrap class="hidden-xs-only">
 			
-			<v-flex d-flex sm6>
-				<div class="powerSwitchesMap-parent-sm">
+			<v-flex d-flex sm9>
+				<div class="scroll-parent-sm-and-up">
 					<PowerSwitchesMap
-						class="powerSwitchesMap-child"
+						class="scroll-child"
 						v-bind:devicesMapSVGjsMarkup = "devicesMapSVGjsMarkup" 
 						v-bind:devices = "devicesData"
 						v-bind:visibleItems = "visiblePowerswitchMapItems"
@@ -40,14 +37,51 @@
 					</PowerSwitchesMap>
 				</div>
 			</v-flex>
-			<v-flex xs12 class="py-2">
-				<p>Display System</p>
-				<v-btn-toggle v-model="visiblePowerswitchMapItems" multiple>
-					<v-btn flat value="telldus433MHz">433 MHz</v-btn>
-					<v-btn flat value="zWave">Z-Wave</v-btn>
-				</v-btn-toggle>
-			</v-flex>
+			<v-flex sm3>
+				
+				<div class="scroll-parent-sm-and-up">
 
+					<v-layout row wrap class="scroll-child">
+						<v-flex sm12>
+
+							<v-card>
+								<v-img
+									class="white--text"
+									height="200px"
+									src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
+								>
+									<v-container fill-height fluid>
+									<v-layout fill-height>
+										<v-flex xs12 align-end flexbox>
+										<span class="headline">Top 10 Australian beaches</span>
+										</v-flex>
+									</v-layout>
+									</v-container>
+								</v-img>
+								<v-card-title>
+									<div>
+									<span class="grey--text">Number 10</span><br>
+									<span>Whitehaven Beach</span><br>
+									<span>Whitsunday Island, Whitsunday Islands</span>
+									</div>
+								</v-card-title>
+								<v-card-actions>
+									<v-btn flat color="orange">Share</v-btn>
+									<v-btn flat color="orange">Explore</v-btn>
+								</v-card-actions>
+							</v-card>
+
+						</v-flex>
+						<v-flex sm12>						
+							<p>Display System</p>
+							<v-btn-toggle v-model="visiblePowerswitchMapItems" multiple>
+								<v-btn flat value="telldus433MHz">433 MHz</v-btn>
+								<v-btn flat value="zWave">Z-Wave</v-btn>
+							</v-btn-toggle>
+						</v-flex>
+					</v-layout>
+				</div>
+			</v-flex>
 		</v-layout>
 		
 	</div>
@@ -56,7 +90,7 @@
 
 <script>
 
-import Vue from 'vue';
+import Vue from 'vue'; 
 import PowerSwitchesMap from "./PowerSwitchesMap.vue";
 import { EventBus } from './event-bus.js';
 
@@ -138,8 +172,7 @@ export default {
 				color = "#F44336";
 			}
 			return color;
-		},
-		
+		},		
 		getHoverText : function (name, state, statevalue, type, curUTC) {
 			let hoverText = "";
 			
@@ -171,8 +204,7 @@ export default {
 				if (e.name === currentTellstickElement.name) {
 					return e;
 				}
-			});
-			
+			});			
 			let toggledState = currentDevice.state === 2 ? 'on' : 'off';
 			this.onOffDevice(currentDevice, toggledState);
 		},	
@@ -274,24 +306,17 @@ export default {
 }
 </script>
 <style scoped>
-	.powerSwitchesMap-parent-sm {
-		
-        height: calc(100vh - 30vh);
-		overflow-y: hidden;
-		overflow-x: hidden;
+	.scroll-parent-xs {
+        height: calc(100vh - 45vh);
+		overflow: hidden;
 	}
-	.powerSwitchesMap-parent-xs {
-		
-        height: calc(100vh - 30vh);
-		overflow-y: hidden;
-		overflow-x: hidden;
+	
+	.scroll-parent-sm-and-up {
+        height: calc(100vh - 112px);
+		overflow: hidden;
 	}
-	.powerSwitchesMap-child {
+	.scroll-child {
 		height: 100%;
-		margin-bottom: -50px; /* maximum width of scrollbar */
-		padding-bottom: 50px; /* maximum width of scrollbar */
-		margin-right: -50px; /* maximum width of scrollbar */
-		padding-right: 50px; /* maximum width of scrollbar */
 		overflow: scroll;
 	}
 </style>
