@@ -39,20 +39,13 @@ export default {
 					schedulerLicenseKey: "GPL-My-Project-Is-Open-Source",
 					height: "parent",
 					slotLabelFormat: [
-						'MMMM YYYY', // top level of text
+						'dddd', // top level of text
 						'HH:mm'        // lower level of text
 					],
 					defaultView: "timelineWeek",
-					slotDuration: "01:00:00",
-					
-					validRange: {
-						start: this.$FULLCALENDAR_DEFAULT_START_DATE_MONDAY,//start date here
-						end: this. FULLCALENDAR_DEFAULT_END_DATE_SUNDAY //end date here
-					},
-					visibleRange: {
-						start: this.$FULLCALENDAR_DEFAULT_START_DATE_MONDAY,//start date here
-						end: this. FULLCALENDAR_DEFAULT_END_DATE_SUNDAY //end date here
-					},
+					slotDuration: "00:15:00",
+					minTime: this.$FULLCALENDAR_DEFAULT_START_DATE_MONDAY,
+  maxTime: this. FULLCALENDAR_DEFAULT_END_DATE_SUNDAY,
 					defaultDate: '2018-07-06',
 					header: {
 						left: "",
@@ -179,7 +172,6 @@ export default {
 		height: calc(100vh - 9rem);
 	}
 	.scheduler >>> tbody.fc-body{
-		background-color: red;
 		height: 100%;
 	}
 	
