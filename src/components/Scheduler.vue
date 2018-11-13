@@ -37,7 +37,7 @@ export default {
 				let permanentConfiguration = {
 					locale: "sv",					
 					schedulerLicenseKey: "GPL-My-Project-Is-Open-Source",
-					//height: "auto",
+					height: "parent",
 					slotLabelFormat: [
 						'MMMM YYYY', // top level of text
 						'HH:mm'        // lower level of text
@@ -169,13 +169,28 @@ export default {
 	}
 }
 </script>
+
+
+
+
 <style scoped>
 	.scheduler {
-		font-size: 8px;
+		font-size: 10px;
+		height: calc(100vh - 9rem);
 	}
+	.scheduler >>> tbody.fc-body{
+		background-color: red;
+		height: 100%;
+	}
+	
 	.scheduler > fc-cell-content {
 		margin-top : 1px;
 		margin-bottom: 1px;
 	}
-	
+	.scheduler >>> .fc-divider .fc-cell-text { 
+		/* https://vue-loader.vuejs.org/guide/scoped-css.html#deep-selectors */
+		
+		font-size: larger;
+		color: #2f2f2f;
+	}
 </style>
