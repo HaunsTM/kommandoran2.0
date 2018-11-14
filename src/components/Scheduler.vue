@@ -1,21 +1,95 @@
 <template>
 	<article>
+		<v-layout row wrap class="hidden-md-and-up">
+			<v-flex d-flex xs12>
+				<full-calendar 
+						class = "scheduler"
+						v-if="this.bufferTelldusSchedulerOverview.length > 0" 
+						:config="calendarConfig" 
+						:events="calendarEvents"
+					/>
+			</v-flex>
+		</v-layout>
+		<v-layout row wrap class="hidden-sm-and-down">
+			
+			<v-flex d-flex md12>
 
-	<full-calendar 
-		class = "scheduler"
-		v-if="this.bufferTelldusSchedulerOverview.length > 0" 
-		:config="calendarConfig" 
-		:events="calendarEvents"
+				<v-toolbar dense>
 
-		@event-selected = "eventSelected"
-		@event-drop = "eventDrop"
-		@event-resize = "eventResize"
-		@event-created = "eventCreated"
-		@event-receive = "eventReceive"
-		@event-render = "eventRender"
-		@view-render = "viewRender"
-		@day-click = "dayClick"/>
+					<v-overflow-btn
+					:items="dropdown_edit"
+					editable
+					label="Select system"
+					hide-details
+					class="pa-0"
+					overflow
+					></v-overflow-btn>
 
+					<v-divider
+					class="mr-2"
+					vertical
+					></v-divider>
+
+					<v-btn-toggle v-model="multiple_select" class="transparent" multiple>
+
+						<span>BROADEN<br/>EVENT</span>
+						<v-tooltip bottom>
+							<v-btn :value="1" flat slot="activator">
+								<v-icon >more_horiz</v-icon>
+							</v-btn>
+							<span>Add created event to multiple days</span>
+						</v-tooltip>
+
+						<v-tooltip bottom>
+							<v-btn :value="2" flat slot="activator">
+								<v-icon>more_vert</v-icon>
+							</v-btn>
+							<span>Add created event to all units </span>
+						</v-tooltip>
+
+					</v-btn-toggle>
+
+					<v-divider	class="mx-2" vertical></v-divider>
+
+					<v-btn-toggle v-model="multiple_select" class="transparent">
+						<span>ADD<br/>DAYS</span>
+						<v-tooltip bottom>
+							<v-btn :value="mon_fri" flat slot="activator">
+								<v-icon>work</v-icon>
+							</v-btn>
+							<span>Tooltip</span>
+						</v-tooltip>
+
+						<v-tooltip bottom>
+							<v-btn :value="sat_sun" flat slot="activator">
+								<v-icon>weekend</v-icon>
+							</v-btn>
+							<span>Tooltip</span>
+						</v-tooltip>
+					</v-btn-toggle>
+
+				</v-toolbar>
+
+
+			</v-flex>
+			<v-flex d-flex md12>
+				<full-calendar 
+					class = "scheduler"
+					v-if="this.bufferTelldusSchedulerOverview.length > 0" 
+					:config="calendarConfig" 
+					:events="calendarEvents"
+
+					@event-selected = "eventSelected"
+					@event-drop = "eventDrop"
+					@event-resize = "eventResize"
+					@event-created = "eventCreated"
+					@event-receive = "eventReceive"
+					@event-render = "eventRender"
+					@view-render = "viewRender"
+					@day-click = "dayClick"
+				/>
+			</v-flex>
+		</v-layout>
 	</article>
 </template>
 <script>
@@ -169,7 +243,7 @@ export default {
 <style scoped>
 	.scheduler {
 		font-size: 10px;
-		height: calc(100vh - 9rem);
+		height: calc(100vh - 11rem);
 	}
 	.scheduler >>> tbody.fc-body{
 		height: 100%;
