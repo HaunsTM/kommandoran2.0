@@ -4,16 +4,18 @@
 			<v-flex d-flex xs12>
 				<full-calendar 
 						class = "scheduler"
-						v-if="this.bufferTelldusSchedulerOverview.length > 0" 
+						v-if="!$vuetify.breakpoint.mdAndUp && this.bufferTelldusSchedulerOverview.length > 0" 
 						:config="calendarConfig" 
 						:events="calendarEvents"
 					/>
+
 			</v-flex>
 		</v-layout>
+
 		<v-layout row wrap class="hidden-sm-and-down">
 			
 			<v-flex d-flex md12>
-
+<!--
 				<v-toolbar dense>
 
 					<v-overflow-btn
@@ -25,57 +27,51 @@
 					overflow
 					></v-overflow-btn>
 
-					<v-divider
-					class="mr-2"
-					vertical
-					></v-divider>
+					<v-divider class="mr-2"	vertical></v-divider>
 
-					<v-btn-toggle v-model="multiple_select" class="transparent" multiple>
-
-						<span>BROADEN<br/>EVENT</span>
+					<v-btn-toggle v-model="selectionShouldAffectAllUnits" class="transparent" multiple>
 						<v-tooltip bottom>
-							<v-btn :value="1" flat slot="activator">
-								<v-icon >more_horiz</v-icon>
-							</v-btn>
-							<span>Add created event to multiple days</span>
-						</v-tooltip>
-
-						<v-tooltip bottom>
-							<v-btn :value="2" flat slot="activator">
+							<v-btn :value="true" flat slot="activator">
 								<v-icon>more_vert</v-icon>
 							</v-btn>
 							<span>Add created event to all units </span>
 						</v-tooltip>
-
 					</v-btn-toggle>
 
-					<v-divider	class="mx-2" vertical></v-divider>
+					<v-divider class="mx-2" vertical></v-divider>
 
-					<v-btn-toggle v-model="multiple_select" class="transparent">
-						<span>ADD<br/>DAYS</span>
+					<v-btn-toggle v-model="selectionShouldAffectMultipleDays" class="transparent" multiple>
 						<v-tooltip bottom>
-							<v-btn :value="mon_fri" flat slot="activator">
-								<v-icon>work</v-icon>
+							<v-btn :value="true" flat slot="activator">
+								<v-icon >more_horiz</v-icon>
 							</v-btn>
-							<span>Tooltip</span>
+							<span>Add created event to multiple days</span>
 						</v-tooltip>
-
-						<v-tooltip bottom>
-							<v-btn :value="sat_sun" flat slot="activator">
-								<v-icon>weekend</v-icon>
-							</v-btn>
-							<span>Tooltip</span>
-						</v-tooltip>
+						<v-btn-toggle class="transparent">
+							<v-tooltip bottom>
+								<v-btn :value="mon_fri" flat slot="activator">
+									<v-icon>work</v-icon>
+								</v-btn>
+								<span>Monday to Friday</span>
+							</v-tooltip>
+							<v-tooltip bottom>
+								<v-btn :value="sat_sun" flat slot="activator">
+									<v-icon>weekend</v-icon>
+								</v-btn>
+								<span>Weekend</span>
+							</v-tooltip>
+						</v-btn-toggle>
 					</v-btn-toggle>
 
 				</v-toolbar>
-
-
+-->
 			</v-flex>
+
 			<v-flex d-flex md12>
-				<full-calendar 
+				<full-calendar
+					ref="calendar"
 					class = "scheduler"
-					v-if="this.bufferTelldusSchedulerOverview.length > 0" 
+					v-if="$vuetify.breakpoint.mdAndUp && this.bufferTelldusSchedulerOverview.length > 0" 
 					:config="calendarConfig" 
 					:events="calendarEvents"
 
@@ -89,6 +85,7 @@
 					@day-click = "dayClick"
 				/>
 			</v-flex>
+
 		</v-layout>
 	</article>
 </template>
@@ -100,7 +97,6 @@
 import Vue from 'vue';
 import PowerSwitchesMap from "./PowerSwitchesMap.vue";
 import { EventBus } from './event-bus.js';
-
 import moment from "moment";
 export default {
 	components: {
@@ -108,64 +104,54 @@ export default {
 	computed: {
 		calendarConfig : function () {
 			
-				let permanentConfiguration = {
-					locale: "sv",					
-					schedulerLicenseKey: "GPL-My-Project-Is-Open-Source",
-					height: "parent",
-					slotLabelFormat: [
-						'dddd', // top level of text
-						'HH:mm'        // lower level of text
-					],
-					defaultView: "timelineWeek",
-					slotDuration: "00:15:00",
-					minTime: this.$FULLCALENDAR_DEFAULT_START_DATE_MONDAY,
-  maxTime: this. FULLCALENDAR_DEFAULT_END_DATE_SUNDAY,
-					defaultDate: '2018-07-06',
-					header: {
-						left: "",
-						center: "",
-						right: ""
-					},					
-					resourceGroupField: 'telldusUnitLocationName',
-					resourceColumns: [{	labelText: 'Name',	field: 'telldusUnitName' } ,{ labelText: 'Location', field: 'telldusUnitLocationDesciption'	}],
-					editable: "true",
-					selectable: "true"
-				}
+			let permanentConfiguration = {
+				locale: "sv",					
+				schedulerLicenseKey: "GPL-My-Project-Is-Open-Source",
+				height: "parent",
+				slotLabelFormat: [
+					'dddd', // top level of text
+					'HH:mm'        // lower level of text
+				],
+				defaultView: "timelineWeek",
+				slotDuration: "00:15:00",
+				minTime: this.$FULLCALENDAR_DEFAULT_START_DATE_MONDAY,
+				maxTime: this. FULLCALENDAR_DEFAULT_END_DATE_SUNDAY,
+				defaultDate: '2018-07-06',
+				header: {
+					left: "",
+					center: "",
+					right: ""
+				},					
+				resourceGroupField: 'telldusUnitLocationName',
+				resourceColumns: [{	labelText: 'Name',	field: 'telldusUnitName' } ,{ labelText: 'Location', field: 'telldusUnitLocationDesciption'	}],
+				editable: "true",
+				selectable: "true"
+			}
 
-				let variableResources = this.$_(this.bufferTelldusSchedulerOverview)
-					.sortBy(['TelldusUnitLocation_Name', 'TelldusUnitType_Name', 'TelldusUnit_Name', 'TelldusUnit_LocationDesciption'])
-					.map( (u) => {
-						let unit = {
-							id : "\"" + u.TelldusUnit_Id + "\"",
-							telldusUnitLocationName : u.TelldusUnitLocation_Name,
-							telldusUnitName : u.TelldusUnit_Name,
-							telldusUnitTypeName : u.TelldusUnitType_Name,
-							telldusUnitActive : u.TelldusUnit_Active,
-							telldusActionActive : u.TelldusAction_Active,
-							telldusUnitId : u.TelldusUnit_Id,
-							telldusUnitLocationDesciption : u.TelldusUnit_LocationDesciption
-						};
-						
-						return unit;
-					})
-					.value();
+			let variableResources = this.$_(this.bufferTelldusSchedulerOverview)
+				.sortBy(['TelldusUnitLocation_Name', 'TelldusUnitType_Name', 'TelldusUnit_Name', 'TelldusUnit_LocationDesciption'])
+				.map( (u) => {
+					let unit = {
+						id : "\"" + u.TelldusUnit_Id + "\"",
+						telldusUnitLocationName : u.TelldusUnitLocation_Name,
+						telldusUnitName : u.TelldusUnit_Name,
+						telldusUnitTypeName : u.TelldusUnitType_Name,
+						telldusUnitActive : u.TelldusUnit_Active,
+						telldusActionActive : u.TelldusAction_Active,
+						telldusUnitId : u.TelldusUnit_Id,
+						telldusUnitLocationDesciption : u.TelldusUnit_LocationDesciption
+					};
+					
+					return unit;
+				})
+				.value();
 
-				if(variableResources && variableResources.length > 1) {
-					let merged = permanentConfiguration;
-					merged.resources = variableResources;
-					return merged;
-				}
-		},
-		calendarEvents : () => {
-			let events = [
-				{ id: '1', resourceId: 'b', start: '2018-04-07T02:00:00', end: '2018-04-07T07:00:00', title: 'event 1' },
-				{ id: '2', resourceId: 'c', start: '2018-04-07T05:00:00', end: '2018-04-07T22:00:00', title: 'event 2' },
-				{ id: '3', resourceId: 'd', start: '2018-04-06', end: '2018-04-08', title: 'event 3' },
-				{ id: '4', resourceId: 'e', start: '2018-04-07T03:00:00', end: '2018-04-07T08:00:00', title: 'event 4' },
-				{ id: '5', resourceId: 'f', start: '2018-04-07T00:30:00', end: '2018-04-07T02:30:00', title: 'event 5' }
-			];
-			return events;
-		},	 
+			if(variableResources && variableResources.length > 1) {
+				let merged = permanentConfiguration;
+				merged.resources = variableResources;
+				return merged;
+			}
+		}	 
 	},
 	created () {
 		// fetch the data when the view is created and the data is
@@ -174,8 +160,10 @@ export default {
 	},
 	data() {
 		return {
-			bufferTelldusSchedulerOverview : {}
-
+			bufferTelldusSchedulerOverview : {},
+			calendarEvents: [],
+			selectionShouldAffectAllUnits : false,
+			selectionShouldAffectMultipleDays : {}
 		};
 	},
 	methods: {
@@ -199,22 +187,32 @@ export default {
 			EventBus.$emit('loading', payLoad);
 		},
 		eventSelected(event, jsEvent, view) {
+			//debugger;
 			console.log("eventSelected");
 			console.log(event);
 		},
 		eventDrop(event) {
+			debugger;
 			console.log("eventDrop");
 			console.log(event);
 		},
 		eventResize(event) {
+			debugger;
 			console.log("eventResize");
 			console.log(event);
 		},
 		eventCreated(event) {
+			event.resourceId =event.resource.id;
+			//let createdEvent = new CalendarEvent(event.resource.id, event.start, event.end, event.resource.telldusUnitName, "on");
+			//this.calendarEvents.push(event);
+			this.$refs.calendar.fireMethod('getResources')
+			this.$refs.calendar.fireMethod('renderEvent', event, true)
+			
 			console.log("eventCreated");
 			console.log(event);
 		},
 		eventReceive(event) {
+			debugger;
 			console.log("eventReceive");
 			console.log(event);
 		},
@@ -223,9 +221,7 @@ export default {
 			console.log(event);
 		},
 		viewRender(view, element) {
-			console.log("viewRender");
-			console.log(view);
-			console.log(element);
+			//when calendar is rendered
 		},
 		dayClick(date, jsEvent, view) {
 			console.log("dayClick");

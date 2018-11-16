@@ -37,7 +37,7 @@
 
 <script>
 export default {
-  name: 'NavigationDrawer',
+  name: 'NavigationList',
   props: ['drawer'],
   methods: {      
     routeLinkClick(route) {         

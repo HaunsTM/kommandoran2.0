@@ -25,7 +25,7 @@
 		</v-content>
 
 		<v-footer app fixed>
-			<span>Sjöstorpsvägen 3A</span>
+			<KommandoranFooter />
 		</v-footer>
 	</v-app>
 
@@ -35,34 +35,36 @@
 
 import { EventBus } from './components/event-bus.js';
 
+import KommandoranFooter from './components/KommandoranFooter.vue'
 import NavigationList from './components/NavigationList.vue'
+
 export default {
-name: 'App',
-data: () => ({
-	drawer: false,
-	
-	loading: false,
-	loadingError: ""
-}),
-created(){
-	EventBus.$on('loading', this.setLoadingState);
-},
-components: {
-	//NavigationDrawer
-	NavigationList
-},
-methods: {
-	navigateTo(route) {
-		this.$router.push({ path: route })
+	name: 'App',
+	data: () => ({
+		drawer: false,
+		
+		loading: false,
+		loadingError: ""
+	}),
+	created(){
+		EventBus.$on('loading', this.setLoadingState);
 	},
-	setLoadingState(data) {
-		this.loading = data.isLoading;
-		this.loadingError=JSON.stringify(data.error);
+	components: {
+		KommandoranFooter,
+		NavigationList
+	},
+	methods: {
+		navigateTo(route) {
+			this.$router.push({ path: route })
+		},
+		setLoadingState(data) {
+			this.loading = data.isLoading;
+			this.loadingError=JSON.stringify(data.error);
+		}
+	},
+	mounted () {
+		this.$mqtt.subscribe('nodered/#')
 	}
-},
-mounted () {
-	this.$mqtt.subscribe('nodered/#')
-}
 }
 </script>
 
