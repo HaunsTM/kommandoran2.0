@@ -41,8 +41,7 @@ import NavigationList from './components/NavigationList.vue'
 export default {
 	name: 'App',
 	data: () => ({
-		drawer: false,
-		
+		drawer: false,		
 		loading: false,
 		loadingError: ""
 	}),
