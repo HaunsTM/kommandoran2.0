@@ -16,23 +16,33 @@
 			
 			<v-flex d-flex md12>
 <!--
+-->
 				<v-toolbar dense>
 
+					<v-tooltip bottom>
+						<v-btn v-on:click="save" flat slot="activator">									
+							<v-icon>save</v-icon>
+						</v-btn>
+						<span>Add created event to all units </span>
+					</v-tooltip>
+
+					<v-divider class="mr-2"	vertical></v-divider>
+
 					<v-overflow-btn
-					:items="dropdown_edit"
-					editable
-					label="Select system"
-					hide-details
-					class="pa-0"
-					overflow
+						v-bind:items="dropdown_system"
+						editable
+						label="Select system"
+						hide-details
+						class="pa-0"
+						overflow
 					></v-overflow-btn>
 
 					<v-divider class="mr-2"	vertical></v-divider>
 
 					<v-btn-toggle v-model="selectionShouldAffectAllUnits" class="transparent" multiple>
 						<v-tooltip bottom>
-							<v-btn :value="true" flat slot="activator">
-								<v-icon>more_vert</v-icon>
+							<v-btn v-bind:value="1" flat slot="activator" class="toolbar-button-image">									
+								<img v-bind:src="require(`@/assets/all_units24x24.png`)"/>
 							</v-btn>
 							<span>Add created event to all units </span>
 						</v-tooltip>
@@ -42,29 +52,20 @@
 
 					<v-btn-toggle v-model="selectionShouldAffectMultipleDays" class="transparent" multiple>
 						<v-tooltip bottom>
-							<v-btn :value="true" flat slot="activator">
-								<v-icon >more_horiz</v-icon>
+							<v-btn v-bind:value="1" flat slot="activator" class="toolbar-button-image">									
+								<img v-bind:src="require(`@/assets/mon_fri24x24.png`)"/>
 							</v-btn>
-							<span>Add created event to multiple days</span>
+							<span>Monday to Friday</span>
 						</v-tooltip>
-						<v-btn-toggle class="transparent">
-							<v-tooltip bottom>
-								<v-btn :value="mon_fri" flat slot="activator">
-									<v-icon>work</v-icon>
-								</v-btn>
-								<span>Monday to Friday</span>
-							</v-tooltip>
-							<v-tooltip bottom>
-								<v-btn :value="sat_sun" flat slot="activator">
-									<v-icon>weekend</v-icon>
-								</v-btn>
-								<span>Weekend</span>
-							</v-tooltip>
-						</v-btn-toggle>
+						<v-tooltip bottom>
+							<v-btn v-bind:value="2" flat slot="activator" class="toolbar-button-image">
+								<img v-bind:src="require(`@/assets/sat_sun24x24.png`)"/>
+							</v-btn>
+							<span>Weekend</span>
+						</v-tooltip>
 					</v-btn-toggle>
 
 				</v-toolbar>
--->
 			</v-flex>
 
 			<v-flex d-flex md12>
@@ -162,8 +163,9 @@ export default {
 		return {
 			bufferTelldusSchedulerOverview : {},
 			calendarEvents: [],
-			selectionShouldAffectAllUnits : false,
-			selectionShouldAffectMultipleDays : {}
+			selectionShouldAffectAllUnits : [],
+			selectionShouldAffectMultipleDays : [],
+			dropdown_system: ["Telldus"]
 		};
 	},
 	methods: {
@@ -187,9 +189,7 @@ export default {
 			EventBus.$emit('loading', payLoad);
 		},
 		eventSelected(event, jsEvent, view) {
-			//debugger;
-			console.log("eventSelected");
-			console.log(event);
+			this.$refs.calendar.fireMethod('removeEvents', event._id);
 		},
 		eventDrop(event) {
 			debugger;
@@ -205,9 +205,14 @@ export default {
 			event.resourceId =event.resource.id;
 			//let createdEvent = new CalendarEvent(event.resource.id, event.start, event.end, event.resource.telldusUnitName, "on");
 			//this.calendarEvents.push(event);
-			this.$refs.calendar.fireMethod('getResources')
-			this.$refs.calendar.fireMethod('renderEvent', event, true)
-			
+			this.$refs.calendar.fireMethod('getResources');
+			this.$refs.calendar.fireMethod('renderEvent', event, true);
+
+			let addEvent = event;
+			addEvent.resourceId ="\"9\"";
+
+			this.$refs.calendar.fireMethod('renderEvent', addEvent, true);
+
 			console.log("eventCreated");
 			console.log(event);
 		},
@@ -228,6 +233,13 @@ export default {
 			console.log(date);
 			console.log(jsEvent);
 			console.log(view);
+		},
+		save(event) {
+			debugger;
+			var allCalendarEvents = this.$refs.calendar.fireMethod('clientEvents');
+			//disable button
+			//send to server
+			//enable button
 		}
 	}
 }
@@ -237,6 +249,9 @@ export default {
 
 
 <style scoped>
+	.toolbar-button-image >>> div {
+		width: 2rem;
+	}
 	.scheduler {
 		font-size: 10px;
 		height: calc(100vh - 11rem);

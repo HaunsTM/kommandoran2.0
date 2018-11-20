@@ -9,12 +9,12 @@
             {{dwellingTemperature}} °C
         </v-flex>
         <v-flex xs3>            
-            <v-layout align-center column fill-height class="extra-padding">              
+            <v-layout align-center column fill-height>              
                 
-                <v-flex>
+                <v-flex class="date-time">
                     {{currentTime}}
                 </v-flex>
-                <v-flex>
+                <v-flex class="date-time">
                     {{currentDate}}
                 </v-flex>
             </v-layout>
@@ -83,7 +83,7 @@ export default {
 		this.fetchTemperatureData(); 
 
         this.intervalCalculateTime = setInterval(this.calculateTime, 1*1000);
-        this.intervalCalculateDate = setInterval(this.calculateDate, 24*60*60*1000);
+        this.intervalCalculateDate = setInterval(this.calculateDate, 1*1000);
         this.intervalFetchTemperatureData = setInterval(this.fetchTemperatureData, 5*60*1000);
     },
     beforeDestroy() {
@@ -95,5 +95,8 @@ export default {
 </script>
 
 <style scope>
-
+    .date-time {
+        font-size: 1rem;
+        line-height: 1.2rem;
+    }
 </style>
