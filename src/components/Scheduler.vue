@@ -2,6 +2,7 @@
 	<article>
 		<v-layout row wrap class="hidden-md-and-up">
 			<v-flex d-flex xs12>
+				<!--
 				<full-calendar 
 						class = "scheduler"
 						v-if="!$vuetify.breakpoint.mdAndUp && this.bufferTelldusSchedulerOverview.length > 0" 
@@ -9,6 +10,7 @@
 						:events="calendarEvents"
 					/>
 
+-->
 			</v-flex>
 		</v-layout>
 
@@ -69,22 +71,7 @@
 			</v-flex>
 
 			<v-flex d-flex md12>
-				<full-calendar
-					ref="calendar"
-					class = "scheduler"
-					v-if="$vuetify.breakpoint.mdAndUp && this.bufferTelldusSchedulerOverview.length > 0" 
-					:config="calendarConfig" 
-					:events="calendarEvents"
-
-					@event-selected = "eventSelected"
-					@event-drop = "eventDrop"
-					@event-resize = "eventResize"
-					@event-created = "eventCreated"
-					@event-receive = "eventReceive"
-					@event-render = "eventRender"
-					@view-render = "viewRender"
-					@day-click = "dayClick"
-				/>
+				<DayPilotScheduler id="dp" :config="config" />
 			</v-flex>
 
 		</v-layout>
@@ -96,13 +83,29 @@
 	//https://github.com/CroudTech/vue-fullcalendar
 
 import Vue from 'vue';
-import PowerSwitchesMap from "./PowerSwitchesMap.vue";
+import {DayPilotScheduler} from 'daypilot-pro-vue'
 import { EventBus } from './event-bus.js';
 import moment from "moment";
 export default {
-	components: {
+	components: {		
+    	DayPilotScheduler 
 	},	
 	computed: {
+
+		config: function() {
+			timeHeaders: [
+				{groupBy: "Month"},
+				{groupBy: "Day", format: "d"}
+			],
+			scale: "Day",
+			startDate: DayPilot.Date.today().firstDayOfYear(),
+			days: DayPilot.Date.today().daysInYear(),
+			resources: [
+				{name: "Resource 1", id: "R1"},
+				{name: "Resource 2", id: "R2"},
+				{name: "Resource 3", id: "R3"}
+			]
+		},
 		calendarConfig : function () {
 			
 			let permanentConfiguration = {
@@ -188,52 +191,7 @@ export default {
 			let payLoad =  { "isLoading" : loading, "error" : error };
 			EventBus.$emit('loading', payLoad);
 		},
-		eventSelected(event, jsEvent, view) {
-			this.$refs.calendar.fireMethod('removeEvents', event._id);
-		},
-		eventDrop(event) {
-			debugger;
-			console.log("eventDrop");
-			console.log(event);
-		},
-		eventResize(event) {
-			debugger;
-			console.log("eventResize");
-			console.log(event);
-		},
-		eventCreated(event) {
-			event.resourceId =event.resource.id;
-			//let createdEvent = new CalendarEvent(event.resource.id, event.start, event.end, event.resource.telldusUnitName, "on");
-			//this.calendarEvents.push(event);
-			this.$refs.calendar.fireMethod('getResources');
-			this.$refs.calendar.fireMethod('renderEvent', event, true);
-
-			let addEvent = event;
-			addEvent.resourceId ="\"9\"";
-
-			this.$refs.calendar.fireMethod('renderEvent', addEvent, true);
-
-			console.log("eventCreated");
-			console.log(event);
-		},
-		eventReceive(event) {
-			debugger;
-			console.log("eventReceive");
-			console.log(event);
-		},
-		eventRender(event) {
-			console.log("eventRender");
-			console.log(event);
-		},
-		viewRender(view, element) {
-			//when calendar is rendered
-		},
-		dayClick(date, jsEvent, view) {
-			console.log("dayClick");
-			console.log(date);
-			console.log(jsEvent);
-			console.log(view);
-		},
+		
 		save(event) {
 			debugger;
 			var allCalendarEvents = this.$refs.calendar.fireMethod('clientEvents');
@@ -252,22 +210,5 @@ export default {
 	.toolbar-button-image >>> div {
 		width: 2rem;
 	}
-	.scheduler {
-		font-size: 10px;
-		height: calc(100vh - 11rem);
-	}
-	.scheduler >>> tbody.fc-body{
-		height: 100%;
-	}
 	
-	.scheduler > fc-cell-content {
-		margin-top : 1px;
-		margin-bottom: 1px;
-	}
-	.scheduler >>> .fc-divider .fc-cell-text { 
-		/* https://vue-loader.vuejs.org/guide/scoped-css.html#deep-selectors */
-		
-		font-size: larger;
-		color: #2f2f2f;
-	}
 </style>
