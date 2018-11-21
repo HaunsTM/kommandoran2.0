@@ -1,21 +1,12 @@
 <template>
 	<article>
-		<v-layout row wrap class="hidden-md-and-up">
-			<v-flex d-flex xs12>
-				<!--
-				<full-calendar 
-						class = "scheduler"
-						v-if="!$vuetify.breakpoint.mdAndUp && this.bufferTelldusSchedulerOverview.length > 0" 
-						:config="calendarConfig" 
-						:events="calendarEvents"
-					/>
-
--->
-			</v-flex>
-		</v-layout>
 
 		<v-layout row wrap class="hidden-sm-and-down">
 			
+
+			<v-flex d-flex md12>
+				<DayPilotScheduler id="dp" :config="config" ref="scheduler" />
+			</v-flex>
 			<v-flex d-flex md12>
 <!--
 -->
@@ -70,139 +61,101 @@
 				</v-toolbar>
 			</v-flex>
 
-			<v-flex d-flex md12>
-				<DayPilotScheduler id="dp" :config="config" />
-			</v-flex>
-
 		</v-layout>
 	</article>
+
+  
 </template>
+
 <script>
+import {DayPilot, DayPilotScheduler} from 'daypilot-pro-vue'
+import Vue from 'vue'
 
-
-	//https://github.com/CroudTech/vue-fullcalendar
-
-import Vue from 'vue';
-import {DayPilotScheduler} from 'daypilot-pro-vue'
-import { EventBus } from './event-bus.js';
-import moment from "moment";
 export default {
-	components: {		
-    	DayPilotScheduler 
-	},	
-	computed: {
+  name: 'Scheduler',
+  data: function() {
+    return {
+      config: {
+        timeHeaders: [{"groupBy":"Month"},{"groupBy":"Day","format":"d"}],
+        scale: "Day",
+        days: DayPilot.Date.today().daysInMonth(),
+        startDate: DayPilot.Date.today().firstDayOfMonth(),
+        timeRangeSelectedHandling: "Enabled",
+        onTimeRangeSelected: function (args) {
+          var dp = this;
+          DayPilot.Modal.prompt("Create a new event:", "Event 1").then(function(modal) {
+            dp.clearSelection();
+            if (!modal.result) { return; }
+            dp.events.add(new DayPilot.Event({
+              start: args.start,
+              end: args.end,
+              id: DayPilot.guid(),
+              resource: args.resource,
+              text: modal.result
+            }));
+          });
+        },
+        eventMoveHandling: "Update",
+        onEventMoved: function (args) {
+          this.message("Event moved: " + args.e.text());
+        },
+        eventResizeHandling: "Update",
+        onEventResized: function (args) {
+          this.message("Event resized: " + args.e.text());
+        },
+        eventDeleteHandling: "Update",
+        onEventDeleted: function (args) {
+          this.message("Event deleted: " + args.e.text());
+        },
+        eventClickHandling: "Disabled",
+        eventHoverHandling: "Bubble",
+        bubble: new DayPilot.Bubble({
+          onLoad: function(args) {
+            // if event object doesn't specify "bubbleHtml" property 
+            // this onLoad handler will be called to provide the bubble HTML
+            args.html = "Event details";
+          }
+        }),
+        treeEnabled: true,
+      },
+    }
+  },
+  props: {
+  },
+  components: {
+    DayPilotScheduler
+  },
+  computed: {
+    // DayPilot.Scheduler object - https://api.daypilot.org/daypilot-scheduler-class/
+    scheduler: function () {
+      return this.$refs.scheduler.control;
+    }
+  },
+  methods: {
+    loadEvents() {
+      const events = [
+        // { id: 1, start: "2018-10-01T00:00:00", end: "2018-10-05T00:00:00", text: "Event 1", resource: "R1" },
+        { id: 2, start: DayPilot.Date.today().addDays(2), end: DayPilot.Date.today().addDays(5), text: "Event 1", resource: "R2"}
+      ];
+      Vue.set(this.config, "events", events);
+    },
+    loadResources() {
+      const resources = [
+        {name: "Resource 1", id: "R1"},
+        {name: "Resource 2", id: "R2"},
+        {name: "Resource 3", id: "R3"}
+      ];
+      Vue.set(this.config, "resources", resources);
+    }
+  },
+  mounted: function() {
+    this.loadResources();
+    this.loadEvents();
 
-		config: function() {
-			timeHeaders: [
-				{groupBy: "Month"},
-				{groupBy: "Day", format: "d"}
-			],
-			scale: "Day",
-			startDate: DayPilot.Date.today().firstDayOfYear(),
-			days: DayPilot.Date.today().daysInYear(),
-			resources: [
-				{name: "Resource 1", id: "R1"},
-				{name: "Resource 2", id: "R2"},
-				{name: "Resource 3", id: "R3"}
-			]
-		},
-		calendarConfig : function () {
-			
-			let permanentConfiguration = {
-				locale: "sv",					
-				schedulerLicenseKey: "GPL-My-Project-Is-Open-Source",
-				height: "parent",
-				slotLabelFormat: [
-					'dddd', // top level of text
-					'HH:mm'        // lower level of text
-				],
-				defaultView: "timelineWeek",
-				slotDuration: "00:15:00",
-				minTime: this.$FULLCALENDAR_DEFAULT_START_DATE_MONDAY,
-				maxTime: this. FULLCALENDAR_DEFAULT_END_DATE_SUNDAY,
-				defaultDate: '2018-07-06',
-				header: {
-					left: "",
-					center: "",
-					right: ""
-				},					
-				resourceGroupField: 'telldusUnitLocationName',
-				resourceColumns: [{	labelText: 'Name',	field: 'telldusUnitName' } ,{ labelText: 'Location', field: 'telldusUnitLocationDesciption'	}],
-				editable: "true",
-				selectable: "true"
-			}
-
-			let variableResources = this.$_(this.bufferTelldusSchedulerOverview)
-				.sortBy(['TelldusUnitLocation_Name', 'TelldusUnitType_Name', 'TelldusUnit_Name', 'TelldusUnit_LocationDesciption'])
-				.map( (u) => {
-					let unit = {
-						id : "\"" + u.TelldusUnit_Id + "\"",
-						telldusUnitLocationName : u.TelldusUnitLocation_Name,
-						telldusUnitName : u.TelldusUnit_Name,
-						telldusUnitTypeName : u.TelldusUnitType_Name,
-						telldusUnitActive : u.TelldusUnit_Active,
-						telldusActionActive : u.TelldusAction_Active,
-						telldusUnitId : u.TelldusUnit_Id,
-						telldusUnitLocationDesciption : u.TelldusUnit_LocationDesciption
-					};
-					
-					return unit;
-				})
-				.value();
-
-			if(variableResources && variableResources.length > 1) {
-				let merged = permanentConfiguration;
-				merged.resources = variableResources;
-				return merged;
-			}
-		}	 
-	},
-	created () {
-		// fetch the data when the view is created and the data is
-		// already being observed
-		this.fetchData(); 
-	},
-	data() {
-		return {
-			bufferTelldusSchedulerOverview : {},
-			calendarEvents: [],
-			selectionShouldAffectAllUnits : [],
-			selectionShouldAffectMultipleDays : [],
-			dropdown_system: ["Telldus"]
-		};
-	},
-	methods: {
-		fetchData : function () {
-			this.setLoadingState(true);
-			let that = this;
-			const promises = [         
-				Vue.axios.get(this.$DB_API_BASE_URL + '?procedure=GetRepetitiveOnlyTelldusSchedulerOverview')
-			];
-			Promise.all(promises)
-			.then((response) => {
-				this.setLoadingState(false);
-				that.bufferTelldusSchedulerOverview = response[0].data[1];
-			})
-			.catch((error) => {
-				this.setLoadingState(false, error);
-			});
-		},
-		setLoadingState: function (loading, error) {
-			let payLoad =  { "isLoading" : loading, "error" : error };
-			EventBus.$emit('loading', payLoad);
-		},
-		
-		save(event) {
-			debugger;
-			var allCalendarEvents = this.$refs.calendar.fireMethod('clientEvents');
-			//disable button
-			//send to server
-			//enable button
-		}
-	}
+    this.scheduler.message("Welcome!");
+  }
 }
 </script>
-
 
 
 
@@ -210,5 +163,6 @@ export default {
 	.toolbar-button-image >>> div {
 		width: 2rem;
 	}
+
 	
 </style>
