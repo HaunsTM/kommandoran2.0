@@ -21,8 +21,7 @@ Vue.config.productionTip = false;
 Vue.prototype.$TELLDUS_API_BASE_URL = 'http://10.0.0.4/iot/kommandoran2.0/telldus-api';
 Vue.prototype.$DB_API_BASE_URL = 'http://10.0.0.4/iot/kommandoran2.0/db-api';
 
-Vue.prototype.$FULLCALENDAR_DEFAULT_START_DATE_MONDAY = '2018-07-02';
-Vue.prototype.$FULLCALENDAR_DEFAULT_END_DATE_SUNDAY = '2018-07-08';
+Vue.prototype.$DEFAULT_START_DATE_MONDAY = '2018-07-02';
 
 Object.defineProperty(Vue.prototype, '$_', { value: _ });
 
