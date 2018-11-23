@@ -243,7 +243,7 @@ export default {
         	this.setLoadingState(true);
 
 			const promises = [    
-				Vue.axios.get(this.$TELLDUS_API_BASE_URL + '?telldusActionTypeActionTypeOption=onOffDevice&telldusUnitName=' + currentDevice.name + '&telldusActionValueTypeName=command&telldusActionValueActionValue=' + setPointState)
+				Vue.axios.get(this.$TELLDUS_API_BASE_URL + '?telldusActionTypeActionTypeOption=onOffDevice&telldusUnitName=' + currentDevice.name + '&telldusActionValueTypeName=levelValue&telldusActionValueActionValue=' + setPointState)
 			];
 
 			Promise.all(promises)
