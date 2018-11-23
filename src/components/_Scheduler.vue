@@ -218,8 +218,6 @@ export default {
 	.toolbar-button-image >>> div {
 		width: 2rem;
 	}
-
-	
     #dp * {
 		all: initial;
 	}

@@ -80,8 +80,15 @@ export default {
 			selectionShouldAffectMultipleDays : [],
 			dropdown_system: ["Telldus"],
 			config: {
-				timeHeaders: [{"groupBy":"Day","format":"dddd"},{"groupBy":"Hour", "format":"HH:mm"}],
-				scale: "Hour",
+				timeHeaders: [{"groupBy":"Day","format":"dddd"},{"groupBy":"Hour", "format":"HH"},{"groupBy":"Cell"}],
+				
+				scale: "CellDuration",
+				cellDuration: 5,
+				cellWidth: 20,
+
+				crosshairType: "Full",
+
+
 				days: 7,
 				startDate: this.$DEFAULT_START_DATE_MONDAY,
 				timeRangeSelectedHandling: "Enabled",
@@ -193,13 +200,16 @@ export default {
 			//disable button
 			//send to server
 			//enable button
+			let eventList = this.$refs.scheduler.control.events.list;
+			debugger;
+				//this.$refs.scheduler.control.rows.expandAll();
 		}
 	},
 	mounted: function() {
 		this.loadResources();
 		//this.loadEvents();
 
-		this.scheduler.message("Welcome!");
+		this.scheduler.message("Welcomes!");
 	}
 }
 </script>
@@ -211,5 +221,10 @@ export default {
 		width: 2rem;
 	}
 
+	
+#dp >>> ::-webkit-scrollbar { 
+    display: block !important; 
+	visibility: visible !important;
+} 
 	
 </style>
