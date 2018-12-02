@@ -66,7 +66,8 @@
 
 <script>
 import Vue from 'vue';
-import {DayPilot, DayPilotScheduler} from 'daypilot-pro-vue'
+
+import { DayPilot, DayPilotScheduler } from 'daypilot-pro-vue'
 import { EventBus } from './event-bus.js';
 
 export default {
@@ -141,17 +142,148 @@ export default {
 			return this.$refs.scheduler.control;
 		}
 	},
-	methods: {		
+	methods: {
+		calendarEvent(start, end, resource, text, durationBarColor) {
+			const calendarEvent = {
+				"start": start,
+				"end": end,
+				"resource": resource,
+				"text": text,
+				"durationBarColor": durationBarColor,
+				"id": DayPilot.guid()
+			};
+			return calendarEvent;
+		},		
+		calendarEventDateTime(weekDay, hour, minute) {
+			const daysToAdd = (weekDay === 0) ? 6 : weekDay - 1;
+			const dateTime = new Date(this.$DEFAULT_START_DATE_MONDAY);
+			dateTime.setHours(hour, minute);
+			dateTime.setDate(dateTime.getDate() + daysToAdd);
+			return dateTime;
+		},
+		calendarEventArrayPerResource(resourceId, resourceWithActivitiesArray) {
+			let calendarEventArrayPerResource = [];
+			const numberOfActivities = resourceWithActivitiesArray.length;
+			let durationBarColor = "";
+			let i = 0;
+
+			while (i < numberOfActivities) {
+				let currentEventIsLastInSerie = (i + 1) === numberOfActivities;
+				let currentEvent = resourceWithActivitiesArray[i];
+				debugger;
+				let currentEventDateTime = 
+					this.calendarEventDateTime(currentEvent.Scheduler_WeekDay, currentEvent.Scheduler_Hour, currentEvent.Scheduler_Minute)
+					.toISOString();
+debugger;
+//TODO: toISOString gives "wrong" timestring
+				switch (currentEvent.TelldusActionTypes_ActionTypeOption) {
+					case "onOffDevice":
+						durationBarColor = "red";
+
+						if (currentEvent.TelldusActionValue_ActionValue === "on") {
+							if (!currentEventIsLastInSerie) {
+								let nextEvent = resourceWithActivitiesArray[i+1];
+								let nextEventDateTime = 
+									this.calendarEventDateTime(nextEvent.Scheduler_WeekDay, nextEvent.Scheduler_Hour, nextEvent.Scheduler_Minute)
+									.toISOString();
+
+								if (nextEvent.TelldusActionValue_ActionValue === "off") {
+									calendarEventArrayPerResource.push(	this.calendarEvent(
+										currentEventDateTime, 
+										nextEventDateTime, 
+										resourceId, 
+										currentEvent.TelldusActionTypes_ActionTypeOption, 
+										durationBarColor)
+									);
+									i++;
+								} else {
+									calendarEventArrayPerResource.push(	this.calendarEvent(
+										currentEventDateTime, 
+										currentEventDateTime, 
+										resourceId, 
+										currentEvent.TelldusActionTypes_ActionTypeOption, 
+										durationBarColor)
+									);
+								}
+							} else {
+								calendarEventArrayPerResource.push(	this.calendarEvent(
+									currentEventDateTime, 
+									currentEventDateTime, 
+									resourceId, 
+									currentEvent.TelldusActionTypes_ActionTypeOption, 
+									durationBarColor)
+								);
+							}
+						} else {							
+							if (!currentEventIsLastInSerie) {
+								const nextEvent = resourceWithActivitiesArray[i+1];
+								const nextEventDateTime = this.calendarEventDateTime(nextEvent.Scheduler_WeekDay, nextEvent.Scheduler_Hour, nextEvent.Scheduler_Minute)
+
+								if (nextEvent.TelldusActionValue_ActionValue === "on") {
+									calendarEventArrayPerResource.push(	this.calendarEvent(
+										currentEventDateTime, 
+										nextEventDateTime, 
+										resourceId, 
+										currentEvent.TelldusActionTypes_ActionTypeOption, 
+										durationBarColor)
+									);
+									i++;
+								} else {
+									calendarEventArrayPerResource.push(	this.calendarEvent(
+										currentEventDateTime, 
+										currentEventDateTime, 
+										resourceId, 
+										currentEvent.TelldusActionTypes_ActionTypeOption, 
+										durationBarColor)
+									);
+								}
+							} else {
+								calendarEventArrayPerResource.push(	this.calendarEvent(
+									currentEventDateTime, 
+									currentEventDateTime, 
+									resourceId, 
+									currentEvent.TelldusActionTypes_ActionTypeOption, 
+									durationBarColor)
+								);
+							}
+						}
+						break;
+					default:
+						durationBarColor = "blue";
+
+				}
+				i++;
+			}
+			return calendarEventArrayPerResource;			
+		},
+		groupResourcesEvents(loadedTelldusSchedulerOverview) {
+			const MIN_STRING_CONTENT_LENGTH_TO_REPRESENT_A_POSSIBLE_JSON_OBJECT = 10;
+			let that = this;
+
+			let groupedResourcesEvents = this.$_(loadedTelldusSchedulerOverview)
+				.filter( (e) => { return (e.ScheduledActivities && e.ScheduledActivities.length > MIN_STRING_CONTENT_LENGTH_TO_REPRESENT_A_POSSIBLE_JSON_OBJECT); })
+				.map( (resource) => {
+					let repetitiveActivities = that.$_(JSON.parse(resource.ScheduledActivities))
+						.filter( (sE) => { return ( sE.Scheduler_Year === "" && sE.Scheduler_Month === "" && sE.Scheduler_Day === "" && sE.Scheduler_WeekDay !== "")})
+						.sortBy(['TelldusActionTypes_ActionTypeOption','Scheduler_WeekDay', 'Scheduler_Hour', 'Scheduler_Minute'])
+						.value();
+					return that.calendarEventArrayPerResource(resource.TelldusUnit_Id, repetitiveActivities)
+				})
+				.flattenDeep()
+				.union()
+				.value();
+			return groupedResourcesEvents; 
+		},
 		groupResources(loadedTelldusSchedulerOverview) {
 			let groupedResources = this.$_(loadedTelldusSchedulerOverview)
-				.sortBy(['TelldusUnitLocation_Name', 'TelldusUnitType_Name', 'TelldusUnit_Name', 'TelldusUnit_LocationDesciption'])
+				.sortBy(['TelldusActionValueType_Name'])
 				.groupBy(x => x.TelldusUnitLocation_Name)
 				.map( (value, key) => {
 					let resourceGroup = {
 						"name" : key,
 						"children" :  value.map( u => {
 							let child = {
-								id : "\"" + u.TelldusUnit_Id + "\"",
+								id :  u.TelldusUnit_Id,
 								name: u.TelldusUnit_Name + "<br />" + u.TelldusUnit_LocationDesciption,
 								
 								TelldusUnitType_Name : u.TelldusUnitType_Name,
@@ -162,17 +294,22 @@ export default {
 						})
 					}			
 				return resourceGroup;})
-				.value();
+			.value();
 			return groupedResources;
 		},
 		loadEvents() {
 			const events = [
 			// { id: 1, start: "2018-10-01T00:00:00", end: "2018-10-05T00:00:00", text: "Event 1", resource: "R1" },
-			{ id: 2, start: DayPilot.Date.today().addDays(2), end: DayPilot.Date.today().addDays(5), text: "Event 1", resource: "R2"}
+				{"start":"2018-07-02T00:25:00",
+				"end":"2018-07-02T00:25:00",
+				"resource":"\"16\"",
+				"text":"Event 1" ,
+				"id":DayPilot.guid()
+				}
 			];
 			Vue.set(this.config, "events", events);
 		},
-		loadResources() {
+		loadCalendarData() {
 			this.setLoadingState(true);
 			let that = this;
 			const promises = [         
@@ -182,9 +319,12 @@ export default {
 			.then((response) => {
 				that.setLoadingState(false);
 				let loadedTelldusSchedulerOverview = response[0].data[1];
-				let groupedResources = that.groupResources(loadedTelldusSchedulerOverview);
-				
+
+				let groupedResources = that.groupResources(loadedTelldusSchedulerOverview);				
+				let groupResourcesEvents = that.groupResourcesEvents(loadedTelldusSchedulerOverview);
+	debugger;
 				Vue.set(this.config, "resources", groupedResources);
+				Vue.set(this.config, "events", groupResourcesEvents);
 				that.$refs.scheduler.control.rows.expandAll();
 			})
 			.catch((error) => {
@@ -195,7 +335,7 @@ export default {
 			let payLoad =  { "isLoading" : loading, "error" : error };
 			EventBus.$emit('loading', payLoad);
 		},
-		
+
 		save(event) {
 			//disable button
 			//send to server
@@ -206,10 +346,10 @@ export default {
 		}
 	},
 	mounted: function() {
-		this.loadResources();
+		this.loadCalendarData();
 		//this.loadEvents();
 
-		this.scheduler.message("Welcomes!");
+		//this.scheduler.message("Welcomes!");
 	}
 }
 </script>
