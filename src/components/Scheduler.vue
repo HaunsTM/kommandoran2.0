@@ -159,7 +159,16 @@ export default {
 			const dateTime = new Date(this.$DEFAULT_START_DATE_MONDAY);
 			dateTime.setHours(hour, minute);
 			dateTime.setDate(dateTime.getDate() + daysToAdd);
-			return dateTime;
+
+			const yearValue = dateTime.getFullYear().toString();
+			const monthValue = (dateTime.getMonth() + 1).toString().toString().padStart(2,'0');
+			const dateValue = dateTime.getDate().toString().padStart(2,'0');
+			const hourValue = hour.toString().padStart(2,'0');
+			const minuteValue = minute.toString().padStart(2,'0');
+			const secondValue = '00';
+			
+			let calendarEventDateTime = yearValue + '-' + monthValue + '-' + dateValue + 'T' + hourValue + ':' + minuteValue + ':' + secondValue;
+			return calendarEventDateTime;
 		},
 		calendarEventArrayPerResource(resourceId, resourceWithActivitiesArray) {
 			let calendarEventArrayPerResource = [];
@@ -170,12 +179,9 @@ export default {
 			while (i < numberOfActivities) {
 				let currentEventIsLastInSerie = (i + 1) === numberOfActivities;
 				let currentEvent = resourceWithActivitiesArray[i];
-				debugger;
 				let currentEventDateTime = 
-					this.calendarEventDateTime(currentEvent.Scheduler_WeekDay, currentEvent.Scheduler_Hour, currentEvent.Scheduler_Minute)
-					.toISOString();
-debugger;
-//TODO: toISOString gives "wrong" timestring
+					this.calendarEventDateTime(currentEvent.Scheduler_WeekDay, currentEvent.Scheduler_Hour, currentEvent.Scheduler_Minute);
+
 				switch (currentEvent.TelldusActionTypes_ActionTypeOption) {
 					case "onOffDevice":
 						durationBarColor = "red";
@@ -184,8 +190,7 @@ debugger;
 							if (!currentEventIsLastInSerie) {
 								let nextEvent = resourceWithActivitiesArray[i+1];
 								let nextEventDateTime = 
-									this.calendarEventDateTime(nextEvent.Scheduler_WeekDay, nextEvent.Scheduler_Hour, nextEvent.Scheduler_Minute)
-									.toISOString();
+									this.calendarEventDateTime(nextEvent.Scheduler_WeekDay, nextEvent.Scheduler_Hour, nextEvent.Scheduler_Minute);
 
 								if (nextEvent.TelldusActionValue_ActionValue === "off") {
 									calendarEventArrayPerResource.push(	this.calendarEvent(
@@ -217,7 +222,7 @@ debugger;
 						} else {							
 							if (!currentEventIsLastInSerie) {
 								const nextEvent = resourceWithActivitiesArray[i+1];
-								const nextEventDateTime = this.calendarEventDateTime(nextEvent.Scheduler_WeekDay, nextEvent.Scheduler_Hour, nextEvent.Scheduler_Minute)
+								const nextEventDateTime = this.calendarEventDateTime(nextEvent.Scheduler_WeekDay, nextEvent.Scheduler_Hour, nextEvent.Scheduler_Minute);
 
 								if (nextEvent.TelldusActionValue_ActionValue === "on") {
 									calendarEventArrayPerResource.push(	this.calendarEvent(
@@ -297,18 +302,6 @@ debugger;
 			.value();
 			return groupedResources;
 		},
-		loadEvents() {
-			const events = [
-			// { id: 1, start: "2018-10-01T00:00:00", end: "2018-10-05T00:00:00", text: "Event 1", resource: "R1" },
-				{"start":"2018-07-02T00:25:00",
-				"end":"2018-07-02T00:25:00",
-				"resource":"\"16\"",
-				"text":"Event 1" ,
-				"id":DayPilot.guid()
-				}
-			];
-			Vue.set(this.config, "events", events);
-		},
 		loadCalendarData() {
 			this.setLoadingState(true);
 			let that = this;
@@ -322,7 +315,7 @@ debugger;
 
 				let groupedResources = that.groupResources(loadedTelldusSchedulerOverview);				
 				let groupResourcesEvents = that.groupResourcesEvents(loadedTelldusSchedulerOverview);
-	debugger;
+
 				Vue.set(this.config, "resources", groupedResources);
 				Vue.set(this.config, "events", groupResourcesEvents);
 				that.$refs.scheduler.control.rows.expandAll();
