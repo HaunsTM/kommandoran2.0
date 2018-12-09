@@ -340,7 +340,6 @@ export default {
 	},
 	mounted: function() {
 		this.loadCalendarData();
-		//this.loadEvents();
 
 		//this.scheduler.message("Welcomes!");
 	}
