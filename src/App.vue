@@ -25,7 +25,7 @@
 		</v-content>
 
 		<v-footer app fixed>
-			<KommandoranFooter />
+			<kommandoran-footer />
 		</v-footer>
 	</v-app>
 
@@ -36,6 +36,7 @@
 import { EventBus } from './components/event-bus.js';
 
 import KommandoranFooter from './components/KommandoranFooter.vue'
+
 import NavigationList from './components/NavigationList.vue'
 
 export default {
