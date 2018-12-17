@@ -1,14 +1,23 @@
 <template>
-    <article class="flex-container column justify-content-center">
-        <div class="flex-container">
-            <div>
-                {{currentTime}}
+
+    <article class="flex-container">
+        <div class="flex-container column">
+            <div>                
+                <img :src="require(`@/assets/wall-clock24x24.png`)" />
             </div>
         </div>
-        <div class="flex-container">
-                {{currentDate}}
+        <div class="flex-container column justify-content-center">
+            <div class="flex-container">
+                <div>
+                    {{currentTime}}
+                </div>
+            </div>
+            <div class="flex-container">
+                    {{currentDate}}
+            </div>
         </div>
     </article>
+
 </template>
 
 <script>
