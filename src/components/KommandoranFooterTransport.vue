@@ -8,8 +8,8 @@
         </div>
         <div class="flex-container column">
             <div class="flex-container">
-                
-                <div class="flex-container column">
+
+               <div class="flex-container column">
                     <div class="current-ride" v-bind:class="{deviations: transportData['Lund'][0].Deviations !== ''}">
                         <span class="line-info">{{transportData['Lund'][0].Name}}</span>                   
                     </div>
@@ -26,7 +26,7 @@
                     </div>
                 </div>
                 
-                <div class="flex-container column">
+               <div class="flex-container column">
                     <div class="current-ride" v-bind:class="{deviations: transportData['Lund'][0].Deviations !== ''}">
                         <span class="scheduled-departure">{{transportData['Lund'][0].JourneyTime}}</span>
                         <span v-if="transportData['Lund'][0].Deviations !== ''">({{transportData['Lund'][0].Deviations}})</span>                        
@@ -43,13 +43,13 @@
                         <span>{{transportData['Lund'][1].JourneyTime}})</span>
                         <span v-if="transportData['Lund'][1].Deviations !== ''">({{transportData['Lund'][1].Deviations}})</span>
                     </span>
-                    <span class="next-ride" v-bind:class="{deviations: transportData['Malmö'][1].Deviations !== ''}">
+                     <span class="next-ride" v-bind:class="{deviations: transportData['Malmö'][1].Deviations !== ''}">
                         <span>({{transportData['Malmö'][1].Name}}</span>
                         <span>{{transportData['Malmö'][1].JourneyTime}})</span>
                         <span v-if="transportData['Malmö'][1].Deviations !== ''">({{transportData['Malmö'][1].Deviations}})</span>
                     </span>
                 </div>
-
+ 
             </div>
         </div>
     </article>
@@ -65,7 +65,7 @@ export default {
         bufferTransportData: {},
     }),
     created(){
-    },  
+    },
     computed: {
         mediaWidthMoreThan400px: () => {            
             return window.matchMedia("(min-width: 400px)").matches;
@@ -93,8 +93,6 @@ export default {
 			}
 		}
     },
-    methods: {
-    },
 	mqtt: {
 		// subscribe to this topic for updates 
 		'nodered/transport/departureTime' (data, topic) {
@@ -103,11 +101,7 @@ export default {
 			let decodedJSON = JSON.parse(decoded);
 			this.transportData = decodedJSON;
         }
-	},
-    mounted() {
-    },
-    beforeDestroy() {
-    }
+	}
 }
 </script>
 
