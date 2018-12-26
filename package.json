@@ -9,11 +9,11 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
-    "fullcalendar-scheduler": "^1.9.4",
+    "daypilot-pro-vue": "https://npm.daypilot.org/daypilot-pro-vue/trial/2018.4.3487.tar.gz",
     "lodash": "^4.17.11",
+    "moment": "^2.22.2",
     "vue": "^2.5.17",
     "vue-axios": "^2.1.4",
-    "vue-full-calendar": "^2.7.0",
     "vue-mqtt": "^2.0.3",
     "vue-range-slider": "^0.6.0",
     "vue-router": "^3.0.1",
