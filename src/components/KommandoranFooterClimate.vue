@@ -56,9 +56,6 @@
 
 import Vue from 'vue';
 
-import moment from "moment";
-import localization from 'moment/locale/sv';
-
 export default {
     name: 'KommandoranFooterClimate',
     data: () => ({

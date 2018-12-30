@@ -141,6 +141,18 @@ export default {
 		this.fetchData(); 
 	},
 	methods: {
+		setAllDevices : function(setPointState) {
+
+		},
+		setAllComfortDevices : function(setPointState) {
+
+		},
+		setAllZwaveDevices : function(setPointState) {
+
+		},
+		setAll433MHzDevices : function(setPointState) {
+
+		},
 		fetchData : function () {
         	this.setLoadingState(true);
 			let that = this;
