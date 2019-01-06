@@ -29,11 +29,11 @@
                <div class="flex-container column">
                     <div class="current-ride" v-bind:class="{deviations: transportData['Lund'][0].Deviations !== ''}">
                         <span class="scheduled-departure">{{transportData['Lund'][0].JourneyTime}}</span>
-                        <span v-if="transportData['Lund'][0].Deviations !== ''">({{transportData['Lund'][0].Deviations}})</span>                        
+                        <span v-if="transportData['Lund'][0].Deviations !== ''">(+ {{transportData['Lund'][0].Deviations}} min)</span>                        
                     </div>
                     <div class="current-ride" v-bind:class="{deviations: transportData['Malmö'][0].Deviations !== ''}">
                         <span class="scheduled-departure">{{transportData['Malmö'][0].JourneyTime}}</span>
-                        <span v-if="transportData['Malmö'][0].Deviations !== ''">({{transportData['Malmö'][0].Deviations}})</span>                        
+                        <span v-if="transportData['Malmö'][0].Deviations !== ''">(+ {{transportData['Malmö'][0].Deviations}} min)</span>                        
                     </div>
                 </div>
                 
@@ -41,12 +41,12 @@
                     <span class="next-ride" v-bind:class="{deviations: transportData['Lund'][1].Deviations !== ''}">
                         <span>({{transportData['Lund'][1].Name}}</span>
                         <span>{{transportData['Lund'][1].JourneyTime}})</span>
-                        <span v-if="transportData['Lund'][1].Deviations !== ''">({{transportData['Lund'][1].Deviations}})</span>
+                        <span v-if="transportData['Lund'][1].Deviations !== ''">(+ {{transportData['Lund'][1].Deviations}} min)</span>
                     </span>
                      <span class="next-ride" v-bind:class="{deviations: transportData['Malmö'][1].Deviations !== ''}">
                         <span>({{transportData['Malmö'][1].Name}}</span>
                         <span>{{transportData['Malmö'][1].JourneyTime}})</span>
-                        <span v-if="transportData['Malmö'][1].Deviations !== ''">({{transportData['Malmö'][1].Deviations}})</span>
+                        <span v-if="transportData['Malmö'][1].Deviations !== ''">(+ {{transportData['Malmö'][1].Deviations}} min)</span>
                     </span>
                 </div>
  

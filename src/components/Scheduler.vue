@@ -338,9 +338,11 @@ export default {
 				//this.$refs.scheduler.control.rows.expandAll();
 		}
 	},
+	created() {
+		window.alert = (message) => { console.log(message); }
+    },
 	mounted: function() {
 		this.loadCalendarData();
-
 		//this.scheduler.message("Welcomes!");
 	}
 }

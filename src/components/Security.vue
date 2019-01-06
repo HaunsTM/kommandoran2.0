@@ -45,11 +45,11 @@ export default {
             return window.matchMedia("(min-width: 400px)").matches;
         },
         videoSize () {
-            const baseWidth=320;
-            const baseHeight=240;
+            const baseWidth=1280;
+            const baseHeight=720;
             switch (this.$vuetify.breakpoint.name) {
-                case 'xs': return { width: baseWidth * 0.8, height: baseHeight * 0.8 };
-                default: return { width: baseWidth * 1.5, height: baseHeight * 1.5 };
+                case 'xs': return { width: baseWidth * 0. , height: baseHeight * 0.2 };
+                default: return { width: baseWidth * 0.4, height: baseHeight * 0.4 };
                 /*case 'sm': return { width: baseWidth * 1.875, height: baseHeight * 1.875 };
                 case 'md': return { width: baseWidth * 3, height: baseHeight * 3};
                 case 'lg': return { width: baseWidth * 3.95, height: baseHeight * 3.95 };
@@ -60,12 +60,16 @@ export default {
     },
     methods: {
         flvPlayer: (videoElementRef, type, url) => {
-	        var flvPlayer = flvjs.createPlayer({
-	            type: type,
-	            url: url
-	        });
-	        flvPlayer.attachMediaElement(videoElementRef);
-	        flvPlayer.load();
+            const config = {
+                enableStashBuffer: false
+            };
+            const mediaDataSource = { 
+                type: type,
+                url: url
+            };
+            var flvPlayer = flvjs.createPlayer( mediaDataSource, config );
+            flvPlayer.attachMediaElement( videoElementRef );
+            flvPlayer.load();
 
             return flvPlayer;
         }
