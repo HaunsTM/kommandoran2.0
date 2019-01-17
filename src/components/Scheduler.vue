@@ -1,13 +1,21 @@
 <template>
 	<article>
-
+		<v-dialog
+			v-model="eventSelectorDialog"
+		>
+			<event-selector-dialog
+				v-bind:grouped-resources-by-location-and-telldus-unit-type="groupedResourcesByLocationAndTelldusUnitType"
+				v-bind:current-event="currentSelectedEvent"
+			>
+			</event-selector-dialog>
+		</v-dialog>
 		<v-layout row wrap class="hidden-sm-and-down">
 			
 			<v-flex d-flex md12>
 				<v-toolbar >
 
 					<v-tooltip bottom>
-						<v-btn v-on:click="save" flat slot="activator">									
+						<v-btn v-on:click="save" flat slot="activator">
 							<v-icon>save</v-icon>
 						</v-btn>
 						<span>Add created event to all units </span>
@@ -24,38 +32,13 @@
 						overflow
 					></v-overflow-btn>
 
-					<v-divider class="mr-2"	vertical></v-divider>
-
-					<v-btn-toggle v-model="selectionShouldAffectAllUnits" class="transparent" multiple>
-						<v-tooltip bottom>
-							<v-btn v-bind:value="1" flat slot="activator" class="toolbar-button-image">									
-								<img v-bind:src="require(`@/assets/all_units24x24.png`)"/>
-							</v-btn>
-							<span>Add created event to all units </span>
-						</v-tooltip>
-					</v-btn-toggle>
-
-					<v-divider class="mx-2" vertical></v-divider>
-
-					<v-btn-toggle v-model="selectionShouldAffectMultipleDays" class="transparent" multiple>
-						<v-tooltip bottom>
-							<v-btn v-bind:value="1" flat slot="activator" class="toolbar-button-image">									
-								<img v-bind:src="require(`@/assets/mon_fri24x24.png`)"/>
-							</v-btn>
-							<span>Monday to Friday</span>
-						</v-tooltip>
-						<v-tooltip bottom>
-							<v-btn v-bind:value="2" flat slot="activator" class="toolbar-button-image">
-								<img v-bind:src="require(`@/assets/sat_sun24x24.png`)"/>
-							</v-btn>
-							<span>Weekend</span>
-						</v-tooltip>
-					</v-btn-toggle>
-
 				</v-toolbar>
 			</v-flex>
 			<v-flex d-flex md12>
-				<DayPilotScheduler id="dp" :config="config" ref="scheduler" />
+				<DayPilotScheduler 
+					id="dp" 
+					:config="config" 
+					ref="scheduler"/>
 			</v-flex>
 
 		</v-layout>
@@ -66,6 +49,7 @@
 
 <script>
 import Vue from 'vue';
+import EventSelectorDialog from './EventSelectorDialog';
 
 import { DayPilot, DayPilotScheduler } from 'daypilot-pro-vue'
 import { EventBus } from './event-bus.js';
@@ -73,12 +57,11 @@ import { EventBus } from './event-bus.js';
 export default {
 	name: 'Scheduler',
 	data: function() {
-		return {
-			
+		return {			
 			bufferTelldusSchedulerOverview : {},
 			calendarEvents: [],
-			selectionShouldAffectAllUnits : [],
-			selectionShouldAffectMultipleDays : [],
+			currentSelectedEvent: {},
+			eventSelectorDialog: false,
 			dropdown_system: ["Telldus"],
 			config: {
 				timeHeaders: [{"groupBy":"Day","format":"dddd"},{"groupBy":"Hour", "format":"HH"},{"groupBy":"Cell"}],
@@ -92,9 +75,16 @@ export default {
 
 				days: 7,
 				startDate: this.$DEFAULT_START_DATE_MONDAY,
-				timeRangeSelectedHandling: "Enabled",
+
+				onAfterRender: function(args) {
+
+								this.rows.expandAll();
+				},
+
+				/*timeRangeSelectedHandling: "Enabled",
 				onTimeRangeSelected: function (args) {
 					var dp = this;
+					
 					DayPilot.Modal.prompt("Create a new event:", "Event 1")
 						.then(function(modal) {
 							dp.clearSelection();
@@ -107,7 +97,8 @@ export default {
 								text: modal.result
 							}));
 						});
-				},
+					
+				},*/
 				eventMoveHandling: "Update",
 				onEventMoved: function (args) {
 					this.message("Event moved: " + args.e.text());
@@ -134,9 +125,84 @@ export default {
 		}
 	},
 	components: {
-		DayPilotScheduler
+		DayPilotScheduler,
+		EventSelectorDialog
 	},
 	computed: {
+		
+		groupResourcesEvents() {
+			const MIN_STRING_CONTENT_LENGTH_TO_REPRESENT_A_POSSIBLE_JSON_OBJECT = 10;
+			let that = this;
+
+			let groupedResourcesEvents = this.$_(this.bufferTelldusSchedulerOverview)
+				.filter( (e) => { return (e.ScheduledActivities && e.ScheduledActivities.length > MIN_STRING_CONTENT_LENGTH_TO_REPRESENT_A_POSSIBLE_JSON_OBJECT); })
+				.map( (resource) => {
+					let repetitiveActivities = that.$_(JSON.parse(resource.ScheduledActivities))
+						.filter( (sE) => { return ( sE.Scheduler_Year === "" && sE.Scheduler_Month === "" && sE.Scheduler_Day === "" && sE.Scheduler_WeekDay !== "")})
+						.sortBy(['TelldusActionTypes_ActionTypeOption','Scheduler_WeekDay', 'Scheduler_Hour', 'Scheduler_Minute'])
+						.value();
+					return that.calendarEventArrayPerResource(resource.TelldusUnit_Id, repetitiveActivities)
+				})
+				.flattenDeep()
+				.union()
+				.value();
+			return groupedResourcesEvents; 
+		},
+		groupResourcesByLocation() {
+			let groupedResources = this.$_(this.bufferTelldusSchedulerOverview)
+				.sortBy(['TelldusActionValueType_Name'])
+				.groupBy(x => x.TelldusUnitLocation_Name)
+				.map( (value, key) => {
+					let resourceGroup = {
+						"name" : key,
+						"children" :  value.map( u => {
+							let child = {
+								id :  u.TelldusUnit_Id,
+								name: u.TelldusUnit_Name + "<br />" + u.TelldusUnit_LocationDesciption,
+								
+								TelldusUnitType_Name : u.TelldusUnitType_Name,
+								TelldusUnit_Active : u.TelldusUnit_Active,
+								TelldusAction_Active : u.TelldusAction_Active
+							};
+							return child;
+						})
+					}
+					return resourceGroup;
+				})
+			.value();
+			return groupedResources;
+		},
+		groupedResourcesByLocationAndTelldusUnitType() {
+			let groupedResources = this.$_(this.bufferTelldusSchedulerOverview)
+				.sortBy(['TelldusUnitLocation_Name'])
+				.groupBy(x => x.TelldusUnitLocation_Name)
+				.map( (value, key) => {
+					let resourceGroupByUnitLocation = {
+						
+						"node": {"TelldusUnitLocation_Name" : key, "checked": false},
+						"children" :  this.$_(value)
+							.groupBy(x => x.TelldusUnitType_Name)
+							.map( (value, key) => {
+								let child = {
+									"node": {"TelldusUnitType_Name" : key, "checked": false},
+									"children" :  value.map( u => {
+										let child = {
+											"TelldusUnit_Name": u.TelldusUnit_Name,
+											"checked": false,
+											"TelldusUnit_LocationDesciption": u.TelldusUnit_LocationDesciption
+										};
+										return child;
+									})
+								}
+								return child;
+							})
+							.value()
+					}
+					return resourceGroupByUnitLocation;
+				})
+			.value();
+			return JSON.parse( JSON.stringify( groupedResources ) );
+		},
 		// DayPilot.Scheduler object - https://api.daypilot.org/daypilot-scheduler-class/
 		scheduler: function () {
 			return this.$refs.scheduler.control;
@@ -261,81 +327,36 @@ export default {
 			}
 			return calendarEventArrayPerResource;			
 		},
-		groupResourcesEvents(loadedTelldusSchedulerOverview) {
-			const MIN_STRING_CONTENT_LENGTH_TO_REPRESENT_A_POSSIBLE_JSON_OBJECT = 10;
-			let that = this;
-
-			let groupedResourcesEvents = this.$_(loadedTelldusSchedulerOverview)
-				.filter( (e) => { return (e.ScheduledActivities && e.ScheduledActivities.length > MIN_STRING_CONTENT_LENGTH_TO_REPRESENT_A_POSSIBLE_JSON_OBJECT); })
-				.map( (resource) => {
-					let repetitiveActivities = that.$_(JSON.parse(resource.ScheduledActivities))
-						.filter( (sE) => { return ( sE.Scheduler_Year === "" && sE.Scheduler_Month === "" && sE.Scheduler_Day === "" && sE.Scheduler_WeekDay !== "")})
-						.sortBy(['TelldusActionTypes_ActionTypeOption','Scheduler_WeekDay', 'Scheduler_Hour', 'Scheduler_Minute'])
-						.value();
-					return that.calendarEventArrayPerResource(resource.TelldusUnit_Id, repetitiveActivities)
-				})
-				.flattenDeep()
-				.union()
-				.value();
-			return groupedResourcesEvents; 
-		},
-		groupResources(loadedTelldusSchedulerOverview) {
-			let groupedResources = this.$_(loadedTelldusSchedulerOverview)
-				.sortBy(['TelldusActionValueType_Name'])
-				.groupBy(x => x.TelldusUnitLocation_Name)
-				.map( (value, key) => {
-					let resourceGroup = {
-						"name" : key,
-						"children" :  value.map( u => {
-							let child = {
-								id :  u.TelldusUnit_Id,
-								name: u.TelldusUnit_Name + "<br />" + u.TelldusUnit_LocationDesciption,
-								
-								TelldusUnitType_Name : u.TelldusUnitType_Name,
-								TelldusUnit_Active : u.TelldusUnit_Active,
-								TelldusAction_Active : u.TelldusAction_Active
-							};
-							return child;
-						})
-					}			
-				return resourceGroup;})
-			.value();
-			return groupedResources;
-		},
 		loadCalendarData() {
 			this.setLoadingState(true);
-			let that = this;
 			const promises = [         
 				Vue.axios.get(this.$DB_API_BASE_URL + '?procedure=GetRepetitiveOnlyTelldusSchedulerOverview')
 			];
 			Promise.all(promises)
 			.then((response) => {
-				that.setLoadingState(false);
-				let loadedTelldusSchedulerOverview = response[0].data[1];
+				this.setLoadingState(false);
+				this.bufferTelldusSchedulerOverview = response[0].data[1];
 
-				let groupedResources = that.groupResources(loadedTelldusSchedulerOverview);				
-				let groupResourcesEvents = that.groupResourcesEvents(loadedTelldusSchedulerOverview);
-
-				Vue.set(this.config, "resources", groupedResources);
-				Vue.set(this.config, "events", groupResourcesEvents);
-				that.$refs.scheduler.control.rows.expandAll();
+				Vue.set(this.config, "resources", this.groupResourcesByLocation);
+				Vue.set(this.config, "events", this.groupResourcesEvents);
 			})
 			.catch((error) => {
-				that.setLoadingState(false, error);
+				this.setLoadingState(false, error);
 			});
 		},
 		setLoadingState: function (loading, error) {
 			let payLoad =  { "isLoading" : loading, "error" : error };
 			EventBus.$emit('loading', payLoad);
 		},
-
 		save(event) {
 			//disable button
 			//send to server
 			//enable button
 			let eventList = this.$refs.scheduler.control.events.list;
-			debugger;
-				//this.$refs.scheduler.control.rows.expandAll();
+		},
+		timeRangeSelected: function(args) {
+			this.currentSelectedEvent = args;
+			this.eventSelectorDialog = true;
 		}
 	},
 	created() {
@@ -344,6 +365,8 @@ export default {
 	mounted: function() {
 		this.loadCalendarData();
 		//this.scheduler.message("Welcomes!");
+		//add event handlers for calendar
+		this.scheduler.onTimeRangeSelected = this.timeRangeSelected;
 	}
 }
 </script>
