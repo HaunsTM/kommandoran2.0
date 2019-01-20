@@ -1,6 +1,6 @@
 <template>
     
-	<div>
+	<div class="invisible-scrollbar">
 		<v-layout row wrap class="hidden-sm-and-up">
 			<v-flex d-flex xs12>
 				<div class="scroll-parent-xs">
@@ -431,6 +431,10 @@ export default {
 }
 </script>
 <style scoped>
+	::-webkit-scrollbar {
+		display: none;
+	}
+
 	.scroll-parent-xs {
         height: calc(100vh - 45vh);
 		overflow: hidden;

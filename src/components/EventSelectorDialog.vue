@@ -1,57 +1,93 @@
 <template>
         <v-card>
-            <v-card-title class="headline">Use Google's location service?</v-card-title>
+            <v-card-title class="headline">{{start}}</v-card-title>
             <v-card-text>
-                <article class="container row">
-                    <section class="grouped-resources-list container column">
-                        <div v-for="unitLocation in groupedResources" v-bind:key="unitLocation.node.TelldusUnitLocation_Name" class="container row">
-                            <!-- Resources -->
-                            <div class="container column">
-                                <div>
+                <div class="flex-container row">
+                    <div class="grouped-resources-list">
+                        <table>
+                            <tr v-for="unitLocation in groupedResources" v-bind:key="unitLocation.node.TelldusUnitLocation_Name" class="resourceGroup">
+                                <td class="location">
                                     <v-checkbox
                                         @change="toggledLocation(unitLocation)"
                                         v-model="unitLocation.node.checked"
                                         :label="unitLocation.node.TelldusUnitLocation_Name"
                                         color="white"
                                         hide-details
+                                        class="checkbox"
                                     ></v-checkbox>
-                                </div>
-                            </div>
-                            <div class="container column">
-                                <div v-for="unitType in unitLocation.children" v-bind:key="unitType.node.TelldusUnitType_Name" class="container row">
-                                    <div class="container column">
-                                        <div>
-                                            <v-checkbox
-                                                @change="toggledType(unitType)"
-                                                v-model="unitType.node.checked"
-                                                :label="unitType.node.TelldusUnitType_Name"
-                                                color="white"
-                                                hide-details
-                                            ></v-checkbox>
-                                        </div>
-                                    </div>
-                                    <div class="container column">
-                                        <div v-for="unit in unitType.children" v-bind:key="unit.TelldusUnit_Name" class="container row">
-                                            <div>
+                                </td>
+                                <td>
+                                    <table>
+                                        <tr v-for="unitType in unitLocation.children" v-bind:key="unitType.node.TelldusUnitType_Name" class="type-unit">
+                                            <td class="type">
                                                 <v-checkbox
-                                                    v-model="unit.checked"
-                                                    :label="unit.TelldusUnit_Name"
+                                                    @change="toggledType(unitType)"
+                                                    v-model="unitType.node.checked"
+                                                    :label="unitType.node.TelldusUnitType_Name"
                                                     color="white"
                                                     hide-details
-                                                ></v-checkbox>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                                    class="checkbox"
+                                                ></v-checkbox>                                        
+                                            </td>
+                                            <td class="unit">
+                                                <table>
+                                                    <tr v-for="unit in unitType.children" v-bind:key="unit.TelldusUnit_Name">
+                                                        <td>
+                                                            <v-checkbox
+                                                                v-model="unit.checked"
+                                                                :label="unit.TelldusUnit_Name"
+                                                                color="white"
+                                                                hide-details
+                                                                class="checkbox"
+                                                            ></v-checkbox>                                                    
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="flex-container column action-list">
+                        <section>
+                            <h4>Selected units</h4>
+                            <p>{{selectedUnits}}</p>
+                        </section>
+                        <section>
+                            <h4>Action days</h4>
+                            <div class="flex-container row">
+                                <v-checkbox v-model="days.monday.checked" :label="days.monday.name" color="white" class="checkbox"></v-checkbox>
+                                <v-checkbox v-model="days.tuesday.checked" :label="days.tuesday.name" color="white" class="checkbox"></v-checkbox>
+                                <v-checkbox v-model="days.wednesday.checked" :label="days.wednesday.name" color="white" class="checkbox"></v-checkbox>
+                                <v-checkbox v-model="days.thursday.checked" :label="days.thursday.name" color="white" class="checkbox"></v-checkbox>
+                                <v-checkbox v-model="days.friday.checked" :label="days.friday.name" color="white" class="checkbox"></v-checkbox>
                             </div>
-                        </div>
-                        
-                    </section>
-                    <!--<section class="container row">
-                         Week days 
-                    </section>-->
-                </article>
-
+                            <div class="flex-container row">
+                                <v-checkbox v-model="days.saturday.checked" :label="days.saturday.name" color="white" class="checkbox"></v-checkbox>
+                                <v-checkbox v-model="days.sunday.checked" :label="days.sunday.name" color="white" class="checkbox"></v-checkbox>  
+                            </div>
+                        </section>
+                        <section>
+                            <h4>Action level value</h4>
+                            <h5>Start: </h5>
+                            <div class="flex-container row center-row">
+<!--
+                                <v-checkbox v-model="actionLevelValue.start" label="on" color="white" class="checkbox"></v-checkbox>
+                                <v-slider
+                                    v-model="actionLevelValue.start"
+                                    step="25"
+                                    thumb-label
+                                    ticks
+                                    class="value-slider"
+                                ></v-slider>
+                                <v-checkbox v-model="actionLevelValue.start.off" label="off" color="white" class="checkbox"></v-checkbox>  
+-->     
+                            </div>
+                        </section>
+                    </div>
+                </div>
             </v-card-text>
 
             <v-card-actions>
@@ -76,7 +112,9 @@
 </template>
 
 <script>
-import Vue from 'vue';
+
+import moment from "moment";
+import localization from 'moment/locale/sv';
 
 export default {
     name: 'EventSelectorDialog',
@@ -115,7 +153,8 @@ export default {
             },
             wholeWorkWeek_name: "Mon - Fri",
             weekend_name: "Sat - Sun",
-            groupedResources : {}
+            groupedResources : {},
+            actionLevelValue : {}
 		}
     },
     methods: { 
@@ -133,7 +172,31 @@ export default {
                 unit.checked = checked;
             });
         }
-    },
+    },    
+	computed: {
+        start() {
+            return this.currentEvent.start;
+        },
+        end() {
+            return this.currentEvent.end;
+        },
+        selectedUnits() {
+            let selectedUnits = {};
+            if(this.groupedResources) {
+                selectedUnits = this.groupedResources
+                .flatMap( (loc) => {
+                    return loc.children.flatMap( (type) => {
+                        return type.children.flatMap( (u) => {
+                            if (u.checked) {
+                                return u.TelldusUnit_Name;
+                            }
+                        })
+                    })
+                });
+            }
+            return selectedUnits;
+        }
+	},
 	watch: {
         groupedResourcesByLocationAndTelldusUnitType: {
             handler: function(newValue, oldValue) {
@@ -145,25 +208,61 @@ export default {
 
     },
 	mounted: function () {
+
 	}
 }
 </script>
 
 <style scoped>
-    .grouped-resources-list > article, section, div {
-       padding: 0;
-       /*  margin: 0; */
-    }
-    .grouped-resources-list{
-        border: 1px solid white;
-    }
-    .container {
-        display: flex; /* or inline-flex */
-    }
-    .row {
-        flex-direction: row;
+
+    .flex-container {
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-start;
     }
     .column {
         flex-direction: column;
     }
+    .row {
+        flex-direction: row;
+    }
+    .center-row {        
+        align-items: baseline;
+    }
+
+    .grouped-resources-list {
+        height: calc(100vh - 45vh);
+        width: 60%;
+		overflow-y: scroll;
+    }
+    
+    .resourceGroup:nth-child(2n+2) {
+       background-color: #757575;
+    }
+    .location {
+        width: 15rem;
+    }
+    .type {
+        width: 15rem;
+    }
+    .unit {
+        width: 15rem;
+    }
+
+    .checkbox {
+        margin: 0;
+        padding: 0 1rem 0 0;
+    }
+
+    .action-list {
+        width: 40%;
+        padding-left: 2rem;
+        justify-content: flex-start;
+        align-items: flex-start;
+    }
+    .value-slider {
+        margin: 0;
+        padding-right: 1rem;
+    }
+
 </style>

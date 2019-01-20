@@ -4,21 +4,21 @@
             <v-flex xs12 sm6 class="video-card-container">
                 <v-card dark class="video-card">
                     <v-card-media primary class="title">Fågelmatare</v-card-media>
-                    <v-card-media primary><video ref="birdFeeder" :width="videoSize.width" :height="videoSize.height"></video></v-card-media>
+                    <img src="http://10.0.0.2:1021/mjpegfeed?oid=2&full">
                     <v-card-text>Den här bilden visar en vy</v-card-text>
                 </v-card>
             </v-flex>
             <v-flex xs12 sm6 class="video-card-container">
                 <v-card dark class="video-card">
                     <v-card-media primary class="title">Uterum</v-card-media>
-                    <v-card-media primary><video ref="outdoorRoom" :width="videoSize.width" :height="videoSize.height"></video></v-card-media>
+                    <v-card-media primary><img src="http://10.0.0.2:1021/mjpegfeed?oid=1&full"></v-card-media>
                     <v-card-text>{{ lorem }}</v-card-text>
                 </v-card>
             </v-flex>
             <v-flex xs12 sm6 class="video-card-container">
                 <v-card dark class="video-card">
                     <v-card-media primary class="title">Garage</v-card-media>
-                    <v-card-media primary><video ref="garage" :width="videoSize.width" :height="videoSize.height"></video></v-card-media>
+                    <v-card-media primary><img src="http://10.0.0.2:1021/mjpegfeed?oid=3&full"></v-card-media>
                     <v-card-text>{{ lorem }}</v-card-text>
                 </v-card>
             </v-flex>
@@ -58,54 +58,19 @@ export default {
             }
         }
     },
-    methods: {
-        flvPlayer: (videoElementRef, type, url) => {
-            const config = {
-                enableStashBuffer: false
-            };
-            const mediaDataSource = { 
-                type: type,
-                url: url
-            };
-            var flvPlayer = flvjs.createPlayer( mediaDataSource, config );
-            flvPlayer.attachMediaElement( videoElementRef );
-            flvPlayer.load();
-
-            return flvPlayer;
-        }
-    },
     mounted() {
-        this.birdFeederCam = this.flvPlayer(this.$refs.birdFeeder, 'flv', 'http://10.0.0.4:8000/surveillance/bird-feeder.flv');
-        this.outdoorRoomCam = this.flvPlayer(this.$refs.outdoorRoom, 'flv', 'http://10.0.0.4:8001/surveillance/outdoor-room.flv');
-        this.garageCam = this.flvPlayer(this.$refs.garage, 'flv', 'http://10.0.0.4:8002/surveillance/garage.flv');
-
-        this.birdFeederCam.play();
-        this.outdoorRoomCam.play();
-        this.garageCam.play();
     },
     beforeDestroy() {
-
-        this.birdFeederCam.pause();
-        this.birdFeederCam.unload();
-        this.birdFeederCam.detachMediaElement();
-        this.birdFeederCam.destroy();
-        this.birdFeederCam = null;
-
-        this.outdoorRoomCam.pause();
-        this.outdoorRoomCam.unload();
-        this.outdoorRoomCam.detachMediaElement();
-        this.outdoorRoomCam.destroy();
-        this.outdoorRoomCam = null;
-        
-        this.garageCam.pause();
-        this.garageCam.unload();
-        this.garageCam.detachMediaElement();
-        this.garageCam.destroy();
-        this.garageCam = null;
     }
 }
 </script>
 <style scoped>
+    img {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+    }
     .video-card-container {
         padding: 1rem;
     }
