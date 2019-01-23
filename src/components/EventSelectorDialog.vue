@@ -72,19 +72,14 @@
                         <section>
                             <h4>Action level value</h4>
                             <h5>Start: </h5>
-                            <div class="flex-container row center-row">
-<!--
-                                <v-checkbox v-model="actionLevelValue.start" label="on" color="white" class="checkbox"></v-checkbox>
-                                <v-slider
-                                    v-model="actionLevelValue.start"
-                                    step="25"
-                                    thumb-label
-                                    ticks
-                                    class="value-slider"
-                                ></v-slider>
-                                <v-checkbox v-model="actionLevelValue.start.off" label="off" color="white" class="checkbox"></v-checkbox>  
--->     
-                            </div>
+                            <v-slider
+                                v-model="actionLevelValue.start"
+                                :tick-labels="actionValues"
+                                max="2"
+                                tick-size="6"
+                            ></v-slider>
+                            <h5>End: </h5>
+                            <v-switch v-model="actionLevelValue.end" label="off" value="off"></v-switch>
                         </section>
                     </div>
                 </div>
@@ -121,6 +116,11 @@ export default {
     props: ['groupedResourcesByLocationAndTelldusUnitType', 'currentEvent'],
 	data: function() {
 		return {
+            actionValues: ['off', '30', 'on'],
+            actionLevelValue: {
+                start: 100,
+                end: 0
+            },
 			days: {
                 monday: {
                     checked: false,
@@ -153,8 +153,7 @@ export default {
             },
             wholeWorkWeek_name: "Mon - Fri",
             weekend_name: "Sat - Sun",
-            groupedResources : {},
-            actionLevelValue : {}
+            groupedResources: {}
 		}
     },
     methods: { 
@@ -182,7 +181,7 @@ export default {
         },
         selectedUnits() {
             let selectedUnits = {};
-            if(this.groupedResources) {
+            if(this.groupedResources.flatMap) {
                 selectedUnits = this.groupedResources
                 .flatMap( (loc) => {
                     return loc.children.flatMap( (type) => {
@@ -192,7 +191,7 @@ export default {
                             }
                         })
                     })
-                });
+                }).filter( e => e);
             }
             return selectedUnits;
         }
@@ -240,7 +239,7 @@ export default {
        background-color: #757575;
     }
     .location {
-        width: 15rem;
+        width: 10rem;
     }
     .type {
         width: 15rem;

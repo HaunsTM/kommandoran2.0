@@ -1,6 +1,7 @@
 <template>
 	<article>
 		<v-dialog
+			v-if="bufferTelldusSchedulerOverview !== {}"
 			v-model="eventSelectorDialog"
 		>
 			<event-selector-dialog
@@ -61,8 +62,9 @@ export default {
 			bufferTelldusSchedulerOverview : {},
 			calendarEvents: [],
 			currentSelectedEvent: {},
-			eventSelectorDialog: false,
 			dropdown_system: ["Telldus"],
+			eventSelectorDialog: false,
+			regValidTelldusUnitTypes_Name: /(^433 MHz - OnOff|433 MHz - Bell|Z-Wave - OnOffDim$)/,
 			config: {
 				timeHeaders: [{"groupBy":"Day","format":"dddd"},{"groupBy":"Hour", "format":"HH"},{"groupBy":"Cell"}],
 				
@@ -149,59 +151,72 @@ export default {
 			return groupedResourcesEvents; 
 		},
 		groupResourcesByLocation() {
+			const that = this;
 			let groupedResources = this.$_(this.bufferTelldusSchedulerOverview)
 				.sortBy(['TelldusActionValueType_Name'])
 				.groupBy(x => x.TelldusUnitLocation_Name)
-				.map( (value, key) => {
+				.reduce( (result0, value, key) => {
 					let resourceGroup = {
 						"name" : key,
-						"children" :  value.map( u => {
-							let child = {
-								id :  u.TelldusUnit_Id,
-								name: u.TelldusUnit_Name + "<br />" + u.TelldusUnit_LocationDesciption,
-								
-								TelldusUnitType_Name : u.TelldusUnitType_Name,
-								TelldusUnit_Active : u.TelldusUnit_Active,
-								TelldusAction_Active : u.TelldusAction_Active
-							};
-							return child;
-						})
+						"children" :  value.reduce( (result1, u) => {
+							if (u.TelldusUnitType_Name.match(that.regValidTelldusUnitTypes_Name)) {
+								let child = {
+									id :  u.TelldusUnit_Id,
+									name: u.TelldusUnit_Name + "<br />" + u.TelldusUnit_LocationDesciption,
+									
+									TelldusUnitType_Name : u.TelldusUnitType_Name,
+									TelldusUnit_Active : u.TelldusUnit_Active,
+									TelldusAction_Active : u.TelldusAction_Active
+								};
+								result1.push(child);
+							}
+							return result1;
+						}, [])
+					}					
+					if(resourceGroup.children.length > 0) {
+						result0.push(resourceGroup);
 					}
-					return resourceGroup;
-				})
-			.value();
+					return result0;
+				}, []);
 			return groupedResources;
 		},
 		groupedResourcesByLocationAndTelldusUnitType() {
+			const that = this;
 			let groupedResources = this.$_(this.bufferTelldusSchedulerOverview)
 				.sortBy(['TelldusUnitLocation_Name'])
 				.groupBy(x => x.TelldusUnitLocation_Name)
-				.map( (value, key) => {
-					let resourceGroupByUnitLocation = {
-						
-						"node": {"TelldusUnitLocation_Name" : key, "checked": false},
-						"children" :  this.$_(value)
+				.reduce( (result0, value0, key0) => {
+					let resourceGroupByUnitLocation = {						
+						"node": {"TelldusUnitLocation_Name" : key0, "checked": false},
+						"children" :  this.$_(value0)
 							.groupBy(x => x.TelldusUnitType_Name)
-							.map( (value, key) => {
-								let child = {
-									"node": {"TelldusUnitType_Name" : key, "checked": false},
-									"children" :  value.map( u => {
-										let child = {
-											"TelldusUnit_Name": u.TelldusUnit_Name,
-											"checked": false,
-											"TelldusUnit_LocationDesciption": u.TelldusUnit_LocationDesciption
-										};
-										return child;
-									})
+							.reduce( (result1, value1, key1) => {
+								let child1 = {
+									"node": {"TelldusUnitType_Name" : key1, "checked": false},
+									"children" :  value1.reduce( (result2, u) => {
+										if (u.TelldusUnitType_Name.match(that.regValidTelldusUnitTypes_Name)) {
+											let child2 = {
+												"TelldusUnit_Name": u.TelldusUnit_Name,
+												"checked": false,
+												"TelldusUnit_LocationDesciption": u.TelldusUnit_LocationDesciption
+											};
+											result2.push(child2);
+										}
+										return result2;
+									}, [])
 								}
-								return child;
-							})
-							.value()
+								if(child1.children.length > 0) {
+									result1.push(child1);
+								}
+								return result1;
+							}, [])
 					}
-					return resourceGroupByUnitLocation;
-				})
-			.value();
-			return JSON.parse( JSON.stringify( groupedResources ) );
+					if(resourceGroupByUnitLocation.children.length > 0) {
+						result0.push(resourceGroupByUnitLocation);
+					}
+					return result0;
+				}, []);
+			return groupedResources;
 		},
 		// DayPilot.Scheduler object - https://api.daypilot.org/daypilot-scheduler-class/
 		scheduler: function () {
