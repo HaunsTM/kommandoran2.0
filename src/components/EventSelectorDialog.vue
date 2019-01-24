@@ -53,7 +53,8 @@
                     <div class="flex-container column action-list">
                         <section>
                             <h4>Selected units</h4>
-                            <p>{{selectedUnits}}</p>
+                            <p v-if="selectedUnits.length > 0">{{selectedUnits}}</p>
+                            <p v-else>NO UNIT SELECTED</p>
                         </section>
                         <section>
                             <h4>Action days</h4>
@@ -72,14 +73,31 @@
                         <section>
                             <h4>Action level value</h4>
                             <h5>Start: </h5>
-                            <v-slider
-                                v-model="actionLevelValue.start"
-                                :tick-labels="actionValues"
-                                max="2"
-                                tick-size="6"
-                            ></v-slider>
+                            <v-btn-toggle v-model="actionLevelValue.start" mandatory>
+                                <v-btn flat value="Off">
+                                    <img :src="require(`@/assets/lightbulbOff.png`)"/>
+                                    <span>Off</span>
+                                </v-btn>
+                                <v-btn flat value="30">
+                                    <img :src="require(`@/assets/lightbulb30p32x32.png`)"/>
+                                    <span>30%</span>
+                                </v-btn>
+                                <v-btn flat value="On">
+                                    <img :src="require(`@/assets/lightbulbFull32x32.png`)"/>
+                                    <span>On</span>
+                                </v-btn>
+                            </v-btn-toggle>
                             <h5>End: </h5>
-                            <v-switch v-model="actionLevelValue.end" label="off" value="off"></v-switch>
+                            <v-btn-toggle v-model="actionLevelValue.end" mandatory>
+                                <v-btn flat>
+                                    <img :src="require(`@/assets/update-arrows32x32.png`)"/>
+                                    <span>Keep</span>
+                                </v-btn>
+                                <v-btn flat value="Off">
+                                    <img :src="require(`@/assets/lightbulbOff.png`)"/>
+                                    <span>Off</span>
+                                </v-btn>
+                            </v-btn-toggle>
                         </section>
                     </div>
                 </div>
