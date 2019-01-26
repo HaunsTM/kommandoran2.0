@@ -5,7 +5,7 @@
                 <div class="flex-container row">
                     <div class="grouped-resources-list">
                         <table>
-                            <tr v-for="unitLocation in groupedResources" v-bind:key="unitLocation.node.TelldusUnitLocation_Name" class="resourceGroup">
+                            <tr v-for="unitLocation in currentGroupedResources" v-bind:key="unitLocation.node.TelldusUnitLocation_Name" class="resourceGroup">
                                 <td class="location">
                                     <v-checkbox
                                         @change="toggledLocation(unitLocation)"
@@ -74,29 +74,44 @@
                             <h4>Action level value</h4>
                             <h5>Start: </h5>
                             <v-btn-toggle v-model="actionLevelValue.start" mandatory>
-                                <v-btn flat value="Off">
-                                    <img :src="require(`@/assets/lightbulbOff.png`)"/>
-                                    <span>Off</span>
-                                </v-btn>
-                                <v-btn flat value="30">
-                                    <img :src="require(`@/assets/lightbulb30p32x32.png`)"/>
-                                    <span>30%</span>
-                                </v-btn>
-                                <v-btn flat value="On">
-                                    <img :src="require(`@/assets/lightbulbFull32x32.png`)"/>
-                                    <span>On</span>
-                                </v-btn>
+                                <v-tooltip bottom>
+                                    <v-btn flat slot="activator" value="off">
+                                        <img :src="require(`@/assets/lightbulbOff.png`)"/>
+                                        <span>Off</span>
+                                    </v-btn>
+                                    <span>Should be set to off from the beginning</span>
+                                </v-tooltip>
+                                <v-tooltip bottom>
+                                    <v-btn flat slot="activator" value="30">
+                                        <img :src="require(`@/assets/lightbulb30p32x32.png`)"/>
+                                        <span>30%</span>
+                                    </v-btn>
+                                    <span>Should be set to level 30% from the beginning</span>
+                                </v-tooltip>
+                                <v-tooltip bottom>
+                                    <v-btn flat slot="activator" value="on">
+                                        <img :src="require(`@/assets/lightbulbFull32x32.png`)"/>
+                                        <span>On</span>
+                                    </v-btn>
+                                    <span>Should be set to on from the beginning</span>
+                                </v-tooltip>
                             </v-btn-toggle>
                             <h5>End: </h5>
                             <v-btn-toggle v-model="actionLevelValue.end" mandatory>
-                                <v-btn flat>
-                                    <img :src="require(`@/assets/update-arrows32x32.png`)"/>
-                                    <span>Keep</span>
-                                </v-btn>
-                                <v-btn flat value="Off">
-                                    <img :src="require(`@/assets/lightbulbOff.png`)"/>
-                                    <span>Off</span>
-                                </v-btn>
+                                <v-tooltip bottom>
+                                    <v-btn flat slot="activator" value="keep" >
+                                        <img :src="require(`@/assets/update-arrows32x32.png`)"/>
+                                        <span>Keep </span>
+                                    </v-btn>
+                                    <span>Don't change setting when time's up</span>
+                                </v-tooltip>
+                                <v-tooltip bottom>
+                                    <v-btn flat slot="activator" value="off">
+                                        <img :src="require(`@/assets/lightbulbOff.png`)"/>
+                                        <span>Off</span>
+                                    </v-btn>
+                                    <span>Set to off when time's up</span>
+                                </v-tooltip>
                             </v-btn-toggle>
                         </section>
                     </div>
@@ -131,13 +146,12 @@ import localization from 'moment/locale/sv';
 
 export default {
     name: 'EventSelectorDialog',
-    props: ['groupedResourcesByLocationAndTelldusUnitType', 'currentEvent'],
+    props: ['groupedResources', 'currentEvent', 'visible'],
 	data: function() {
 		return {
-            actionValues: ['off', '30', 'on'],
             actionLevelValue: {
-                start: 100,
-                end: 0
+                start: 'on',
+                end: 'off'
             },
 			days: {
                 monday: {
@@ -171,10 +185,10 @@ export default {
             },
             wholeWorkWeek_name: "Mon - Fri",
             weekend_name: "Sat - Sun",
-            groupedResources: {}
+            currentGroupedResources: []
 		}
     },
-    methods: { 
+    methods: {
         toggledLocation(args) {
             const that = this;
             const checked = args.node.checked;
@@ -188,7 +202,29 @@ export default {
             args.children.forEach( (unit) => {
                 unit.checked = checked;
             });
-        }
+        },        
+        setCurrentGroupedResources() {
+            const tempGroupedResources = JSON.parse( JSON.stringify( this.groupedResources ) )
+            const retVal = tempGroupedResources.map( (loc) => {
+                    let locTemp = {
+                        'node': loc.node,
+                        'children': loc.children.map( (type) => {
+                            let typeTemp = {
+                                'node': type.node,
+                                'children': type.children.map( (unit) => {
+                                    if (unit.TelldusUnit_Id === this.currentEvent.resource) {
+                                        unit.checked = true;
+                                    }
+                                    return unit;
+                                })
+                            }
+                            return typeTemp;
+                        })
+                    }
+                    return locTemp;
+                });
+            this.currentGroupedResources = retVal;
+        },
     },    
 	computed: {
         start() {
@@ -199,8 +235,8 @@ export default {
         },
         selectedUnits() {
             let selectedUnits = {};
-            if(this.groupedResources.flatMap) {
-                selectedUnits = this.groupedResources
+            if(this.currentGroupedResources.flatMap) {
+                selectedUnits = this.currentGroupedResources
                 .flatMap( (loc) => {
                     return loc.children.flatMap( (type) => {
                         return type.children.flatMap( (u) => {
@@ -213,13 +249,17 @@ export default {
             }
             return selectedUnits;
         }
-	},
-	watch: {
-        groupedResourcesByLocationAndTelldusUnitType: {
-            handler: function(newValue, oldValue) {
-                this.groupedResources = newValue;
+    },
+    watch: {        
+        visible: {
+            immediate: true,
+            deep: true,
+            handler(newValue, oldValue) {
+
+                this.setCurrentGroupedResources();
+                console.log('Hello');
             }
-        },
+        }
     },
 	created() {
 

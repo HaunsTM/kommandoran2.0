@@ -5,8 +5,9 @@
 			v-model="eventSelectorDialog"
 		>
 			<event-selector-dialog
-				v-bind:grouped-resources-by-location-and-telldus-unit-type="groupedResourcesByLocationAndTelldusUnitType"
+				v-bind:grouped-resources="groupedResourcesByLocationAndTelldusUnitType"
 				v-bind:current-event="currentSelectedEvent"
+				v-bind:visible="eventSelectorDialog"
 			>
 			</event-selector-dialog>
 		</v-dialog>
@@ -196,6 +197,7 @@ export default {
 									"children" :  value1.reduce( (result2, u) => {
 										if (u.TelldusUnitType_Name.match(that.regValidTelldusUnitTypes_Name)) {
 											let child2 = {
+												"TelldusUnit_Id" :  u.TelldusUnit_Id,
 												"TelldusUnit_Name": u.TelldusUnit_Name,
 												"checked": false,
 												"TelldusUnit_LocationDesciption": u.TelldusUnit_LocationDesciption
