@@ -27,7 +27,7 @@
                                                     color="white"
                                                     hide-details
                                                     class="checkbox"
-                                                ></v-checkbox>                                        
+                                                ></v-checkbox>
                                             </td>
                                             <td class="unit">
                                                 <table>
@@ -36,10 +36,11 @@
                                                             <v-checkbox
                                                                 v-model="unit.checked"
                                                                 :label="unit.TelldusUnit_Name"
+                                                                :hint="unit.TelldusUnit_LocationDesciption"
                                                                 color="white"
-                                                                hide-details
+                                                                persistent-hint
                                                                 class="checkbox"
-                                                            ></v-checkbox>                                                    
+                                                            ></v-checkbox>                                                
                                                         </td>
                                                     </tr>
                                                 </table>
@@ -57,62 +58,80 @@
                             <p v-else>NO UNIT SELECTED</p>
                         </section>
                         <section>
-                            <h4>Action days</h4>
-                            <div class="flex-container row">
-                                <v-checkbox v-model="days.monday.checked" :label="days.monday.name" color="white" class="checkbox"></v-checkbox>
-                                <v-checkbox v-model="days.tuesday.checked" :label="days.tuesday.name" color="white" class="checkbox"></v-checkbox>
-                                <v-checkbox v-model="days.wednesday.checked" :label="days.wednesday.name" color="white" class="checkbox"></v-checkbox>
-                                <v-checkbox v-model="days.thursday.checked" :label="days.thursday.name" color="white" class="checkbox"></v-checkbox>
-                                <v-checkbox v-model="days.friday.checked" :label="days.friday.name" color="white" class="checkbox"></v-checkbox>
-                            </div>
-                            <div class="flex-container row">
-                                <v-checkbox v-model="days.saturday.checked" :label="days.saturday.name" color="white" class="checkbox"></v-checkbox>
-                                <v-checkbox v-model="days.sunday.checked" :label="days.sunday.name" color="white" class="checkbox"></v-checkbox>  
-                            </div>
-                        </section>
-                        <section>
                             <h4>Action level value</h4>
                             <h5>Start: </h5>
-                            <v-btn-toggle v-model="actionLevelValue.start" mandatory>
-                                <v-tooltip bottom>
-                                    <v-btn flat slot="activator" value="off">
-                                        <img :src="require(`@/assets/lightbulbOff.png`)"/>
-                                        <span>Off</span>
-                                    </v-btn>
-                                    <span>Should be set to off from the beginning</span>
-                                </v-tooltip>
-                                <v-tooltip bottom>
-                                    <v-btn flat slot="activator" value="30">
-                                        <img :src="require(`@/assets/lightbulb30p32x32.png`)"/>
-                                        <span>30%</span>
-                                    </v-btn>
-                                    <span>Should be set to level 30% from the beginning</span>
-                                </v-tooltip>
-                                <v-tooltip bottom>
-                                    <v-btn flat slot="activator" value="on">
-                                        <img :src="require(`@/assets/lightbulbFull32x32.png`)"/>
-                                        <span>On</span>
-                                    </v-btn>
-                                    <span>Should be set to on from the beginning</span>
-                                </v-tooltip>
-                            </v-btn-toggle>
+                            <div class="flex-container row">
+                                <div>
+                                    {{currentSettings.start.time}}
+                                    <v-text-field
+                                        v-model="currentSettings.start.time"
+                                        :value="currentValue" 
+                                        return-masked-value
+                                        mask="##.##"
+                                        @input="handleInput"
+                                    ></v-text-field>
+                                </div>
+                                <div>
+                                    <v-btn-toggle v-model="currentSettings.start.actionLevelValue" mandatory>
+                                        <v-tooltip bottom>
+                                            <v-btn flat slot="activator" value="off">
+                                                <img :src="require(`@/assets/lightbulbOff.png`)"/>
+                                                <span>Off</span>
+                                            </v-btn>
+                                            <span>Meaning that the setting Off applies from the beginning</span>
+                                        </v-tooltip>
+                                        <v-tooltip bottom>
+                                            <v-btn flat slot="activator" value="30">
+                                                <img :src="require(`@/assets/lightbulb30p32x32.png`)"/>
+                                                <span>30%</span>
+                                            </v-btn>
+                                            <span>Meaning that the setting level 30% (or on in cases where 30% is not valid) applies from the beginning</span>
+                                        </v-tooltip>
+                                        <v-tooltip bottom>
+                                            <v-btn flat slot="activator" value="on">
+                                                <img :src="require(`@/assets/lightbulbFull32x32.png`)"/>
+                                                <span>On</span>
+                                            </v-btn>
+                                            <span>Meaning that the setting On applies from the beginning</span>
+                                        </v-tooltip>
+                                    </v-btn-toggle>
+                                </div>
+                            </div>
+                            
+
+
                             <h5>End: </h5>
-                            <v-btn-toggle v-model="actionLevelValue.end" mandatory>
+                            <v-btn-toggle v-model="currentSettings.end.actionLevelValue" mandatory>
                                 <v-tooltip bottom>
                                     <v-btn flat slot="activator" value="keep" >
                                         <img :src="require(`@/assets/update-arrows32x32.png`)"/>
                                         <span>Keep </span>
                                     </v-btn>
-                                    <span>Don't change setting when time's up</span>
+                                    <span>Meaning that the initial setting remains</span>
                                 </v-tooltip>
                                 <v-tooltip bottom>
                                     <v-btn flat slot="activator" value="off">
                                         <img :src="require(`@/assets/lightbulbOff.png`)"/>
                                         <span>Off</span>
                                     </v-btn>
-                                    <span>Set to off when time's up</span>
+                                    <span>Meaning that the setting Off applies when time's up</span>
                                 </v-tooltip>
                             </v-btn-toggle>
+
+
+                        </section>
+                        <section>
+                            <h4>Repeat event</h4>
+                            <div class="flex-container row">
+                                <div v-for="(day, index) in repeatDays" v-bind:key="day.shortName">
+                                    <v-checkbox v-if=" index < 5 " v-model="day.checked" :label="day.shortName" color="white" class="checkbox"></v-checkbox>
+                                </div>
+                            </div>
+                            <div class="flex-container row">
+                                <div v-for="(day, index) in repeatDays" v-bind:key="day.shortName">
+                                    <v-checkbox v-if=" index >= 5 " v-model="day.checked" :label="day.shortName" color="white" class="checkbox"></v-checkbox>
+                                </div>
+                            </div>
                         </section>
                     </div>
                 </div>
@@ -149,42 +168,32 @@ export default {
     props: ['groupedResources', 'currentEvent', 'visible'],
 	data: function() {
 		return {
+            currentSettings: {
+                'start': {
+                    'time': '',
+                    'actionLevelValue': 'on'
+                },
+                'end': {
+                    'time': '',
+                    'actionLevelValue': 'off'
+                },
+                'selectedUnits': []
+            },
             actionLevelValue: {
                 start: 'on',
                 end: 'off'
             },
-			days: {
-                monday: {
-                    checked: false,
-                    name: "Mon"
-                },
-                tuesday: {
-                    checked: false,
-                    name: "Tue"
-                },
-                wednesday: {
-                    checked: false,
-                    name: "Wed"
-                },
-                thursday: {
-                    checked: false,
-                    name: "Thu"
-                },
-                friday: {
-                    checked: false,
-                    name: "Fri"
-                },
-                saturday: {
-                    checked: false,
-                    name: "Sat"
-                },
-                sunday: {
-                    checked: false,
-                    name: "Sun"
-                }
-            },
-            wholeWorkWeek_name: "Mon - Fri",
-            weekend_name: "Sat - Sun",
+			days: [
+                {shortName: 'Mon', checked: false},
+                {shortName: 'Tue', checked: false},
+                {shortName: 'Wed', checked: false},
+                {shortName: 'Thu', checked: false},
+                {shortName: 'Fri', checked: false},
+                
+                {shortName: 'Sat', checked: false},
+                {shortName: 'Sun', checked: false}
+            ],
+            repeatDays:[],
             currentGroupedResources: []
 		}
     },
@@ -202,8 +211,18 @@ export default {
             args.children.forEach( (unit) => {
                 unit.checked = checked;
             });
-        },        
-        setCurrentGroupedResources() {
+        },
+        setrepeatDaysSelected() {
+            const tempCurrentEvent = JSON.parse( JSON.stringify( this.currentEvent ) );
+            const startDayIndex = moment( tempCurrentEvent.start ).day() - 1;
+            const endDayIndex = moment( tempCurrentEvent.end ).day() - 1;
+
+            const tempDays = JSON.parse( JSON.stringify( this.days ) );
+            tempDays[startDayIndex].checked = true;
+            tempDays[endDayIndex].checked = true;
+            this.repeatDays = tempDays;
+        },
+        setCurrentGroupedResourcesSelections() {
             const tempGroupedResources = JSON.parse( JSON.stringify( this.groupedResources ) )
             const retVal = tempGroupedResources.map( (loc) => {
                     let locTemp = {
@@ -252,12 +271,15 @@ export default {
     },
     watch: {        
         visible: {
+            // watch for outer set property (indicates if the control has had 
+            // its visibility property changed = if property settings should be updated)
             immediate: true,
             deep: true,
-            handler(newValue, oldValue) {
-
-                this.setCurrentGroupedResources();
-                console.log('Hello');
+            handler(newValue) {
+                if ( newValue === true ) {
+                    this.setCurrentGroupedResourcesSelections();
+                    this.setrepeatDaysSelected();
+                }
             }
         }
     },
@@ -301,9 +323,11 @@ export default {
     }
     .type {
         width: 15rem;
+        border-bottom: 1px solid white;
     }
     .unit {
         width: 15rem;
+        border-bottom: 1px solid white;
     }
 
     .checkbox {

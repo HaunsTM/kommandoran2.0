@@ -67,10 +67,10 @@ export default {
 			eventSelectorDialog: false,
 			regValidTelldusUnitTypes_Name: /(^433 MHz - OnOff|433 MHz - Bell|Z-Wave - OnOffDim$)/,
 			config: {
-				timeHeaders: [{"groupBy":"Day","format":"dddd"},{"groupBy":"Hour", "format":"HH"},{"groupBy":"Cell"}],
+				timeHeaders: [{"groupBy":"Day","format":"dddd"},{"groupBy":"Hour", "format":"HH"}],
 				
 				scale: "CellDuration",
-				cellDuration: 5,
+				cellDuration: 60,
 				cellWidth: 20,
 
 				crosshairType: "Full",
