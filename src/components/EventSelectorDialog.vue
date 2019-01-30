@@ -1,7 +1,8 @@
 <template>
-        <v-card>
-            <v-card-title class="headline">{{start}}</v-card-title>
-            <v-card-text>
+    <v-card>
+        <v-card-title class="headline">{{start}}</v-card-title>
+        <v-card-text>
+            <v-form v-model="valid">
                 <div class="flex-container row">
                     <div class="grouped-resources-list">
                         <table>
@@ -53,75 +54,73 @@
                     </div>
                     <div class="flex-container column action-list">
                         <section>
-                            <h4>Selected units</h4>
+                            <h4 class="subheading">Selected units</h4>
                             <p v-if="selectedUnits.length > 0">{{selectedUnits}}</p>
                             <p v-else>NO UNIT SELECTED</p>
                         </section>
                         <section>
-                            <h4>Action level value</h4>
-                            <h5>Start: </h5>
+                            <v-divider dark></v-divider>
+                            <h4 class="subheading">Action time and Level</h4>                            
                             <div class="flex-container row">
-                                <div>
-                                    {{currentSettings.start.time}}
+                                <div class="action-time">
+                                    <h5 class="caption">Start time</h5>
                                     <v-text-field
                                         v-model="currentSettings.start.time"
-                                        :value="currentValue" 
+                                        placeholder="HH:MM"
                                         return-masked-value
-                                        mask="##.##"
-                                        @input="handleInput"
+                                        mask="##:##"
+                                        :rules="timeFormatRules"
+                                        class="time-input"
                                     ></v-text-field>
                                 </div>
-                                <div>
-                                    <v-btn-toggle v-model="currentSettings.start.actionLevelValue" mandatory>
+                                <div class="action-value">
+                                    <h5 class="caption">Level</h5>
+                                    <v-radio-group v-model="currentSettings.start.actionLevelValue" row>
                                         <v-tooltip bottom>
-                                            <v-btn flat slot="activator" value="off">
-                                                <img :src="require(`@/assets/lightbulbOff.png`)"/>
-                                                <span>Off</span>
-                                            </v-btn>
+                                            <v-radio flat slot="activator" label="Off" value="off" color="white"></v-radio>
                                             <span>Meaning that the setting Off applies from the beginning</span>
                                         </v-tooltip>
                                         <v-tooltip bottom>
-                                            <v-btn flat slot="activator" value="30">
-                                                <img :src="require(`@/assets/lightbulb30p32x32.png`)"/>
-                                                <span>30%</span>
-                                            </v-btn>
+                                            <v-radio flat slot="activator" label="30%" value="30" color="white"></v-radio>
                                             <span>Meaning that the setting level 30% (or on in cases where 30% is not valid) applies from the beginning</span>
                                         </v-tooltip>
                                         <v-tooltip bottom>
-                                            <v-btn flat slot="activator" value="on">
-                                                <img :src="require(`@/assets/lightbulbFull32x32.png`)"/>
-                                                <span>On</span>
-                                            </v-btn>
+                                            <v-radio flat slot="activator" label="On" value="on" color="white"></v-radio>
                                             <span>Meaning that the setting On applies from the beginning</span>
                                         </v-tooltip>
-                                    </v-btn-toggle>
+                                    </v-radio-group>                                   
                                 </div>
                             </div>
-                            
-
-
-                            <h5>End: </h5>
-                            <v-btn-toggle v-model="currentSettings.end.actionLevelValue" mandatory>
-                                <v-tooltip bottom>
-                                    <v-btn flat slot="activator" value="keep" >
-                                        <img :src="require(`@/assets/update-arrows32x32.png`)"/>
-                                        <span>Keep </span>
-                                    </v-btn>
-                                    <span>Meaning that the initial setting remains</span>
-                                </v-tooltip>
-                                <v-tooltip bottom>
-                                    <v-btn flat slot="activator" value="off">
-                                        <img :src="require(`@/assets/lightbulbOff.png`)"/>
-                                        <span>Off</span>
-                                    </v-btn>
-                                    <span>Meaning that the setting Off applies when time's up</span>
-                                </v-tooltip>
-                            </v-btn-toggle>
-
-
+                            <div class="flex-container row">
+                                <div class="action-time">
+                                    <h5 class="caption">End time<span v-if="endEventTimeOccurNextDay"> (day after)</span></h5>
+                                    <v-text-field
+                                        v-model="currentSettings.end.time"
+                                        placeholder="HH:MM"
+                                        return-masked-value
+                                        mask="##:##"
+                                        :rules="timeFormatRules"
+                                        class="time-input"
+                                    ></v-text-field>
+                                </div>
+                                <div class="action-value">
+                                    <h5 class="caption">Level</h5>
+                                    <v-radio-group v-model="currentSettings.end.actionLevelValue" row>
+                                        <v-tooltip bottom>
+                                            <v-radio flat slot="activator" label="Keep" value="keep" color="white"></v-radio>
+                                            <span>Meaning that the initial setting remains</span>
+                                        </v-tooltip>
+                                        <v-tooltip bottom>
+                                            <v-radio flat slot="activator" label="Off" value="off" color="white"></v-radio>
+                                            <span>Meaning that the setting Off applies at the end</span>
+                                        </v-tooltip>
+                                    </v-radio-group>
+                                </div>
+                            </div>
                         </section>
                         <section>
-                            <h4>Repeat event</h4>
+                            <v-divider dark></v-divider>
+                            <h4 class="subheading">Repeat event</h4>
                             <div class="flex-container row">
                                 <div v-for="(day, index) in repeatDays" v-bind:key="day.shortName">
                                     <v-checkbox v-if=" index < 5 " v-model="day.checked" :label="day.shortName" color="white" class="checkbox"></v-checkbox>
@@ -135,32 +134,33 @@
                         </section>
                     </div>
                 </div>
-            </v-card-text>
+            </v-form>
+        </v-card-text>
 
-            <v-card-actions>
+        <v-card-actions>
 
-                <v-btn
-                    color="green darken-1"
-                    flat="flat"
-                    @click="dialog = false"
-                >
-                    Disagree
-                </v-btn>
+            <v-btn
+                color="green darken-1"
+                flat="flat"
+                @click="dialog = false"
+            >
+                Disagree
+            </v-btn>
 
-                <v-btn
-                    color="green darken-1"
-                    flat="flat"
-                    @click="dialog = false"
-                >
-                    Agree
-                </v-btn>
-            </v-card-actions>
-        </v-card>
+            <v-btn
+                color="green darken-1"
+                flat="flat"
+                @click="dialog = false"
+            >
+                Agree
+            </v-btn>
+        </v-card-actions>
+    </v-card>
 </template>
 
 <script>
 
-import moment from "moment";
+import * as moment from 'moment';
 import localization from 'moment/locale/sv';
 
 export default {
@@ -168,6 +168,7 @@ export default {
     props: ['groupedResources', 'currentEvent', 'visible'],
 	data: function() {
 		return {
+            valid: false,
             currentSettings: {
                 'start': {
                     'time': '',
@@ -212,15 +213,21 @@ export default {
                 unit.checked = checked;
             });
         },
-        setrepeatDaysSelected() {
+        setInitialDaySelected() {
             const tempCurrentEvent = JSON.parse( JSON.stringify( this.currentEvent ) );
             const startDayIndex = moment( tempCurrentEvent.start ).day() - 1;
-            const endDayIndex = moment( tempCurrentEvent.end ).day() - 1;
 
             const tempDays = JSON.parse( JSON.stringify( this.days ) );
             tempDays[startDayIndex].checked = true;
-            tempDays[endDayIndex].checked = true;
             this.repeatDays = tempDays;
+        },
+        setInitiallySelectedTime() {
+            const tempCurrentEvent = JSON.parse( JSON.stringify( this.currentEvent ) );
+            const startTime = moment( tempCurrentEvent.start ).format('HH:mm');
+            const endTime = moment( tempCurrentEvent.end ).format('HH:mm');
+
+            this.currentSettings.start.time = startTime;
+            this.currentSettings.end.time = endTime;
         },
         setCurrentGroupedResourcesSelections() {
             const tempGroupedResources = JSON.parse( JSON.stringify( this.groupedResources ) )
@@ -243,14 +250,17 @@ export default {
                     return locTemp;
                 });
             this.currentGroupedResources = retVal;
-        },
+        }
     },    
 	computed: {
-        start() {
-            return this.currentEvent.start;
+        endActionLevelValue() {
+            return this.currentSettings.end.actionLevelValue;
         },
-        end() {
-            return this.currentEvent.end;
+        endEventTimeOccurNextDay() {
+            const startTime = moment( this.currentSettings.start.time, 'HH:mm' );
+            const endTime = moment( this.currentSettings.end.time, 'HH:mm' );
+
+            return endTime < startTime;
         },
         selectedUnits() {
             let selectedUnits = {};
@@ -267,9 +277,24 @@ export default {
                 }).filter( e => e);
             }
             return selectedUnits;
+        },
+        timeFormatRules() {
+            const rules = [
+                v => !!v || 'Time is required',                
+                v => /^(?:[0-1]\d|2[0-3]):(?:[0-5])\d$/.test(v) || 'Invalid time!'
+            ];
+            
+            return rules;
         }
     },
-    watch: {        
+    watch: {
+        endActionLevelValue: {
+            handler(newValue) {
+                if ( newValue === 'keep' ) {
+                    this.currentSettings.end.time = this.currentSettings.start.time
+                }
+            }
+        },
         visible: {
             // watch for outer set property (indicates if the control has had 
             // its visibility property changed = if property settings should be updated)
@@ -278,7 +303,8 @@ export default {
             handler(newValue) {
                 if ( newValue === true ) {
                     this.setCurrentGroupedResourcesSelections();
-                    this.setrepeatDaysSelected();
+                    this.setInitialDaySelected();
+                    this.setInitiallySelectedTime();
                 }
             }
         }
@@ -311,7 +337,6 @@ export default {
 
     .grouped-resources-list {
         height: calc(100vh - 45vh);
-        width: 60%;
 		overflow-y: scroll;
     }
     
@@ -335,15 +360,25 @@ export default {
         padding: 0 1rem 0 0;
     }
 
+
     .action-list {
         width: 40%;
         padding-left: 2rem;
         justify-content: flex-start;
         align-items: flex-start;
     }
-    .value-slider {
-        margin: 0;
-        padding-right: 1rem;
+    .action-value {
+        padding-left: 30px;
+    }
+    .action-time {
+        width: 5rem;
+    }
+    .time-input {
+        width: 4rem;
+    }
+    h4.subheading {
+        padding-top: 0.5rem;
+        padding-bottom: 1rem;
     }
 
 </style>
