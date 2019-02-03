@@ -6,7 +6,7 @@
 		>
 			<event-selector-dialog
 				v-bind:grouped-resources="groupedResourcesByLocationAndTelldusUnitType"
-				v-bind:current-event="currentSelectedEvent"
+				v-bind:initial-event="currentSelectedEvent"
 				v-bind:visible="eventSelectorDialog"
 			>
 			</event-selector-dialog>

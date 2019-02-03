@@ -1,66 +1,70 @@
 <template>
     <v-card>
-        <v-card-title class="headline">{{start}}</v-card-title>
+        <v-card-title class="headline">Event details</v-card-title>
         <v-card-text>
             <v-form v-model="valid">
                 <div class="flex-container row">
-                    <div class="grouped-resources-list">
-                        <table>
-                            <tr v-for="unitLocation in currentGroupedResources" v-bind:key="unitLocation.node.TelldusUnitLocation_Name" class="resourceGroup">
-                                <td class="location">
-                                    <v-checkbox
-                                        @change="toggledLocation(unitLocation)"
-                                        v-model="unitLocation.node.checked"
-                                        :label="unitLocation.node.TelldusUnitLocation_Name"
-                                        color="white"
-                                        hide-details
-                                        class="checkbox"
-                                    ></v-checkbox>
-                                </td>
-                                <td>
-                                    <table>
-                                        <tr v-for="unitType in unitLocation.children" v-bind:key="unitType.node.TelldusUnitType_Name" class="type-unit">
-                                            <td class="type">
-                                                <v-checkbox
-                                                    @change="toggledType(unitType)"
-                                                    v-model="unitType.node.checked"
-                                                    :label="unitType.node.TelldusUnitType_Name"
-                                                    color="white"
-                                                    hide-details
-                                                    class="checkbox"
-                                                ></v-checkbox>
-                                            </td>
-                                            <td class="unit">
-                                                <table>
-                                                    <tr v-for="unit in unitType.children" v-bind:key="unit.TelldusUnit_Name">
-                                                        <td>
-                                                            <v-checkbox
-                                                                v-model="unit.checked"
-                                                                :label="unit.TelldusUnit_Name"
-                                                                :hint="unit.TelldusUnit_LocationDesciption"
-                                                                color="white"
-                                                                persistent-hint
-                                                                class="checkbox"
-                                                            ></v-checkbox>                                                
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                        </table>
+                    <div class="flex-container column">
+                        <h4 class="subheading">Select units</h4>
+                        <div class="grouped-resources-list">
+                            <table>
+                                <tr v-for="unitLocation in currentGroupedResources" v-bind:key="unitLocation.node.TelldusUnitLocation_Name" class="resourceGroup">
+                                    <td class="location">
+                                        <v-checkbox
+                                            @change="toggledLocation(unitLocation)"
+                                            v-model="unitLocation.node.selected"
+                                            :label="unitLocation.node.TelldusUnitLocation_Name"
+                                            color="white"
+                                            hide-details
+                                            class="checkbox"
+                                        ></v-checkbox>
+                                    </td>
+                                    <td>
+                                        <table>
+                                            <tr v-for="unitType in unitLocation.children" v-bind:key="unitType.node.TelldusUnitType_Name" class="type-unit">
+                                                <td class="type">
+                                                    <v-checkbox
+                                                        @change="toggledType(unitType)"
+                                                        v-model="unitType.node.selected"
+                                                        :label="unitType.node.TelldusUnitType_Name"
+                                                        color="white"
+                                                        hide-details
+                                                        class="checkbox"
+                                                    ></v-checkbox>
+                                                </td>
+                                                <td class="unit">
+                                                    <table>
+                                                        <tr v-for="unit in unitType.children" v-bind:key="unit.TelldusUnit_Name">
+                                                            <td>
+                                                                <v-checkbox
+                                                                    v-model="unit.selected"
+                                                                    :label="unit.TelldusUnit_Name"
+                                                                    :hint="unit.TelldusUnit_LocationDesciption"
+                                                                    color="white"
+                                                                    persistent-hint
+                                                                    class="checkbox"
+                                                                ></v-checkbox>                                                
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
                     </div>
                     <div class="flex-container column action-list">
                         <section>
                             <h4 class="subheading">Selected units</h4>
-                            <p v-if="selectedUnits.length > 0">{{selectedUnits}}</p>
+                            <p v-if="selectedUnits.length > 0">
+                                {{selectedUnits}}</p>
                             <p v-else>NO UNIT SELECTED</p>
                         </section>
                         <section>
                             <v-divider dark></v-divider>
-                            <h4 class="subheading">Action time and Level</h4>                            
+                            <h4 class="subheading">Select action time and level</h4>                            
                             <div class="flex-container row">
                                 <div class="action-time">
                                     <h5 class="caption">Start time</h5>
@@ -93,7 +97,7 @@
                             </div>
                             <div class="flex-container row">
                                 <div class="action-time">
-                                    <h5 class="caption">End time<span v-if="endEventTimeOccurNextDay"> (day after)</span></h5>
+                                    <h5 class="caption">End time<sup v-if="endEventTimeOccurNextDay">*)</sup></h5>
                                     <v-text-field
                                         v-model="currentSettings.end.time"
                                         placeholder="HH:MM"
@@ -117,18 +121,22 @@
                                     </v-radio-group>
                                 </div>
                             </div>
-                        </section>
+                            <div class="flex-container row">
+                                
+                            </div>
+                        </section>                        
+                        <v-divider dark></v-divider>
                         <section>
                             <v-divider dark></v-divider>
-                            <h4 class="subheading">Repeat event</h4>
+                            <h4 class="subheading">Select when the event should occur</h4>
                             <div class="flex-container row">
                                 <div v-for="(day, index) in repeatDays" v-bind:key="day.shortName">
-                                    <v-checkbox v-if=" index < 5 " v-model="day.checked" :label="day.shortName" color="white" class="checkbox"></v-checkbox>
+                                    <v-checkbox v-if=" index < 5 " v-model="day.selected" :label="day.shortName" color="white" class="checkbox"></v-checkbox>
                                 </div>
                             </div>
                             <div class="flex-container row">
                                 <div v-for="(day, index) in repeatDays" v-bind:key="day.shortName">
-                                    <v-checkbox v-if=" index >= 5 " v-model="day.checked" :label="day.shortName" color="white" class="checkbox"></v-checkbox>
+                                    <v-checkbox v-if=" index >= 5 " v-model="day.selected" :label="day.shortName" color="white" class="checkbox"></v-checkbox>
                                 </div>
                             </div>
                         </section>
@@ -136,7 +144,9 @@
                 </div>
             </v-form>
         </v-card-text>
-
+{{currentEvents}}
+        <v-divider dark></v-divider>
+        
         <v-card-actions>
 
             <v-btn
@@ -144,7 +154,7 @@
                 flat="flat"
                 @click="dialog = false"
             >
-                Disagree
+                Cancel
             </v-btn>
 
             <v-btn
@@ -152,7 +162,7 @@
                 flat="flat"
                 @click="dialog = false"
             >
-                Agree
+                Ok
             </v-btn>
         </v-card-actions>
     </v-card>
@@ -161,11 +171,11 @@
 <script>
 
 import * as moment from 'moment';
-import localization from 'moment/locale/sv';
+import DayPilotEvent from '../helpers/DayPilotEvent';
 
 export default {
     name: 'EventSelectorDialog',
-    props: ['groupedResources', 'currentEvent', 'visible'],
+    props: ['groupedResources', 'initialEvent', 'visible'],
 	data: function() {
 		return {
             valid: false,
@@ -185,44 +195,72 @@ export default {
                 end: 'off'
             },
 			days: [
-                {shortName: 'Mon', checked: false},
-                {shortName: 'Tue', checked: false},
-                {shortName: 'Wed', checked: false},
-                {shortName: 'Thu', checked: false},
-                {shortName: 'Fri', checked: false},
+                {   shortName: 'Mon', 
+                    selected: false,
+                    dayOfWeek: 1
+                },
+                {
+                    shortName: 'Tue', 
+                    selected: false,
+                    dayOfWeek: 2
+                },
+                {
+                    shortName: 'Wed', 
+                    selected: false,
+                    dayOfWeek: 3
+                },
+                {
+                    shortName: 'Thu', 
+                    selected: false,
+                    dayOfWeek: 4
+                },
+                {
+                    shortName: 'Fri', 
+                    selected: false,
+                    dayOfWeek: 5
+                },
                 
-                {shortName: 'Sat', checked: false},
-                {shortName: 'Sun', checked: false}
+                {
+                    shortName: 'Sat', 
+                    selected: false,
+                    dayOfWeek: 6
+                },
+                {
+                    shortName: 'Sun', 
+                    selected: false,
+                    dayOfWeek: 0
+                }
             ],
             repeatDays:[],
-            currentGroupedResources: []
+            currentGroupedResources: [],
+            timeSeparator: ':'
 		}
     },
     methods: {
         toggledLocation(args) {
             const that = this;
-            const checked = args.node.checked;
+            const selected = args.node.selected;
             args.children.forEach( (type) => {
-                type.node.checked = checked;
+                type.node.selected = selected;
                 that.toggledType(type);
             });
         },
         toggledType(args) {
-            const checked = args.node.checked;
+            const selected = args.node.selected;
             args.children.forEach( (unit) => {
-                unit.checked = checked;
+                unit.selected = selected;
             });
         },
         setInitialDaySelected() {
-            const tempCurrentEvent = JSON.parse( JSON.stringify( this.currentEvent ) );
+            const tempCurrentEvent = JSON.parse( JSON.stringify( this.initialEvent ) );
             const startDayIndex = moment( tempCurrentEvent.start ).day() - 1;
 
             const tempDays = JSON.parse( JSON.stringify( this.days ) );
-            tempDays[startDayIndex].checked = true;
+            tempDays[startDayIndex].selected = true;
             this.repeatDays = tempDays;
         },
         setInitiallySelectedTime() {
-            const tempCurrentEvent = JSON.parse( JSON.stringify( this.currentEvent ) );
+            const tempCurrentEvent = JSON.parse( JSON.stringify( this.initialEvent ) );
             const startTime = moment( tempCurrentEvent.start ).format('HH:mm');
             const endTime = moment( tempCurrentEvent.end ).format('HH:mm');
 
@@ -238,8 +276,8 @@ export default {
                             let typeTemp = {
                                 'node': type.node,
                                 'children': type.children.map( (unit) => {
-                                    if (unit.TelldusUnit_Id === this.currentEvent.resource) {
-                                        unit.checked = true;
+                                    if (unit.TelldusUnit_Id === this.initialEvent.resource) {
+                                        unit.selected = true;
                                     }
                                     return unit;
                                 })
@@ -253,6 +291,38 @@ export default {
         }
     },    
 	computed: {
+        currentEvents() {
+           // DayPilotEvent
+           
+            const that = this;
+                   //s fullDate : startDate: this.$DEFAULT_START_DATE_MONDAY
+/**/
+            const referenceMonday = { 'date': this.$DEFAULT_START_DATE_MONDAY, 'datePattern': 'YYYY-MM-DD'}
+            let currentEvents = that.selectedUnits.flatMap( (u) => {
+                const unitAndEventOccurDays = that.selectedDaysEventOccurs.flatMap( (sDEO) => {
+                    const startDayIndex = sDEO.dayOfWeek;
+                    const endDayIndex = 
+                        that.endEventTimeOccurNextDay ? (startDayIndex < 6 ? startDayIndex + 1 : 0) : startDayIndex;
+
+                    const resource = u.TelldusUnit_Id;
+const text = '';
+                const dPE = new DayPilotEvent(startDayIndex, that.currentSettings.start.time, endDayIndex,
+                    this.currentSettings.end.time, that.timeSeparator, text, resource, referenceMonday);
+                    return dPE
+                });
+                return unitAndEventOccurDays;
+            });
+            return currentEvents;
+        },
+		currentEventText() {
+            let currentEventText = "";
+            if (this.valid) {
+                return null;
+            } else {
+                currentEventText = "Please enter valid ";
+            }
+            return currentEventText;
+		},
         endActionLevelValue() {
             return this.currentSettings.end.actionLevelValue;
         },
@@ -262,6 +332,17 @@ export default {
 
             return endTime < startTime;
         },
+        selectedDaysEventOccurs() {
+            const selectedDaysEventOccurs =
+                this.repeatDays.map( (d) => {
+                    if(d.selected) {
+                        return d;
+                    }
+                    return null;
+                }).filter( e => e);
+                
+            return selectedDaysEventOccurs;
+        },
         selectedUnits() {
             let selectedUnits = {};
             if(this.currentGroupedResources.flatMap) {
@@ -269,14 +350,17 @@ export default {
                 .flatMap( (loc) => {
                     return loc.children.flatMap( (type) => {
                         return type.children.flatMap( (u) => {
-                            if (u.checked) {
-                                return u.TelldusUnit_Name;
+                            if (u.selected) {
+                                return u;
                             }
                         })
                     })
                 }).filter( e => e);
             }
             return selectedUnits;
+        },
+        startActionLevelValue() {
+            return this.currentSettings.start.actionLevelValue;
         },
         timeFormatRules() {
             const rules = [
@@ -291,7 +375,14 @@ export default {
         endActionLevelValue: {
             handler(newValue) {
                 if ( newValue === 'keep' ) {
-                    this.currentSettings.end.time = this.currentSettings.start.time
+                    this.currentSettings.end.time = this.currentSettings.start.time;
+                }
+            }
+        },
+        startActionLevelValue: {
+            handler(newValue) {
+                if ( newValue === 'off' ) {
+                    this.currentSettings.end.actionLevelValue = 'keep';
                 }
             }
         },
@@ -380,5 +471,7 @@ export default {
         padding-top: 0.5rem;
         padding-bottom: 1rem;
     }
-
+    sup {
+        font-size: smaller;
+    }
 </style>
