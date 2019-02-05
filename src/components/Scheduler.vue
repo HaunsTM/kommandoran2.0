@@ -8,6 +8,8 @@
 				v-bind:grouped-resources="groupedResourcesByLocationAndTelldusUnitType"
 				v-bind:initial-event="currentSelectedEvent"
 				v-bind:visible="eventSelectorDialog"
+				v-on:dismiss="dismissEventSelectorDialog"
+				v-on:submit="addNewEvents"
 			>
 			</event-selector-dialog>
 		</v-dialog>
@@ -188,18 +190,18 @@ export default {
 				.groupBy(x => x.TelldusUnitLocation_Name)
 				.reduce( (result0, value0, key0) => {
 					let resourceGroupByUnitLocation = {						
-						"node": {"TelldusUnitLocation_Name" : key0, "checked": false},
+						"node": {"TelldusUnitLocation_Name" : key0, "selected": false},
 						"children" :  this.$_(value0)
 							.groupBy(x => x.TelldusUnitType_Name)
 							.reduce( (result1, value1, key1) => {
 								let child1 = {
-									"node": {"TelldusUnitType_Name" : key1, "checked": false},
+									"node": {"TelldusUnitType_Name" : key1, "selected": false},
 									"children" :  value1.reduce( (result2, u) => {
 										if (u.TelldusUnitType_Name.match(that.regValidTelldusUnitTypes_Name)) {
 											let child2 = {
 												"TelldusUnit_Id" :  u.TelldusUnit_Id,
 												"TelldusUnit_Name": u.TelldusUnit_Name,
-												"checked": false,
+												"selected": false,
 												"TelldusUnit_LocationDesciption": u.TelldusUnit_LocationDesciption
 											};
 											result2.push(child2);
@@ -226,6 +228,11 @@ export default {
 		}
 	},
 	methods: {
+		addNewEvents(events) {
+debugger;
+			this.eventSelectorDialog = false;
+				Vue.set(this.config, "events", events);
+		},
 		calendarEvent(start, end, resource, text, durationBarColor) {
 			const calendarEvent = {
 				"start": start,
@@ -344,6 +351,9 @@ export default {
 			}
 			return calendarEventArrayPerResource;			
 		},
+		dismissEventSelectorDialog() {
+			this.eventSelectorDialog = false;
+		},
 		loadCalendarData() {
 			this.setLoadingState(true);
 			const promises = [         
@@ -376,9 +386,6 @@ export default {
 			this.eventSelectorDialog = true;
 		}
 	},
-	created() {
-		window.alert = (message) => { console.log(message); }
-    },
 	mounted: function() {
 		this.loadCalendarData();
 		//this.scheduler.message("Welcomes!");

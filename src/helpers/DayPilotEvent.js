@@ -1,4 +1,5 @@
 import * as moment from 'moment';
+import * as uuidv1 from 'uuid/v1'
 
 export default class DayPilotEvent {
 
@@ -19,8 +20,13 @@ export default class DayPilotEvent {
         this._end = dateByDay(endDayIndex)
             .set({'hour': endTimeHHMM.split(timeSeparator)[0],
                   'minute': endTimeHHMM.split(timeSeparator)[1]});
+        this._id = uuidv1();
         this._text = text;
         this._resource = resource;
+    }
+
+    get durationBarColor() {
+        return 'red';
     }
 
     get start() {

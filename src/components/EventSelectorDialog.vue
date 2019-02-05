@@ -2,7 +2,7 @@
     <v-card>
         <v-card-title class="headline">Event details</v-card-title>
         <v-card-text>
-            <v-form v-model="valid">
+            <v-form ref="form" v-model="valid">
                 <div class="flex-container row">
                     <div class="flex-container column">
                         <h4 class="subheading">Select units</h4>
@@ -58,8 +58,7 @@
                     <div class="flex-container column action-list">
                         <section>
                             <h4 class="subheading">Selected units</h4>
-                            <p v-if="selectedUnits.length > 0">
-                                {{selectedUnits}}</p>
+                            <p v-if="selectedUnits.length > 0">{{selectedUnits}}</p>
                             <p v-else>NO UNIT SELECTED</p>
                         </section>
                         <section>
@@ -122,7 +121,7 @@
                                 </div>
                             </div>
                             <div class="flex-container row">
-                                
+                                <small></small>
                             </div>
                         </section>                        
                         <v-divider dark></v-divider>
@@ -144,7 +143,6 @@
                 </div>
             </v-form>
         </v-card-text>
-{{currentEvents}}
         <v-divider dark></v-divider>
         
         <v-card-actions>
@@ -152,17 +150,17 @@
             <v-btn
                 color="green darken-1"
                 flat="flat"
-                @click="dialog = false"
+                @click="dismiss"
             >
-                Cancel
+                Dismiss
             </v-btn>
 
             <v-btn
                 color="green darken-1"
                 flat="flat"
-                @click="dialog = false"
+                @click="submit"
             >
-                Ok
+                Submit
             </v-btn>
         </v-card-actions>
     </v-card>
@@ -237,6 +235,9 @@ export default {
 		}
     },
     methods: {
+        dismiss() {
+            this.$emit('dismiss');
+        },
         toggledLocation(args) {
             const that = this;
             const selected = args.node.selected;
@@ -288,6 +289,11 @@ export default {
                     return locTemp;
                 });
             this.currentGroupedResources = retVal;
+        },
+        submit() {
+            if (this.$refs.form.validate()) {
+                this.$emit('submit', this.currentEvents);
+            }
         }
     },    
 	computed: {
@@ -296,7 +302,7 @@ export default {
            
             const that = this;
                    //s fullDate : startDate: this.$DEFAULT_START_DATE_MONDAY
-/**/
+
             const referenceMonday = { 'date': this.$DEFAULT_START_DATE_MONDAY, 'datePattern': 'YYYY-MM-DD'}
             let currentEvents = that.selectedUnits.flatMap( (u) => {
                 const unitAndEventOccurDays = that.selectedDaysEventOccurs.flatMap( (sDEO) => {
@@ -305,7 +311,7 @@ export default {
                         that.endEventTimeOccurNextDay ? (startDayIndex < 6 ? startDayIndex + 1 : 0) : startDayIndex;
 
                     const resource = u.TelldusUnit_Id;
-const text = '';
+                const text = '';
                 const dPE = new DayPilotEvent(startDayIndex, that.currentSettings.start.time, endDayIndex,
                     this.currentSettings.end.time, that.timeSeparator, text, resource, referenceMonday);
                     return dPE
@@ -399,13 +405,7 @@ const text = '';
                 }
             }
         }
-    },
-	created() {
-
-    },
-	mounted: function () {
-
-	}
+    }
 }
 </script>
 
