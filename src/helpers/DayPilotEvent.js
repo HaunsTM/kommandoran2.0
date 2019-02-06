@@ -1,5 +1,5 @@
-import * as moment from 'moment';
-import * as uuidv1 from 'uuid/v1'
+
+import { DayPilot } from 'daypilot-pro-vue'
 
 export default class DayPilotEvent {
 
@@ -7,25 +7,27 @@ export default class DayPilotEvent {
 
         const dateByDay = (index) => {
             // 0 = sunday, 6 = saturday
-            const startMonday = moment(referenceMonday.date, referenceMonday.datePattern);
+            const startMonday = DayPilot.Date.parse(referenceMonday.date, referenceMonday.datePattern);
             const daysToAddBasedOnIndexRelatedToStartMonday = index === 0 ? 6 : index - 1;
-            const currentDate = startMonday.add( daysToAddBasedOnIndexRelatedToStartMonday , 'days');
+            const currentDate = startMonday.addDays( daysToAddBasedOnIndexRelatedToStartMonday);
             
             return currentDate;
         }
 
         this._start = dateByDay(startDayIndex)
-            .set({'hour': startTimeHHMM.split(timeSeparator)[0],
-                  'minute': startTimeHHMM.split(timeSeparator)[1]});
+            .addHours(startTimeHHMM.split(timeSeparator)[0])
+            .addMinutes(startTimeHHMM.split(timeSeparator)[1]);
+        
         this._end = dateByDay(endDayIndex)
-            .set({'hour': endTimeHHMM.split(timeSeparator)[0],
-                  'minute': endTimeHHMM.split(timeSeparator)[1]});
-        this._id = uuidv1();
+            .addHours(endTimeHHMM.split(timeSeparator)[0])
+            .addMinutes(endTimeHHMM.split(timeSeparator)[1]);
+
+        this._id = DayPilot.guid();
         this._text = text;
         this._resource = resource;
     }
-
-    get durationBarColor() {
+//https://api.daypilot.org/daypilot-event-data/
+    get backColor() {
         return 'red';
     }
 

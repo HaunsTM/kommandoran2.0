@@ -303,7 +303,7 @@ export default {
             const that = this;
                    //s fullDate : startDate: this.$DEFAULT_START_DATE_MONDAY
 
-            const referenceMonday = { 'date': this.$DEFAULT_START_DATE_MONDAY, 'datePattern': 'YYYY-MM-DD'}
+            const referenceMonday = { 'date': this.$DEFAULT_START_DATE_MONDAY, 'datePattern': 'yyyy-MM-dd'}
             let currentEvents = that.selectedUnits.flatMap( (u) => {
                 const unitAndEventOccurDays = that.selectedDaysEventOccurs.flatMap( (sDEO) => {
                     const startDayIndex = sDEO.dayOfWeek;

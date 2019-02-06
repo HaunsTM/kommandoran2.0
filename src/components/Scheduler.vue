@@ -74,7 +74,8 @@ export default {
 				scale: "CellDuration",
 				cellDuration: 60,
 				cellWidth: 20,
-
+heightSpec: "Max",
+height: 500,
 				crosshairType: "Full",
 
 
@@ -229,9 +230,9 @@ export default {
 	},
 	methods: {
 		addNewEvents(events) {
-debugger;
 			this.eventSelectorDialog = false;
-				Vue.set(this.config, "events", events);
+	//		https://code.daypilot.org/69423/vue-js-scheduler-build-a-reservation-application-in-5-minut
+			this.scheduler.update({events: events});
 		},
 		calendarEvent(start, end, resource, text, durationBarColor) {
 			const calendarEvent = {
@@ -380,6 +381,7 @@ debugger;
 			//send to server
 			//enable button
 			let eventList = this.$refs.scheduler.control.events.list;
+			debugger;
 		},
 		timeRangeSelected: function(args) {
 			this.currentSelectedEvent = args;
