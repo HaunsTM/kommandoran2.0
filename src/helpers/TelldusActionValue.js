@@ -1,10 +1,18 @@
-export default class TelldusActionValue {
-    constructor(actionValueWithType) {
-        this._actionValueWithType = actionValueWithType;
-    }
+import { ColorProvider } from './colorProvider.hlp';
 
-    get actionValueWithType() {
-        return this._actionValueWithType;
+export default class TelldusActionValue {
+
+    constructor(id, actionValue) {
+        this._id = id;
+        this._actionValue = actionValue;
+    }
+    
+    get Id() {
+        return this._id;
+    }
+    
+    get ActionValue() {
+        return this._actionValue;
     }
     
     static ActionValueWithType() {
@@ -117,4 +125,88 @@ export default class TelldusActionValue {
         };
         return Object.freeze(actionValueWithTypeEnum);
     }
+
+    static getColor(actionValue) {
+        //https://vuetifyjs.com/en/style/colors
+        let color = "";
+
+        if ( /^\d+$/.test( actionValue ) ) {
+
+            if ( actionValue === 1 || actionValue === 100 ) {
+
+                color = ColorProvider.levelValue.on.l100;
+
+            } else if (actionValue === 2 ) {
+
+                color = ColorProvider.levelValue.off;
+
+            } else if ( 2 < actionValue && actionValue < 100 )  {
+
+                color = ColorProvider.levelValue.on.l30;
+
+            } else {
+                color = ColorProvider.error;
+            }
+
+        } else {
+
+            if ( actionValue === 'down' ) {
+
+                color = ColorProvider.commandValue.down;
+
+            } else if (actionValue === 'up' ) {
+
+                color = ColorProvider.commandValue.up;
+
+            } else if (actionValue === 'on' ) {
+
+                color = ColorProvider.levelValue.on.l100;
+
+            } else if (actionValue === 'off' ) {
+
+                color = ColorProvider.levelValue.off;
+
+            } else {
+                color = ColorProvider.error();
+            }
+        }
+
+        return color;
+    }
+    
+    /**
+     * Not every TelldusUnit can deal with different level settings. A on/off must for example either on or of.
+     * @param {*} telldusUnitType - string representation, example: '433 MHz - OnOff'
+     * @param {*} preferredActionValue - string representation (small caps), example: 'on'
+     */
+    static getClosestPossibleTelldusActionValue(telldusUnitType, preferredActionValue) {
+    
+        switch (telldusUnitType.Name) {
+            case '433 MHz - OnOff': {
+                const actionValueIsNumeric = /^\d+$/.test( preferredActionValue );
+                if ( actionValueIsNumeric && preferredActionValue === '2' ) { 
+                    return 'off';
+                } else if ( actionValueIsNumeric ) {
+                    return 'on';
+                } else {
+                    return actionValueIsNumeric
+                }
+            }
+            case '433 MHz - Bell':
+                return preferredActionValue;
+            case '433 MHz - LightSensor':
+                return preferredActionValue;
+            case 'Z-Wave - OnOffDim':
+                return preferredActionValue;
+            case 'Z-Wave - HeatItZWaveThermostat':
+                return preferredActionValue;
+        
+            default:
+                throw new Error('Invalid TelldusUnitType: ' + telldusUnitType);
+        }
+    }
+
   }
+
+
+

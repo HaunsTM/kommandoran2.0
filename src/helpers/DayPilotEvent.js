@@ -3,7 +3,7 @@ import { DayPilot } from 'daypilot-pro-vue'
 
 export default class DayPilotEvent {
 
-    constructor(startDayIndex, startTimeHHMM, endDayIndex, endTimeHHMM, timeSeparator, text, resource, referenceMonday) {
+    constructor(referenceMonday, startDayIndex, startTimeHHMM, endDayIndex, endTimeHHMM, timeSeparator, resource, text, barColor ) {
 
         const dateByDay = (index) => {
             // 0 = sunday, 6 = saturday
@@ -25,10 +25,11 @@ export default class DayPilotEvent {
         this._id = DayPilot.guid();
         this._text = text;
         this._resource = resource;
+        this._barColor = barColor;
     }
 //https://api.daypilot.org/daypilot-event-data/
-    get backColor() {
-        return 'red';
+    get barColor () {
+        return this._barColor;
     }
 
     get start() {
@@ -51,4 +52,5 @@ export default class DayPilotEvent {
         return this._resource;
     }
 
+    static TelldusUnitTypes
   }
