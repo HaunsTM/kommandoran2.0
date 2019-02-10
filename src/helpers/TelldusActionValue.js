@@ -167,7 +167,7 @@ export default class TelldusActionValue {
                 color = ColorProvider.levelValue.off;
 
             } else {
-                color = ColorProvider.error();
+                color = ColorProvider.error;
             }
         }
 
@@ -189,7 +189,7 @@ export default class TelldusActionValue {
                 } else if ( actionValueIsNumeric ) {
                     return 'on';
                 } else {
-                    return actionValueIsNumeric
+                    return preferredActionValue
                 }
             }
             case '433 MHz - Bell':
