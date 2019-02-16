@@ -34,12 +34,12 @@
                                                 </td>
                                                 <td class="unit">
                                                     <table>
-                                                        <tr v-for="unit in unitType.children" v-bind:key="unit.TelldusUnit_Name">
+                                                        <tr v-for="unit in unitType.children" v-bind:key="unit.Id">
                                                             <td>
                                                                 <v-checkbox
                                                                     v-model="unit.selected"
-                                                                    :label="unit.TelldusUnit_Name"
-                                                                    :hint="unit.TelldusUnit_LocationDesciption"
+                                                                    :label="unit.Name"
+                                                                    :hint="unit.LocationDescription"
                                                                     color="white"
                                                                     persistent-hint
                                                                     class="checkbox"
@@ -56,11 +56,13 @@
                         </div>
                     </div>
                     <div class="flex-container column action-list">
+                        <!--
                         <section>
                             <h4 class="subheading">Selected units</h4>
                             <p v-if="selectedUnits.length > 0">{{selectedUnits}}</p>
                             <p v-else>NO UNIT SELECTED</p>
                         </section>
+                        -->
                         <section>
                             <v-divider dark></v-divider>
                             <h4 class="subheading">Select action time and level</h4>                            
@@ -78,7 +80,7 @@
                                 </div>
                                 <div class="action-value">
                                     <h5 class="caption">Level</h5>
-                                    <v-radio-group v-model="currentSettings.start.actionLevelValue" row>
+                                    <v-radio-group v-model="currentSettings.start.TelldusActionValue_actionValue" row>
                                         <v-tooltip bottom>
                                             <v-radio flat slot="activator" label="Off" value="off" color="white"></v-radio>
                                             <span>Meaning that the setting Off applies from the beginning</span>
@@ -108,7 +110,7 @@
                                 </div>
                                 <div class="action-value">
                                     <h5 class="caption">Level</h5>
-                                    <v-radio-group v-model="currentSettings.end.actionLevelValue" row>
+                                    <v-radio-group v-model="currentSettings.end.TelldusActionValue_actionValue" row>
                                         <v-tooltip bottom>
                                             <v-radio flat slot="activator" label="Keep" value="keep" color="white"></v-radio>
                                             <span>Meaning that the initial setting remains</span>
@@ -171,6 +173,10 @@
 import * as moment from 'moment';
 import DayPilotEvent from '../helpers/DayPilotEvent';
 
+import TelldusUnitType from "../helpers/TelldusUnitType"
+import TelldusActionValue from "../helpers/TelldusActionValue"
+import TelldusUnit from "../helpers/TelldusUnit"
+
 export default {
     name: 'EventSelectorDialog',
     props: ['groupedResources', 'initialEvent', 'visible'],
@@ -180,15 +186,15 @@ export default {
             currentSettings: {
                 'start': {
                     'time': '',
-                    'actionLevelValue': 'on'
+                    'TelldusActionValue_actionValue': 'on'
                 },
                 'end': {
                     'time': '',
-                    'actionLevelValue': 'off'
+                    'TelldusActionValue_actionValue': 'off'
                 },
                 'selectedUnits': []
             },
-            actionLevelValue: {
+            TelldusActionValue_actionValue: {
                 start: 'on',
                 end: 'off'
             },
@@ -238,20 +244,6 @@ export default {
         dismiss() {
             this.$emit('dismiss');
         },
-        toggledLocation(args) {
-            const that = this;
-            const selected = args.node.selected;
-            args.children.forEach( (type) => {
-                type.node.selected = selected;
-                that.toggledType(type);
-            });
-        },
-        toggledType(args) {
-            const selected = args.node.selected;
-            args.children.forEach( (unit) => {
-                unit.selected = selected;
-            });
-        },
         setInitialDaySelected() {
             const tempCurrentEvent = JSON.parse( JSON.stringify( this.initialEvent ) );
             const startDayIndex = moment( tempCurrentEvent.start ).day() - 1;
@@ -277,10 +269,14 @@ export default {
                             let typeTemp = {
                                 'node': type.node,
                                 'children': type.children.map( (unit) => {
+                                    const telldusUnitType = new TelldusUnitType(null, type.node.TelldusUnitType_Name)
+                                    let telldusUnit = new TelldusUnit(unit.TelldusUnit_Id, unit.TelldusUnit_Name, unit.TelldusUnit_LocationDesciption);                                    
+                                    telldusUnit.TelldusUnitType = telldusUnitType;
+                                    
                                     if (unit.TelldusUnit_Id === this.initialEvent.resource) {
-                                        unit.selected = true;
+                                        telldusUnit.selected = true;
                                     }
-                                    return unit;
+                                    return telldusUnit;
                                 })
                             }
                             return typeTemp;
@@ -294,7 +290,21 @@ export default {
             if (this.$refs.form.validate()) {
                 this.$emit('submit', this.currentEvents);
             }
-        }
+        },
+        toggledLocation(args) {
+            const that = this;
+            const selected = args.node.selected;
+            args.children.forEach( (type) => {
+                type.node.selected = selected;
+                that.toggledType(type);
+            });
+        },
+        toggledType(args) {
+            const selected = args.node.selected;
+            args.children.forEach( (unit) => {
+                unit.selected = selected;
+            });
+        },
     },    
 	computed: {
         currentEvents() {
@@ -304,16 +314,20 @@ export default {
                    //s fullDate : startDate: this.$DEFAULT_START_DATE_MONDAY
 
             const referenceMonday = { 'date': this.$DEFAULT_START_DATE_MONDAY, 'datePattern': 'yyyy-MM-dd'}
-            let currentEvents = that.selectedUnits.flatMap( (u) => {
+            let currentEvents = that.selectedUnits.flatMap( (telldusUnit) => {
                 const unitAndEventOccurDays = that.selectedDaysEventOccurs.flatMap( (sDEO) => {
                     const startDayIndex = sDEO.dayOfWeek;
                     const endDayIndex = 
                         that.endEventTimeOccurNextDay ? (startDayIndex < 6 ? startDayIndex + 1 : 0) : startDayIndex;
 
-                    const resource = u.TelldusUnit_Id;
-                const text = '';
-                const dPE = new DayPilotEvent(startDayIndex, that.currentSettings.start.time, endDayIndex,
-                    this.currentSettings.end.time, that.timeSeparator, text, resource, referenceMonday);
+                    const startTelldusActionValue_actionValue = TelldusActionValue.getClosestPossibleTelldusActionValue( telldusUnit.TelldusUnitType, that.startTelldusActionValue_actionValue );
+                    const actionColor = TelldusActionValue.getColor( startTelldusActionValue_actionValue );
+
+
+                    const resource = telldusUnit.Id;
+                    const text = startTelldusActionValue_actionValue;
+                    const dPE = new DayPilotEvent(referenceMonday, startDayIndex, that.currentSettings.start.time, endDayIndex,
+                        this.currentSettings.end.time, that.timeSeparator, resource, text, actionColor);
                     return dPE
                 });
                 return unitAndEventOccurDays;
@@ -329,8 +343,8 @@ export default {
             }
             return currentEventText;
 		},
-        endActionLevelValue() {
-            return this.currentSettings.end.actionLevelValue;
+        endTelldusActionValue_actionValue() {
+            return this.currentSettings.end.TelldusActionValue_actionValue;
         },
         endEventTimeOccurNextDay() {
             const startTime = moment( this.currentSettings.start.time, 'HH:mm' );
@@ -365,8 +379,8 @@ export default {
             }
             return selectedUnits;
         },
-        startActionLevelValue() {
-            return this.currentSettings.start.actionLevelValue;
+        startTelldusActionValue_actionValue() {
+            return this.currentSettings.start.TelldusActionValue_actionValue;
         },
         timeFormatRules() {
             const rules = [
@@ -378,17 +392,17 @@ export default {
         }
     },
     watch: {
-        endActionLevelValue: {
+        endTelldusActionValue_actionValue: {
             handler(newValue) {
                 if ( newValue === 'keep' ) {
                     this.currentSettings.end.time = this.currentSettings.start.time;
                 }
             }
         },
-        startActionLevelValue: {
+        startTelldusActionValue_actionValue: {
             handler(newValue) {
                 if ( newValue === 'off' ) {
-                    this.currentSettings.end.actionLevelValue = 'keep';
+                    this.currentSettings.end.TelldusActionValue_actionValue = 'keep';
                 }
             }
         },

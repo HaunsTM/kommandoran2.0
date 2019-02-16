@@ -175,7 +175,7 @@ export default class TelldusActionValue {
     }
     
     /**
-     * Not every TelldusUnit can deal with different level settings. A on/off must for example either on or of.
+     * Not every TelldusUnit can deal with different level settings. A on/off device must for example be set to either on or off.
      * @param {*} telldusUnitType - string representation, example: '433 MHz - OnOff'
      * @param {*} preferredActionValue - string representation (small caps), example: 'on'
      */

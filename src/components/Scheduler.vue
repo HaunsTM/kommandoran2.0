@@ -54,6 +54,7 @@
 <script>
 import Vue from 'vue';
 import EventSelectorDialog from './EventSelectorDialog';
+import TelldusAction_Scheduler from '../helpers/TelldusAction_Scheduler';
 
 import { DayPilot, DayPilotScheduler } from 'daypilot-pro-vue'
 import { EventBus } from './event-bus.js';
@@ -231,8 +232,11 @@ height: 500,
 	methods: {
 		addNewEvents(events) {
 			this.eventSelectorDialog = false;
-	//		https://code.daypilot.org/69423/vue-js-scheduler-build-a-reservation-application-in-5-minut
-			this.scheduler.update({events: events});
+			
+			const that = this;
+			events.forEach( event => {
+				this.scheduler.events.add( event );
+			});
 		},
 		calendarEvent(start, end, resource, text, durationBarColor) {
 			const calendarEvent = {
@@ -357,31 +361,49 @@ height: 500,
 		},
 		loadCalendarData() {
 			this.setLoadingState(true);
+			const that = this;
 			const promises = [         
-				Vue.axios.get(this.$DB_API_BASE_URL + '?procedure=GetRepetitiveOnlyTelldusSchedulerOverview')
+				Vue.axios.get(that.$DB_API_BASE_URL + '?procedure=GetRepetitiveOnlyTelldusSchedulerOverview')
 			];
 			Promise.all(promises)
 			.then((response) => {
-				this.setLoadingState(false);
-				this.bufferTelldusSchedulerOverview = response[0].data[1];
+				that.setLoadingState(false);
+				that.bufferTelldusSchedulerOverview = response[0].data[1];
 
-				Vue.set(this.config, "resources", this.groupResourcesByLocation);
-				Vue.set(this.config, "events", this.groupResourcesEvents);
+				Vue.set(that.config, "resources", that.groupResourcesByLocation);
+				Vue.set(that.config, "events", that.groupResourcesEvents);
 			})
 			.catch((error) => {
-				this.setLoadingState(false, error);
+				that.setLoadingState(false, error);
 			});
 		},
 		setLoadingState: function (loading, error) {
 			let payLoad =  { "isLoading" : loading, "error" : error };
 			EventBus.$emit('loading', payLoad);
 		},
-		save(event) {
+		async save() {
 			//disable button
 			//send to server
 			//enable button
-			let eventList = this.$refs.scheduler.control.events.list;
-			debugger;
+			const eventList = this.scheduler.events.list;
+			const telldusIdNamePhrasebook = this.bufferTelldusSchedulerOverview;
+			const telldusActionSchedulers = eventList.flatMap( (s) => {				
+				const telldusActionSchedulerPair = TelldusAction_Scheduler.DayPilotEvent_2_TelldusActionScheduler(s, telldusIdNamePhrasebook);
+				return telldusActionSchedulerPair;
+			});
+
+			try {
+				this.setLoadingState(true);
+				await Vue.axios.post(this.$DB_API_BASE_URL, {
+					'procedure': {
+						'name': 'RegisterTelldusAction_Scheduler',
+						"data": telldusActionSchedulers
+					}
+				});
+				this.setLoadingState(false);
+			} catch (ex) {				
+				this.setLoadingState(false, ex);
+			}
 		},
 		timeRangeSelected: function(args) {
 			this.currentSelectedEvent = args;

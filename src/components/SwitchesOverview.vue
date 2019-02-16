@@ -141,92 +141,21 @@ export default {
 	},
 	methods: {
 		fetchData : function () {
-        	this.setLoadingState(true);
+			this.setLoadingState(true);
 			let that = this;
 			const promises = [
-         		Vue.axios.get(this.baseUrl + 'devices-map.svg'),          
+				Vue.axios.get(this.baseUrl + 'devices-map.svg'),
 				Vue.axios.get(this.$TELLDUS_API_BASE_URL + '?telldusActionTypeActionTypeOption=listDevices')
 			];
 			Promise.all(promises)
 			.then((response) => {
-            	this.setLoadingState(false);
+				this.setLoadingState(false);
 				that.devicesMapSVGjsMarkup = response[0].data;
 				that.devicesData = response[1].data.successResult;
 			})
 			.catch((error) => {
-            	this.setLoadingState(false, error);
+				this.setLoadingState(false, error);
 			});
-		},
-		getDisplayColor : function (state){
-			//https://vuetifyjs.com/en/style/colors
-			let color = "";
-			if (state === 1) {
-				//on yellow 
-				color = "#FFEB3B";
-			} else if (state === 2) {
-				//off grey lighten-1
-				color = "#BDBDBD";
-			} else if (2 < state && state < 10)  {
-				// yellow lighten-5
-				color = "#FFFDE7";
-			} else if (10 <= state && state < 20)  {
-				// yellow lighten-5
-				color = "#FFFDE7";
-			} else if (20 <= state && state < 30)  {
-				// yellow lighten-4
-				color = "#FFF9C4";
-			} else if (30 <= state && state < 40)  {
-				// yellow lighten-4
-				color = "#FFF9C4";
-			} else if (40 <= state && state < 50)  {
-				// yellow lighten-3
-				color = "#FFF59D";
-			} else if (50 <= state && state < 60)  {
-				// yellow lighten-3
-				color = "#FFF59D";
-			} else if (60 <= state && state < 70)  {
-				// yellow lighten-2
-				color = "#FFF176";
-			} else if (70 <= state && state < 80)  {
-				// yellow lighten-2
-				color = "#FFF176";
-			} else if (80 <= state && state < 90)  {
-				// yellow lighten-1
-				color = "#FFEE58";
-			} else if (90 <= state && state < 100) {
-				// yellow lighten-1
-				color = "#FFEE58";
-			} else {
-				// red
-				color = "#F44336";
-			}
-			return color;
-		},		
-		getHoverText : function (name, state, statevalue, type, curUTC) {
-			let hoverText = "";
-			
-			hoverText += "Name: " + name + "\n";
-
-			hoverText += "State: ";
-				if (state === 1) {
-					//on 
-					hoverText += "on (full)";
-				} else if (state === 2) {
-					//off
-					hoverText += "off";
-				} else if (2 < state && state <= 100)  {
-					// on
-					hoverText += "partially on (" + state + " %)";
-				} else {
-					// red
-					hoverText += "unknown state (" + state + ")";
-				}			
-			hoverText += "\n";
-			
-			hoverText += "Type: " + type + "\n";
-			hoverText += "Last updated: " + new Date(curUTC).toLocaleString('sv-SE', { timeZone: 'Europe/Stockholm' });
-
-			return hoverText;
 		},
 		onPowerSwitchClick : function (currentTellstickElement)  {
 			let currentDevice = this.devicesData.find( (e) => {
@@ -239,7 +168,7 @@ export default {
 		},	
 		onOffDevice: function (currentDevice, setPointState) {
 			let that = this;			
-        	this.setLoadingState(true);
+			this.setLoadingState(true);
 
 			const promises = [    
 				Vue.axios.get(this.$TELLDUS_API_BASE_URL + '?telldusActionTypeActionTypeOption=onOffDevice&telldusUnitName=' + currentDevice.name + '&telldusActionValueTypeName=levelValue&telldusActionValueActionValue=' + setPointState)
@@ -255,8 +184,8 @@ export default {
 								let state = performedTelldusAction.TelldusActionValue.ActionValue === 'on' ? 1 : 2;
 
 								d.state = state;
-								d.color = that.getDisplayColor(state);
-								d.hoverText = that.getHoverText(state);
+								d.color = TelldusActionValue.getColor(state);
+								d.hoverText = TelldusUnit.getHoverText(state);
 								d.updatedTime = new Date().getTime();
 
 								return d;
@@ -282,7 +211,8 @@ export default {
 				let telldusUnit = new TelldusUnit(d.name);
 				let actionTypeOption = setPointState === 'on' || 'off' ? TelldusActionType.ActionTypeOption().ON_OFF_DEVICE : null ;
 				let telldusActionType = new TelldusActionType(actionTypeOption) ;
-				let telldusActionValue = new TelldusActionValue(TelldusActionValue.ActionValueWithType()[setPointState.toUpperCase()]);
+				//let telldusActionValue = new TelldusActionValue(TelldusActionValue.ActionValueWithType()[setPointState.toUpperCase()]);
+				debugger;
 				let telldusAction = new TelldusAction(telldusUnit, telldusActionType, telldusActionValue);
 
 				return telldusAction;
@@ -346,8 +276,8 @@ export default {
 							"state" : shouldUseOldData ? previousDeviceData.state : curDevData.state,
 							"statevalue" : shouldUseOldData ? previousDeviceData.statevalue : curDevData.statevalue,
 							"type" : curDevData.type,
-							"color" : shouldUseOldData ? previousDeviceData.color : that.getDisplayColor(curDevData.state), 
-							"hoverText" : shouldUseOldData ? that.getHoverText(previousDeviceData.name, previousDeviceData.state, previousDeviceData.statevalue, previousDeviceData.type, curUTC): that.getHoverText(curDevData.name, curDevData.state, curDevData.statevalue, curDevData.type, curUTC),
+							"color" : shouldUseOldData ? previousDeviceData.color : TelldusActionValue.getColor(curDevData.state), 
+							"hoverText" : shouldUseOldData ? TelldusUnit.getHoverText(previousDeviceData.name, previousDeviceData.state, previousDeviceData.statevalue, previousDeviceData.type, curUTC): TelldusUnit.getHoverText(curDevData.name, curDevData.state, curDevData.statevalue, curDevData.type, curUTC),
 							"updatedTime" : shouldUseOldData ? previousDeviceData.updatedTime : curUTC,
 							"cursor" : "pointer"
 						}
@@ -361,8 +291,8 @@ export default {
 							"state" : curDevData.state,
 							"statevalue" : curDevData.statevalue,
 							"type" : curDevData.type,
-							"color" : that.getDisplayColor(curDevData.state), 
-							"hoverText" : that.getHoverText(curDevData.name, curDevData.state, curDevData.statevalue, curDevData.type, curUTC),
+							"color" : TelldusActionValue.getColor(curDevData.state), 
+							"hoverText" : TelldusUnit.getHoverText(curDevData.name, curDevData.state, curDevData.statevalue, curDevData.type, curUTC),
 							"updatedTime" : curUTC
 						}
 					});
