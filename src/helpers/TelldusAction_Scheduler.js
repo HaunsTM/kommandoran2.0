@@ -41,7 +41,7 @@ export default class TelldusAction_Scheduler {
     static DayPilotEvent_2_TelldusActionScheduler(dayPilotEvent, telldusIdNamePhrasebook) {
         const start = moment(dayPilotEvent.start.value);
         const end = moment(dayPilotEvent.end.value);
-
+debugger;
         //dayPilotEvent.text
         const telldusUnit_Id = dayPilotEvent.resource;
         const telldusUnit_Name = telldusIdNamePhrasebook.find( (t) => { return t.TelldusUnit_Id === telldusUnit_Id }).TelldusUnit_Name;

@@ -5,7 +5,7 @@
 			v-model="eventSelectorDialog"
 		>
 			<event-selector-dialog
-				v-bind:grouped-resources="groupedResourcesByLocationAndTelldusUnitType"
+				v-bind:grouped-resources="dayPilotSchedulerHelper.groupedResourcesByLocationAndTelldusUnitType"
 				v-bind:initial-event="currentSelectedEvent"
 				v-bind:visible="eventSelectorDialog"
 				v-on:dismiss="dismissEventSelectorDialog"
@@ -57,14 +57,15 @@ import EventSelectorDialog from './EventSelectorDialog';
 import TelldusAction_Scheduler from '../helpers/TelldusAction_Scheduler';
 
 import { DayPilot, DayPilotScheduler } from 'daypilot-pro-vue'
+import { DayPilotSchedulerHelper } from '../helpers/DayPilotScheduler.hlp'
 import { EventBus } from './event-bus.js';
 
 export default {
 	name: 'Scheduler',
 	data: function() {
-		return {			
+		return {
+			dayPilotSchedulerHelper: {},
 			bufferTelldusSchedulerOverview : {},
-			calendarEvents: [],
 			currentSelectedEvent: {},
 			dropdown_system: ["Telldus"],
 			eventSelectorDialog: false,
@@ -75,8 +76,10 @@ export default {
 				scale: "CellDuration",
 				cellDuration: 60,
 				cellWidth: 20,
-heightSpec: "Max",
-height: 500,
+
+				heightSpec: "Max",
+				height: 500,
+				
 				crosshairType: "Full",
 
 
@@ -135,95 +138,8 @@ height: 500,
 		DayPilotScheduler,
 		EventSelectorDialog
 	},
-	computed: {
+	computed: { 		
 		
-		groupResourcesEvents() {
-			const MIN_STRING_CONTENT_LENGTH_TO_REPRESENT_A_POSSIBLE_JSON_OBJECT = 10;
-			let that = this;
-
-			let groupedResourcesEvents = this.$_(this.bufferTelldusSchedulerOverview)
-				.filter( (e) => { return (e.ScheduledActivities && e.ScheduledActivities.length > MIN_STRING_CONTENT_LENGTH_TO_REPRESENT_A_POSSIBLE_JSON_OBJECT); })
-				.map( (resource) => {
-					let repetitiveActivities = that.$_(JSON.parse(resource.ScheduledActivities))
-						.filter( (sE) => { return ( sE.Scheduler_Year === "" && sE.Scheduler_Month === "" && sE.Scheduler_Day === "" && sE.Scheduler_WeekDay !== "")})
-						.sortBy(['TelldusActionTypes_ActionTypeOption','Scheduler_WeekDay', 'Scheduler_Hour', 'Scheduler_Minute'])
-						.value();
-					return that.calendarEventArrayPerResource(resource.TelldusUnit_Id, repetitiveActivities)
-				})
-				.flattenDeep()
-				.union()
-				.value();
-			return groupedResourcesEvents; 
-		},
-		groupResourcesByLocation() {
-			const that = this;
-			let groupedResources = this.$_(this.bufferTelldusSchedulerOverview)
-				.sortBy(['TelldusActionValueType_Name'])
-				.groupBy(x => x.TelldusUnitLocation_Name)
-				.reduce( (result0, value, key) => {
-					let resourceGroup = {
-						"name" : key,
-						"children" :  value.reduce( (result1, u) => {
-							if (u.TelldusUnitType_Name.match(that.regValidTelldusUnitTypes_Name)) {
-								let child = {
-									id :  u.TelldusUnit_Id,
-									name: u.TelldusUnit_Name + "<br />" + u.TelldusUnit_LocationDesciption,
-									
-									TelldusUnitType_Name : u.TelldusUnitType_Name,
-									TelldusUnit_Active : u.TelldusUnit_Active,
-									TelldusAction_Active : u.TelldusAction_Active
-								};
-								result1.push(child);
-							}
-							return result1;
-						}, [])
-					}					
-					if(resourceGroup.children.length > 0) {
-						result0.push(resourceGroup);
-					}
-					return result0;
-				}, []);
-			return groupedResources;
-		},
-		groupedResourcesByLocationAndTelldusUnitType() {
-			const that = this;
-			let groupedResources = this.$_(this.bufferTelldusSchedulerOverview)
-				.sortBy(['TelldusUnitLocation_Name'])
-				.groupBy(x => x.TelldusUnitLocation_Name)
-				.reduce( (result0, value0, key0) => {
-					let resourceGroupByUnitLocation = {						
-						"node": {"TelldusUnitLocation_Name" : key0, "selected": false},
-						"children" :  this.$_(value0)
-							.groupBy(x => x.TelldusUnitType_Name)
-							.reduce( (result1, value1, key1) => {
-								let child1 = {
-									"node": {"TelldusUnitType_Name" : key1, "selected": false},
-									"children" :  value1.reduce( (result2, u) => {
-										if (u.TelldusUnitType_Name.match(that.regValidTelldusUnitTypes_Name)) {
-											let child2 = {
-												"TelldusUnit_Id" :  u.TelldusUnit_Id,
-												"TelldusUnit_Name": u.TelldusUnit_Name,
-												"selected": false,
-												"TelldusUnit_LocationDesciption": u.TelldusUnit_LocationDesciption
-											};
-											result2.push(child2);
-										}
-										return result2;
-									}, [])
-								}
-								if(child1.children.length > 0) {
-									result1.push(child1);
-								}
-								return result1;
-							}, [])
-					}
-					if(resourceGroupByUnitLocation.children.length > 0) {
-						result0.push(resourceGroupByUnitLocation);
-					}
-					return result0;
-				}, []);
-			return groupedResources;
-		},
 		// DayPilot.Scheduler object - https://api.daypilot.org/daypilot-scheduler-class/
 		scheduler: function () {
 			return this.$refs.scheduler.control;
@@ -235,126 +151,8 @@ height: 500,
 			
 			const that = this;
 			events.forEach( event => {
-				this.scheduler.events.add( event );
+				that.scheduler.events.add( event );
 			});
-		},
-		calendarEvent(start, end, resource, text, durationBarColor) {
-			const calendarEvent = {
-				"start": start,
-				"end": end,
-				"resource": resource,
-				"text": text,
-				"durationBarColor": durationBarColor,
-				"id": DayPilot.guid()
-			};
-			return calendarEvent;
-		},		
-		calendarEventDateTime(weekDay, hour, minute) {
-			const daysToAdd = (weekDay === 0) ? 6 : weekDay - 1;
-			const dateTime = new Date(this.$DEFAULT_START_DATE_MONDAY);
-			dateTime.setHours(hour, minute);
-			dateTime.setDate(dateTime.getDate() + daysToAdd);
-
-			const yearValue = dateTime.getFullYear().toString();
-			const monthValue = (dateTime.getMonth() + 1).toString().toString().padStart(2,'0');
-			const dateValue = dateTime.getDate().toString().padStart(2,'0');
-			const hourValue = hour.toString().padStart(2,'0');
-			const minuteValue = minute.toString().padStart(2,'0');
-			const secondValue = '00';
-			
-			let calendarEventDateTime = yearValue + '-' + monthValue + '-' + dateValue + 'T' + hourValue + ':' + minuteValue + ':' + secondValue;
-			return calendarEventDateTime;
-		},
-		calendarEventArrayPerResource(resourceId, resourceWithActivitiesArray) {
-			let calendarEventArrayPerResource = [];
-			const numberOfActivities = resourceWithActivitiesArray.length;
-			let durationBarColor = "";
-			let i = 0;
-
-			while (i < numberOfActivities) {
-				let currentEventIsLastInSerie = (i + 1) === numberOfActivities;
-				let currentEvent = resourceWithActivitiesArray[i];
-				let currentEventDateTime = 
-					this.calendarEventDateTime(currentEvent.Scheduler_WeekDay, currentEvent.Scheduler_Hour, currentEvent.Scheduler_Minute);
-
-				switch (currentEvent.TelldusActionTypes_ActionTypeOption) {
-					case "onOffDevice":
-						durationBarColor = "red";
-
-						if (currentEvent.TelldusActionValue_ActionValue === "on") {
-							if (!currentEventIsLastInSerie) {
-								let nextEvent = resourceWithActivitiesArray[i+1];
-								let nextEventDateTime = 
-									this.calendarEventDateTime(nextEvent.Scheduler_WeekDay, nextEvent.Scheduler_Hour, nextEvent.Scheduler_Minute);
-
-								if (nextEvent.TelldusActionValue_ActionValue === "off") {
-									calendarEventArrayPerResource.push(	this.calendarEvent(
-										currentEventDateTime, 
-										nextEventDateTime, 
-										resourceId, 
-										currentEvent.TelldusActionTypes_ActionTypeOption, 
-										durationBarColor)
-									);
-									i++;
-								} else {
-									calendarEventArrayPerResource.push(	this.calendarEvent(
-										currentEventDateTime, 
-										currentEventDateTime, 
-										resourceId, 
-										currentEvent.TelldusActionTypes_ActionTypeOption, 
-										durationBarColor)
-									);
-								}
-							} else {
-								calendarEventArrayPerResource.push(	this.calendarEvent(
-									currentEventDateTime, 
-									currentEventDateTime, 
-									resourceId, 
-									currentEvent.TelldusActionTypes_ActionTypeOption, 
-									durationBarColor)
-								);
-							}
-						} else {							
-							if (!currentEventIsLastInSerie) {
-								const nextEvent = resourceWithActivitiesArray[i+1];
-								const nextEventDateTime = this.calendarEventDateTime(nextEvent.Scheduler_WeekDay, nextEvent.Scheduler_Hour, nextEvent.Scheduler_Minute);
-
-								if (nextEvent.TelldusActionValue_ActionValue === "on") {
-									calendarEventArrayPerResource.push(	this.calendarEvent(
-										currentEventDateTime, 
-										nextEventDateTime, 
-										resourceId, 
-										currentEvent.TelldusActionTypes_ActionTypeOption, 
-										durationBarColor)
-									);
-									i++;
-								} else {
-									calendarEventArrayPerResource.push(	this.calendarEvent(
-										currentEventDateTime, 
-										currentEventDateTime, 
-										resourceId, 
-										currentEvent.TelldusActionTypes_ActionTypeOption, 
-										durationBarColor)
-									);
-								}
-							} else {
-								calendarEventArrayPerResource.push(	this.calendarEvent(
-									currentEventDateTime, 
-									currentEventDateTime, 
-									resourceId, 
-									currentEvent.TelldusActionTypes_ActionTypeOption, 
-									durationBarColor)
-								);
-							}
-						}
-						break;
-					default:
-						durationBarColor = "blue";
-
-				}
-				i++;
-			}
-			return calendarEventArrayPerResource;			
 		},
 		dismissEventSelectorDialog() {
 			this.eventSelectorDialog = false;
@@ -368,10 +166,11 @@ height: 500,
 			Promise.all(promises)
 			.then((response) => {
 				that.setLoadingState(false);
-				that.bufferTelldusSchedulerOverview = response[0].data[1];
+				const bufferTelldusSchedulerOverview = response[0].data[1];
+				that.dayPilotSchedulerHelper = new DayPilotSchedulerHelper( bufferTelldusSchedulerOverview, that.$DEFAULT_START_DATE_MONDAY );
 
-				Vue.set(that.config, "resources", that.groupResourcesByLocation);
-				Vue.set(that.config, "events", that.groupResourcesEvents);
+				Vue.set(that.config, "resources", that.dayPilotSchedulerHelper.groupResourcesByLocation);
+				Vue.set(that.config, "events", that.dayPilotSchedulerHelper.groupResourcesEvents);
 			})
 			.catch((error) => {
 				that.setLoadingState(false, error);
@@ -386,7 +185,8 @@ height: 500,
 			//send to server
 			//enable button
 			const eventList = this.scheduler.events.list;
-			const telldusIdNamePhrasebook = this.bufferTelldusSchedulerOverview;
+			const telldusIdNamePhrasebook = this.dayPilotSchedulerHelper.bufferTelldusSchedulerOverview;
+debugger;
 			const telldusActionSchedulers = eventList.flatMap( (s) => {				
 				const telldusActionSchedulerPair = TelldusAction_Scheduler.DayPilotEvent_2_TelldusActionScheduler(s, telldusIdNamePhrasebook);
 				return telldusActionSchedulerPair;
