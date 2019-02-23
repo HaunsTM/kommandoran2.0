@@ -2,11 +2,12 @@ import moment from "moment";
 
 export default class TelldusAction_Scheduler {
 
-    constructor(telldusUnit_Name, telldusActionType_ActionTypeOption, telldusActionValueType_Name, telldusActionValue_ActionValue, scheduler_Day, scheduler_Hours, scheduler_Minutes) {
+    constructor(telldusUnit_Name, telldusActionType_ActionTypeOption, telldusActionValueType_Name, telldusActionValue_ActionValue, telldusAction_Scheduler_ReferenceId, scheduler_Day, scheduler_Hours, scheduler_Minutes) {
         this._telldusUnit_Name = telldusUnit_Name;
         this._telldusActionType_ActionTypeOption = telldusActionType_ActionTypeOption;
         this._telldusActionValueType_Name = telldusActionValueType_Name;
         this._telldusActionValue_ActionValue = telldusActionValue_ActionValue;
+        this._telldusAction_Scheduler_ReferenceId = telldusAction_Scheduler_ReferenceId;
         this._scheduler_Day = scheduler_Day;
         this._scheduler_Hours = scheduler_Hours;
         this._scheduler_Minutes = scheduler_Minutes;
@@ -25,6 +26,9 @@ export default class TelldusAction_Scheduler {
     get telldusActionValue_ActionValue() {
         return this._telldusActionValue_ActionValue;
     }
+    get telldusAction_Scheduler_ReferenceId() {
+        return this._telldusAction_Scheduler_ReferenceId;
+    }
     get scheduler_Day() {
         return this._scheduler_Day;
     }					
@@ -39,24 +43,28 @@ export default class TelldusAction_Scheduler {
     }
 
     static DayPilotEvent_2_TelldusActionScheduler(dayPilotEvent, telldusIdNamePhrasebook) {
-        const start = moment(dayPilotEvent.start.value);
-        const end = moment(dayPilotEvent.end.value);
-debugger;
+        const start = moment(dayPilotEvent.start);
+        const end = moment(dayPilotEvent.end);
+
         //dayPilotEvent.text
         const telldusUnit_Id = dayPilotEvent.resource;
-        const telldusUnit_Name = telldusIdNamePhrasebook.find( (t) => { return t.TelldusUnit_Id === telldusUnit_Id }).TelldusUnit_Name;
+        const telldusUnit_Name = telldusIdNamePhrasebook.find( (t) => { return t.TelldusUnit_Id === telldusUnit_Id } ).TelldusUnit_Name;
         const telldusActionType_ActionTypeOption = 'onOffDevice';
         const telldusActionValueType_Name = 'levelValue';
         const telldusActionValue_ActionValue = 'on';
 
+        const telldusAction_Scheduler_ReferenceId = dayPilotEvent.id;
+
         const startTelldusActionScheduler =
             new TelldusAction_Scheduler(telldusUnit_Name, telldusActionType_ActionTypeOption, 
                 telldusActionValueType_Name, telldusActionValue_ActionValue,
+                telldusAction_Scheduler_ReferenceId,
                 start.day(), start.hours(), start.minutes());
 
         const endTelldusActionScheduler =
             new TelldusAction_Scheduler(telldusUnit_Name, telldusActionType_ActionTypeOption, 
                 telldusActionValueType_Name, telldusActionValue_ActionValue,
+                telldusAction_Scheduler_ReferenceId,
                 end.day(), end.hours(), end.minutes());
 
         return [startTelldusActionScheduler, endTelldusActionScheduler];

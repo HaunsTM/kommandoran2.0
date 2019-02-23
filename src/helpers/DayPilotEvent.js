@@ -1,39 +1,36 @@
 
-import { DayPilot } from 'daypilot-pro-vue'
-
+import * as moment from 'moment';
 export default class DayPilotEvent {
 
-    constructor(referenceMonday, startDayIndex, startTimeHHMM, endDayIndex, endTimeHHMM, timeSeparator, resource, text, barColor ) {
+    constructor(id, startMonday, startDayIndex, startTimeHHMMSS, endDayIndex, endTimeHHMMSS, timeSeparator, resource, text, barColor ) {
 
         const dateByDay = (index) => {
             // 0 = sunday, 6 = saturday
-            const startMonday = DayPilot.Date.parse(referenceMonday.date, referenceMonday.datePattern);
             const daysToAddBasedOnIndexRelatedToStartMonday = index === 0 ? 6 : index - 1;
-            const currentDate = startMonday.addDays( daysToAddBasedOnIndexRelatedToStartMonday);
+            const currentDate = moment(startMonday).add( daysToAddBasedOnIndexRelatedToStartMonday, 'days');
             
             return currentDate;
         }
-
-        this._start = dateByDay(startDayIndex)
-            .addHours(startTimeHHMM.split(timeSeparator)[0])
-            .addMinutes(startTimeHHMM.split(timeSeparator)[1]);
+        const tempFirst = dateByDay(startDayIndex)
+            .add(startTimeHHMMSS.split(timeSeparator)[0], 'hours')
+            .add(startTimeHHMMSS.split(timeSeparator)[1], 'minutes');
         
-        this._end = dateByDay(endDayIndex)
-            .addHours(endTimeHHMM.split(timeSeparator)[0])
-            .addMinutes(endTimeHHMM.split(timeSeparator)[1]);
+        const tempLast = dateByDay(endDayIndex)
+            .add(endTimeHHMMSS.split(timeSeparator)[0], 'hours')
+            .add(endTimeHHMMSS.split(timeSeparator)[1], 'minutes');
 
-        this._id = DayPilot.guid();
+        const localFormat = 'YYYY-MM-DD[T]HH:mm:ss';
+        this._start = tempFirst.isBefore(tempLast) ? tempFirst.format(localFormat) : tempLast.format(localFormat);
+        this._end = tempFirst.isBefore(tempLast) ? tempLast.format(localFormat) : tempFirst.format(localFormat);
+
+        this._id = id;
         this._text = text;
         this._resource = resource;
         this._barColor = barColor;
     }
 //https://api.daypilot.org/daypilot-event-data/
-    get barColor () {
+    get barColor() {
         return this._barColor;
-    }
-
-    get start() {
-        return this._start;
     }
 
     get end() {
@@ -44,13 +41,26 @@ export default class DayPilotEvent {
         return this._id;
     }
 
-    get text() {
-        return this._text;
-    }
-
     get resource() {
         return this._resource;
     }
 
-    static TelldusUnitTypes
-  }
+    get start() {
+        return this._start;
+    }
+
+    get text() {
+        return this._text;
+    }
+
+    toJSON() {
+        return {
+            "barColor": this.barColor,        
+            "end": this.end,        
+            "id": this.id,        
+            "resource": this.resource,        
+            "start": this.start,        
+            "text":  this.text
+        }
+    }
+}

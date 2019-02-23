@@ -84,11 +84,11 @@ export default {
 
 
 				days: 7,
+				events: [],
 				startDate: this.$DEFAULT_START_DATE_MONDAY,
 
 				onAfterRender: function(args) {
-
-								this.rows.expandAll();
+					this.rows.expandAll();
 				},
 
 				/*timeRangeSelectedHandling: "Enabled",
@@ -148,8 +148,8 @@ export default {
 	methods: {
 		addNewEvents(events) {
 			this.eventSelectorDialog = false;
-			
 			const that = this;
+//debugger;
 			events.forEach( event => {
 				that.scheduler.events.add( event );
 			});
@@ -159,6 +159,7 @@ export default {
 		},
 		loadCalendarData() {
 			this.setLoadingState(true);
+
 			const that = this;
 			const promises = [         
 				Vue.axios.get(that.$DB_API_BASE_URL + '?procedure=GetRepetitiveOnlyTelldusSchedulerOverview')
@@ -167,10 +168,14 @@ export default {
 			.then((response) => {
 				that.setLoadingState(false);
 				const bufferTelldusSchedulerOverview = response[0].data[1];
-				that.dayPilotSchedulerHelper = new DayPilotSchedulerHelper( bufferTelldusSchedulerOverview, that.$DEFAULT_START_DATE_MONDAY );
+				
+                const startMonday = that.$DEFAULT_START_DATE_MONDAY;
+				that.dayPilotSchedulerHelper = new DayPilotSchedulerHelper( bufferTelldusSchedulerOverview, startMonday );
 
 				Vue.set(that.config, "resources", that.dayPilotSchedulerHelper.groupResourcesByLocation);
-				Vue.set(that.config, "events", that.dayPilotSchedulerHelper.groupResourcesEvents);
+				//Vue.set(that.config, "events", that.dayPilotSchedulerHelper.groupResourcesEvents);
+				const events = that.dayPilotSchedulerHelper.groupResourcesEvents;
+				that.addNewEvents( events );
 			})
 			.catch((error) => {
 				that.setLoadingState(false, error);

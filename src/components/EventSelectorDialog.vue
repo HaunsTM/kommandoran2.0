@@ -171,6 +171,7 @@
 <script>
 
 import * as moment from 'moment';
+import { DayPilot } from 'daypilot-pro-vue'
 import DayPilotEvent from '../helpers/DayPilotEvent';
 
 import TelldusUnitType from "../helpers/TelldusUnitType"
@@ -308,26 +309,34 @@ export default {
     },    
 	computed: {
         currentEvents() {
-           // DayPilotEvent
-           
             const that = this;
-                   //s fullDate : startDate: this.$DEFAULT_START_DATE_MONDAY
 
-            const referenceMonday = { 'date': this.$DEFAULT_START_DATE_MONDAY, 'datePattern': 'yyyy-MM-dd'}
             let currentEvents = that.selectedUnits.flatMap( (telldusUnit) => {
                 const unitAndEventOccurDays = that.selectedDaysEventOccurs.flatMap( (sDEO) => {
+                    
+                    const id = DayPilot.guid();
+                    const startMonday = this.$DEFAULT_START_DATE_MONDAY;
+
                     const startDayIndex = sDEO.dayOfWeek;
+                    const startTimeHHMM = that.currentSettings.start.time;
+
                     const endDayIndex = 
                         that.endEventTimeOccurNextDay ? (startDayIndex < 6 ? startDayIndex + 1 : 0) : startDayIndex;
+                    const endTimeHHMM = this.currentSettings.end.time;
 
-                    const startTelldusActionValue_actionValue = TelldusActionValue.getClosestPossibleTelldusActionValue( telldusUnit.TelldusUnitType, that.startTelldusActionValue_actionValue );
-                    const actionColor = TelldusActionValue.getColor( startTelldusActionValue_actionValue );
-
-
-                    const resource = telldusUnit.Id;
+                    const timeSeparator = that.timeSeparator;
+                    const resource = telldusUnit.Id;                    
+                    const startTelldusActionValue_actionValue =
+                        TelldusActionValue.getClosestPossibleTelldusActionValue( telldusUnit.TelldusUnitType, that.startTelldusActionValue_actionValue );                    
                     const text = startTelldusActionValue_actionValue;
-                    const dPE = new DayPilotEvent(referenceMonday, startDayIndex, that.currentSettings.start.time, endDayIndex,
-                        this.currentSettings.end.time, that.timeSeparator, resource, text, actionColor);
+                    const barColor = TelldusActionValue.getColor( startTelldusActionValue_actionValue );
+
+                    const dPE = new DayPilotEvent(
+                        id, startMonday,
+                        startDayIndex, startTimeHHMM,
+                        endDayIndex, endTimeHHMM, timeSeparator,
+                        resource, text, barColor);
+
                     return dPE
                 });
                 return unitAndEventOccurDays;

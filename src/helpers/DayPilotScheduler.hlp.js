@@ -1,5 +1,7 @@
 import _ from 'lodash';
 import DayPilotEvent from '../helpers/DayPilotEvent';
+import TelldusActionValue from "../helpers/TelldusActionValue"
+import TelldusUnitType from "../helpers/TelldusUnitType"
 
 export class DayPilotSchedulerHelper {
 
@@ -18,18 +20,50 @@ export class DayPilotSchedulerHelper {
         let that = this;
 
         let groupedResourcesEvents = _(this._bufferTelldusSchedulerOverview)
-            .filter( (e) => { return (e.ScheduledActivities && e.ScheduledActivities.length > MIN_STRING_CONTENT_LENGTH_TO_REPRESENT_A_POSSIBLE_JSON_OBJECT); })
-            .map( (resource) => {
+            .filter( (e) => { 
+                return (e.ScheduledActivities && e.ScheduledActivities.length > MIN_STRING_CONTENT_LENGTH_TO_REPRESENT_A_POSSIBLE_JSON_OBJECT); })
+            .map( function (resource) {
+                const telldusUnitType = new TelldusUnitType(null, resource.TelldusUnitType_Name);
                 let repetitiveActivities = _(JSON.parse(resource.ScheduledActivities))
-                     .filter( (sE) => {
-                         return ( sE.Scheduler_Date === this._NO_DATE )})
-                    .sortBy(['TelldusActionTypes_ActionTypeOption','Scheduler_WeekDay', 'Scheduler_Hour', 'Scheduler_Minute'])
+                    .filter( (sE) => {
+                         return ( sE.Scheduler_Date === that._NO_DATE )}
+                    )                    
+                    .groupBy(sE => sE.TelldusActions_Schedulers_ReferenceId)
+                    .map( function( sE ) { 
+                        const id = sE[0].TelldusActions_Schedulers_ReferenceId;
+                        const startMonday = that._defaultStartDateMonday
+
+                        const startDayIndex = sE[0].Scheduler_Day;
+                        const startTimeHHMM = sE[0].Scheduler_Time;
+
+                        const endDayIndex =  sE[1].Scheduler_Day;
+                        const endTimeHHMM = sE[1].Scheduler_Time;
+
+                        const timeSeparator = ':';
+                        const telldusUnitId = resource.TelldusUnit_Id;                    
+                        const startTelldusActionValue_actionValue =
+                            TelldusActionValue.getClosestPossibleTelldusActionValue( telldusUnitType, sE[0].TelldusActionValue_ActionValue );                    
+
+                        const text = startTelldusActionValue_actionValue;
+                        const barColor = TelldusActionValue.getColor( startTelldusActionValue_actionValue );
+
+                        const dPE = new DayPilotEvent(
+                            id, startMonday,
+                            startDayIndex, startTimeHHMM,
+                            endDayIndex, endTimeHHMM, timeSeparator,
+                            telldusUnitId, text, barColor);
+                        
+                        return dPE.toJSON();
+                     })
                     .value();
-                return that.calendarEventArrayPerResource(resource.TelldusUnit_Id, repetitiveActivities)
+                return repetitiveActivities;
             })
             .flattenDeep()
-            .union()
+             .union()
             .value();
+            //debugger;
+//return [{"barColor":"#FFFF00","end":"2018-07-02T07:00:00","id":"a567adda-d998-766a-d485-24e4cad2121a","resource":2,"start":"2018-07-02T06:00:00","text":"on"},
+//{"barColor":"#FFFF00","end":"2018-07-02T07:00:00","id":"a567adda-d998-766a-d485-24e4cad2121s","resource":3,"start":"2018-07-02T06:00:00","text":"on"}];
         return groupedResourcesEvents; 
     }
 
@@ -62,115 +96,6 @@ export class DayPilotSchedulerHelper {
                 return result0;
             }, []);
         return groupedResources;
-    }
-
-    calendarEventArrayPerResource(resourceId, resourceWithActivitiesArray) {
-        let calendarEventArrayPerResource = [];
-        const numberOfActivities = resourceWithActivitiesArray.length;
-        let durationBarColor = "";
-        let i = 0;
-// DEN HÄR FUNKTIONEN BEHÖVER ÖVERSYN
-        while (i < numberOfActivities) {
-            let currentEventIsLastInSerie = (i + 1) === numberOfActivities;
-            let currentEvent = resourceWithActivitiesArray[i];
-            let currentEventDateTime = 
-                this.calendarEventDateTime(currentEvent.Scheduler_Day, currentEvent.Scheduler_Time);
-
-            switch (currentEvent.TelldusActionTypes_ActionTypeOption) {
-                case "onOffDevice":
-                    durationBarColor = "red";
-
-                    if (currentEvent.TelldusActionValue_ActionValue === "on") {
-                        if (!currentEventIsLastInSerie) {
-                            let nextEvent = resourceWithActivitiesArray[i+1];
-                            let nextEventDateTime = 
-                                this.calendarEventDateTime(nextEvent.Scheduler_WeekDay, nextEvent.Scheduler_Hour, nextEvent.Scheduler_Minute);
-
-                            if (nextEvent.TelldusActionValue_ActionValue === "off") {
-                                calendarEventArrayPerResource.push(	new DayPilotEvent(
-                                    currentEventDateTime, 
-                                    nextEventDateTime, 
-                                    resourceId, 
-                                    currentEvent.TelldusActionTypes_ActionTypeOption, 
-                                    durationBarColor)
-                                );
-                                i++;
-                            } else {
-                                calendarEventArrayPerResource.push(	new DayPilotEvent(
-                                    currentEventDateTime, 
-                                    currentEventDateTime, 
-                                    resourceId, 
-                                    currentEvent.TelldusActionTypes_ActionTypeOption, 
-                                    durationBarColor)
-                                );
-                            }
-                        } else {
-                            calendarEventArrayPerResource.push(	new DayPilotEvent(
-                                currentEventDateTime, 
-                                currentEventDateTime, 
-                                resourceId, 
-                                currentEvent.TelldusActionTypes_ActionTypeOption, 
-                                durationBarColor)
-                            );
-                        }
-                    } else {							
-                        if (!currentEventIsLastInSerie) {
-                            const nextEvent = resourceWithActivitiesArray[i+1];
-                            const nextEventDateTime = this.calendarEventDateTime(nextEvent.Scheduler_WeekDay, nextEvent.Scheduler_Hour, nextEvent.Scheduler_Minute);
-
-                            if (nextEvent.TelldusActionValue_ActionValue === "on") {
-                                calendarEventArrayPerResource.push(	new DayPilotEvent(
-                                    currentEventDateTime, 
-                                    nextEventDateTime, 
-                                    resourceId, 
-                                    currentEvent.TelldusActionTypes_ActionTypeOption, 
-                                    durationBarColor)
-                                );
-                                i++;
-                            } else {
-                                calendarEventArrayPerResource.push(	new DayPilotEvent(
-                                    currentEventDateTime, 
-                                    currentEventDateTime, 
-                                    resourceId, 
-                                    currentEvent.TelldusActionTypes_ActionTypeOption, 
-                                    durationBarColor)
-                                );
-                            }
-                        } else {
-                            calendarEventArrayPerResource.push(	new DayPilotEvent(
-                                currentEventDateTime, 
-                                currentEventDateTime, 
-                                resourceId, 
-                                currentEvent.TelldusActionTypes_ActionTypeOption, 
-                                durationBarColor)
-                            );
-                        }
-                    }
-                    break;
-                default:
-                    durationBarColor = "blue";
-
-            }
-            i++;
-        }
-        return calendarEventArrayPerResource;			
-    }
-	
-    calendarEventDateTime(day, time) {
-        const daysToAdd = (day === 0) ? 6 : day - 1;
-        const dateTime = new Date( this._defaultStartDateMonday );
-        //dateTime.setHours(hour, minute);
-        dateTime.setDate(dateTime.getDate() + daysToAdd);
-
-        const yearValue = dateTime.getFullYear().toString();
-        const monthValue = (dateTime.getMonth() + 1).toString().toString().padStart(2,'0');
-        const dateValue = dateTime.getDate().toString().padStart(2,'0');
-        const hourValue = hour.toString().padStart(2,'0');
-        const minuteValue = minute.toString().padStart(2,'0');
-        const secondValue = '00';
-        
-        let calendarEventDateTime = yearValue + '-' + monthValue + '-' + dateValue + 'T' +  time;
-        return calendarEventDateTime;
     }
 
     get groupedResourcesByLocationAndTelldusUnitType() {
