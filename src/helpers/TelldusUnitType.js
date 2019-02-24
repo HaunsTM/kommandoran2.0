@@ -12,4 +12,5 @@ export default class TelldusUnitType {
     get Name() {
         return this._name;
     }
+    
 }

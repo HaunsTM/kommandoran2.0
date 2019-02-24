@@ -323,19 +323,21 @@ export default {
                     const endDayIndex = 
                         that.endEventTimeOccurNextDay ? (startDayIndex < 6 ? startDayIndex + 1 : 0) : startDayIndex;
                     const endTimeHHMM = this.currentSettings.end.time;
-
+debugger;
                     const timeSeparator = that.timeSeparator;
-                    const resource = telldusUnit.Id;                    
+                    const resource = telldusUnit.Id;
                     const startTelldusActionValue_actionValue =
-                        TelldusActionValue.getClosestPossibleTelldusActionValue( telldusUnit.TelldusUnitType, that.startTelldusActionValue_actionValue );                    
-                    const text = startTelldusActionValue_actionValue;
-                    const barColor = TelldusActionValue.getColor( startTelldusActionValue_actionValue );
+                        TelldusActionValue.getClosestPossibleTelldusActionValue( telldusUnit.TelldusUnitType, that.startTelldusActionValue_actionValue );
+                    
+                    const endTelldusActionValue_actionValue =
+                        TelldusActionValue.getClosestPossibleTelldusActionValue( telldusUnit.TelldusUnitType, that.endTelldusActionValue_actionValue );
 
                     const dPE = new DayPilotEvent(
                         id, startMonday,
                         startDayIndex, startTimeHHMM,
                         endDayIndex, endTimeHHMM, timeSeparator,
-                        resource, text, barColor);
+                        resource,
+                        startTelldusActionValue_actionValue, endTelldusActionValue_actionValue);
 
                     return dPE
                 });

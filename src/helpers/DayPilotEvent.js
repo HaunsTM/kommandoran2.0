@@ -1,8 +1,10 @@
 
 import * as moment from 'moment';
+
+import TelldusActionValue from '../helpers/TelldusActionValue';
 export default class DayPilotEvent {
 
-    constructor(id, startMonday, startDayIndex, startTimeHHMMSS, endDayIndex, endTimeHHMMSS, timeSeparator, resource, text, barColor ) {
+    constructor(id, startMonday, startDayIndex, startTimeHHMMSS, endDayIndex, endTimeHHMMSS, timeSeparator, resource, startActionValue, endActionValue ) {
 
         const dateByDay = (index) => {
             // 0 = sunday, 6 = saturday
@@ -23,10 +25,13 @@ export default class DayPilotEvent {
         this._start = tempFirst.isBefore(tempLast) ? tempFirst.format(localFormat) : tempLast.format(localFormat);
         this._end = tempFirst.isBefore(tempLast) ? tempLast.format(localFormat) : tempFirst.format(localFormat);
 
+        this._startActionValue = tempFirst.isBefore(tempLast) ? startActionValue : endActionValue;                            
+        this._endActionValue = tempFirst.isBefore(tempLast) ? endActionValue : startActionValue;
+
+        this._barColor = TelldusActionValue.getColor( this._startActionValue );
         this._id = id;
-        this._text = text;
         this._resource = resource;
-        this._barColor = barColor;
+        this._text = this._startActionValue;
     }
 //https://api.daypilot.org/daypilot-event-data/
     get barColor() {
@@ -35,6 +40,10 @@ export default class DayPilotEvent {
 
     get end() {
         return this._end;
+    }
+
+    get endActionValue() {
+        return this._endActionValue;
     }
 
     get id() {
@@ -47,6 +56,10 @@ export default class DayPilotEvent {
 
     get start() {
         return this._start;
+    }
+
+    get startActionValue() {
+        return this._startActionValue;
     }
 
     get text() {

@@ -1,8 +1,17 @@
-import moment from "moment";
+import moment from 'moment';
+import TelldusActionType from './TelldusActionType';
+import TelldusActionValue from './TelldusActionValue';
 
 export default class TelldusAction_Scheduler {
 
-    constructor(telldusUnit_Name, telldusActionType_ActionTypeOption, telldusActionValueType_Name, telldusActionValue_ActionValue, telldusAction_Scheduler_ReferenceId, scheduler_Day, scheduler_Hours, scheduler_Minutes) {
+    constructor( telldusUnit_Name,
+                telldusActionType_ActionTypeOption,
+                telldusActionValueType_Name,
+                telldusActionValue_ActionValue,
+                telldusAction_Scheduler_ReferenceId,
+                scheduler_Day,
+                scheduler_Hours,
+                scheduler_Minutes) {
         this._telldusUnit_Name = telldusUnit_Name;
         this._telldusActionType_ActionTypeOption = telldusActionType_ActionTypeOption;
         this._telldusActionValueType_Name = telldusActionValueType_Name;
@@ -46,27 +55,31 @@ export default class TelldusAction_Scheduler {
         const start = moment(dayPilotEvent.start);
         const end = moment(dayPilotEvent.end);
 
-        //dayPilotEvent.text
         const telldusUnit_Id = dayPilotEvent.resource;
-        const telldusUnit_Name = telldusIdNamePhrasebook.find( (t) => { return t.TelldusUnit_Id === telldusUnit_Id } ).TelldusUnit_Name;
-        const telldusActionType_ActionTypeOption = 'onOffDevice';
-        const telldusActionValueType_Name = 'levelValue';
-        const telldusActionValue_ActionValue = 'on';
+        const entry = telldusIdNamePhrasebook.find( (t) => { return t.TelldusUnit_Id === telldusUnit_Id } );
+        const telldusUnit_Name = entry.TelldusUnit_Name;
+    
+        const telldusActionType_ActionTypeOption =  TelldusActionType.ActionTypeOption().ON_OFF_DEVICE; //'onOffDevice';
+
+        const startTelldusActionValueType_Name =
+            TelldusActionValue.ActionValueWithType()[dayPilotEvent.startActionValue.toUpperCase()].TelldusActionValueType_Name;//'levelValue';
+        const startTelldusActionValue_ActionValue =  dayPilotEvent.startActionValue;
+        const endTelldusActionValue_ActionValue =  dayPilotEvent.endActionValue;
 
         const telldusAction_Scheduler_ReferenceId = dayPilotEvent.id;
-
+        
         const startTelldusActionScheduler =
             new TelldusAction_Scheduler(telldusUnit_Name, telldusActionType_ActionTypeOption, 
-                telldusActionValueType_Name, telldusActionValue_ActionValue,
+                startTelldusActionValueType_Name, startTelldusActionValue_ActionValue,
                 telldusAction_Scheduler_ReferenceId,
                 start.day(), start.hours(), start.minutes());
 
         const endTelldusActionScheduler =
             new TelldusAction_Scheduler(telldusUnit_Name, telldusActionType_ActionTypeOption, 
-                telldusActionValueType_Name, telldusActionValue_ActionValue,
+                startTelldusActionValueType_Name, endTelldusActionValue_ActionValue,
                 telldusAction_Scheduler_ReferenceId,
                 end.day(), end.hours(), end.minutes());
-
+debugger;
         return [startTelldusActionScheduler, endTelldusActionScheduler];
     }
 }

@@ -191,7 +191,7 @@ export default {
 			//enable button
 			const eventList = this.scheduler.events.list;
 			const telldusIdNamePhrasebook = this.dayPilotSchedulerHelper.bufferTelldusSchedulerOverview;
-debugger;
+
 			const telldusActionSchedulers = eventList.flatMap( (s) => {				
 				const telldusActionSchedulerPair = TelldusAction_Scheduler.DayPilotEvent_2_TelldusActionScheduler(s, telldusIdNamePhrasebook);
 				return telldusActionSchedulerPair;

@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import DayPilotEvent from '../helpers/DayPilotEvent';
-import TelldusActionValue from "../helpers/TelldusActionValue"
-import TelldusUnitType from "../helpers/TelldusUnitType"
+import TelldusUnitType from '../helpers/TelldusUnitType';
+import TelldusActionValue from '../helpers/TelldusActionValue';
 
 export class DayPilotSchedulerHelper {
 
@@ -40,19 +40,20 @@ export class DayPilotSchedulerHelper {
                         const endTimeHHMM = sE[1].Scheduler_Time;
 
                         const timeSeparator = ':';
-                        const telldusUnitId = resource.TelldusUnit_Id;                    
+                        const telldusUnitId = resource.TelldusUnit_Id;
                         const startTelldusActionValue_actionValue =
-                            TelldusActionValue.getClosestPossibleTelldusActionValue( telldusUnitType, sE[0].TelldusActionValue_ActionValue );                    
-
-                        const text = startTelldusActionValue_actionValue;
-                        const barColor = TelldusActionValue.getColor( startTelldusActionValue_actionValue );
+                            TelldusActionValue.getClosestPossibleTelldusActionValue( telldusUnitType, sE[0].TelldusActionValue_ActionValue );
+                            
+                        const endTelldusActionValue_actionValue =
+                            TelldusActionValue.getClosestPossibleTelldusActionValue( telldusUnitType, sE[1].TelldusActionValue_ActionValue );
 
                         const dPE = new DayPilotEvent(
                             id, startMonday,
                             startDayIndex, startTimeHHMM,
                             endDayIndex, endTimeHHMM, timeSeparator,
-                            telldusUnitId, text, barColor);
-                        
+                            telldusUnitId,
+                            startTelldusActionValue_actionValue, endTelldusActionValue_actionValue);
+
                         return dPE.toJSON();
                      })
                     .value();
