@@ -79,7 +79,7 @@ export default class TelldusAction_Scheduler {
                 startTelldusActionValueType_Name, endTelldusActionValue_ActionValue,
                 telldusAction_Scheduler_ReferenceId,
                 end.day(), end.hours(), end.minutes());
-debugger;
+
         return [startTelldusActionScheduler, endTelldusActionScheduler];
     }
 }

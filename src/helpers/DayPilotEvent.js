@@ -68,11 +68,13 @@ export default class DayPilotEvent {
 
     toJSON() {
         return {
-            "barColor": this.barColor,        
-            "end": this.end,        
-            "id": this.id,        
-            "resource": this.resource,        
-            "start": this.start,        
+            "barColor": this.barColor,
+            "end": this.end,
+            "endActionValue": this.endActionValue,
+            "id": this.id,
+            "resource": this.resource,
+            "start": this.start,
+            "startActionValue": this.startActionValue,
             "text":  this.text
         }
     }

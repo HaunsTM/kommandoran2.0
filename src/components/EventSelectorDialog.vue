@@ -323,7 +323,7 @@ export default {
                     const endDayIndex = 
                         that.endEventTimeOccurNextDay ? (startDayIndex < 6 ? startDayIndex + 1 : 0) : startDayIndex;
                     const endTimeHHMM = this.currentSettings.end.time;
-debugger;
+
                     const timeSeparator = that.timeSeparator;
                     const resource = telldusUnit.Id;
                     const startTelldusActionValue_actionValue =
