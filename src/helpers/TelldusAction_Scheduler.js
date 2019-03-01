@@ -59,10 +59,10 @@ export default class TelldusAction_Scheduler {
         const entry = telldusIdNamePhrasebook.find( (t) => { return t.TelldusUnit_Id === telldusUnit_Id } );
         const telldusUnit_Name = entry.TelldusUnit_Name;
     
-        const telldusActionType_ActionTypeOption =  TelldusActionType.ActionTypeOption().ON_OFF_DEVICE; //'onOffDevice';
+        const telldusActionType_ActionTypeOption =  TelldusActionType.ActionTypeOption().ON_OFF_DEVICE; // example: 'onOffDevice';
 
         const startTelldusActionValueType_Name =
-            TelldusActionValue.ActionValueWithType()[dayPilotEvent.startActionValue.toUpperCase()].TelldusActionValueType_Name;//'levelValue';
+            TelldusActionValue.ActionValueWithType()[dayPilotEvent.startActionValue.toUpperCase()].TelldusActionValueType_Name;// example: 'levelValue';
         const startTelldusActionValue_ActionValue =  dayPilotEvent.startActionValue;
         const endTelldusActionValue_ActionValue =  dayPilotEvent.endActionValue;
 

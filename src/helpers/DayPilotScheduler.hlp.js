@@ -27,17 +27,20 @@ export class DayPilotSchedulerHelper {
                 let repetitiveActivities = _(JSON.parse(resource.ScheduledActivities))
                     .filter( (sE) => {
                          return ( sE.Scheduler_Date === that._NO_DATE )}
-                    )                    
+                    )
                     .groupBy(sE => sE.TelldusActions_Schedulers_ReferenceId)
-                    .map( function( sE ) { 
+                    .map( function( sE ) {
+
                         const id = sE[0].TelldusActions_Schedulers_ReferenceId;
                         const startMonday = that._defaultStartDateMonday
-
+                        
                         const startDayIndex = sE[0].Scheduler_Day;
                         const startTimeHHMM = sE[0].Scheduler_Time;
 
-                        const endDayIndex =  sE[1].Scheduler_Day;
-                        const endTimeHHMM = sE[1].Scheduler_Time;
+                        const startAndEndTimeIsEqual = sE.length < 2;
+
+                        const endDayIndex =  startAndEndTimeIsEqual ? sE[0].Scheduler_Day : sE[1].Scheduler_Day;
+                        const endTimeHHMM = startAndEndTimeIsEqual ? sE[0].Scheduler_Time : sE[1].Scheduler_Time;
 
                         const timeSeparator = ':';
                         const telldusUnitId = resource.TelldusUnit_Id;
@@ -45,7 +48,8 @@ export class DayPilotSchedulerHelper {
                             TelldusActionValue.getClosestPossibleTelldusActionValue( telldusUnitType, sE[0].TelldusActionValue_ActionValue );
                             
                         const endTelldusActionValue_actionValue =
-                            TelldusActionValue.getClosestPossibleTelldusActionValue( telldusUnitType, sE[1].TelldusActionValue_ActionValue );
+                            TelldusActionValue.getClosestPossibleTelldusActionValue(
+                                telldusUnitType, startAndEndTimeIsEqual ? sE[0].TelldusActionValue_ActionValue : sE[1].TelldusActionValue_ActionValue );
 
                         const dPE = new DayPilotEvent(
                             id, startMonday,
