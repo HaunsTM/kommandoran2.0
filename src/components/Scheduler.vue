@@ -22,7 +22,14 @@
 						<v-btn v-on:click="save" flat slot="activator">
 							<v-icon>save</v-icon>
 						</v-btn>
-						<span>Add created event to all units </span>
+						<span>Save Schedule to database</span>
+					</v-tooltip>
+
+					<v-tooltip bottom>
+						<v-btn v-on:click="clearAllEvents" flat slot="activator">
+							<v-icon>clear</v-icon>
+						</v-btn>
+						<span>Clear entire Schedule (dont't forget to save)</span>
 					</v-tooltip>
 
 					<v-divider class="mr-2"	vertical></v-divider>
@@ -87,8 +94,8 @@ export default {
 				events: [],
 				startDate: this.$DEFAULT_START_DATE_MONDAY,
 
-				onAfterRender: function(args) {
-					this.rows.expandAll();
+				onAfterRender: function( ) {
+					this.rows.expandAll( );
 				},
 
 				/*timeRangeSelectedHandling: "Enabled",
@@ -153,6 +160,10 @@ export default {
 				that.scheduler.events.add( event );
 			});
 		},
+		clearAllEvents() {
+			this.scheduler.events.list = [];
+			this.scheduler.update();
+		},
 		dismissEventSelectorDialog() {
 			this.eventSelectorDialog = false;
 		},
@@ -172,7 +183,6 @@ export default {
 				that.dayPilotSchedulerHelper = new DayPilotSchedulerHelper( bufferTelldusSchedulerOverview, startMonday );
 
 				Vue.set(that.config, "resources", that.dayPilotSchedulerHelper.groupResourcesByLocation);
-				//Vue.set(that.config, "events", that.dayPilotSchedulerHelper.groupResourcesEvents);
 				const events = that.dayPilotSchedulerHelper.groupResourcesEvents;
 				that.addNewEvents( events );
 			})

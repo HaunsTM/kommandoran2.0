@@ -10,43 +10,43 @@
             <div class="flex-container">
 
                <div class="flex-container column">
-                    <div class="current-ride" v-bind:class="{deviations: transportData['Lund'][0].Deviations !== ''}">
+                    <div class="current-ride" v-bind:class="{deviations: transportData['Lund'][0].DepTimeDeviation !== ''}">
                         <span class="line-info">{{transportData['Lund'][0].Name}}</span>                   
                     </div>
-                    <div class="current-ride" v-bind:class="{deviations: transportData['Malmö'][0].Deviations !== ''}">
+                    <div class="current-ride" v-bind:class="{deviations: transportData['Malmö'][0].DepTimeDeviation !== ''}">
                         <span class="line-info">{{transportData['Malmö'][0].Name}}</span>                   
                     </div>
                 </div>
                 <div class="flex-container column" v-if="mediaWidthMoreThan400px">
-                    <div class="current-ride" v-bind:class="{deviations: transportData['Lund'][0].Deviations !== ''}">
+                    <div class="current-ride" v-bind:class="{deviations: transportData['Lund'][0].DepTimeDeviation !== ''}">
                         <span class="line-info">{{transportData['Lund'][0].Towards.substring(0, 10)}}</span>                   
                     </div>
-                    <div class="current-ride" v-bind:class="{deviations: transportData['Malmö'][0].Deviations !== ''}">
+                    <div class="current-ride" v-bind:class="{deviations: transportData['Malmö'][0].DepTimeDeviation !== ''}">
                         <span class="line-info">{{transportData['Malmö'][0].Towards.substring(0, 10)}}</span>                   
                     </div>
                 </div>
                 
                <div class="flex-container column">
-                    <div class="current-ride" v-bind:class="{deviations: transportData['Lund'][0].Deviations !== ''}">
+                    <div class="current-ride" v-bind:class="{deviations: transportData['Lund'][0].DepTimeDeviation !== ''}">
                         <span class="scheduled-departure">{{transportData['Lund'][0].JourneyTime}}</span>
-                        <span v-if="transportData['Lund'][0].Deviations !== ''">(+ {{transportData['Lund'][0].Deviations}} min)</span>                        
+                        <span v-if="transportData['Lund'][0].DepTimeDeviation !== ''">(+ {{transportData['Lund'][0].DepTimeDeviation}} min)</span>                        
                     </div>
-                    <div class="current-ride" v-bind:class="{deviations: transportData['Malmö'][0].Deviations !== ''}">
+                    <div class="current-ride" v-bind:class="{deviations: transportData['Malmö'][0].DepTimeDeviation !== ''}">
                         <span class="scheduled-departure">{{transportData['Malmö'][0].JourneyTime}}</span>
-                        <span v-if="transportData['Malmö'][0].Deviations !== ''">(+ {{transportData['Malmö'][0].Deviations}} min)</span>                        
+                        <span v-if="transportData['Malmö'][0].DepTimeDeviation !== ''">(+ {{transportData['Malmö'][0].DepTimeDeviation}} min)</span>                        
                     </div>
                 </div>
                 
                 <div class="flex-container column" v-if="mediaWidthMoreThan400px">
-                    <span class="next-ride" v-bind:class="{deviations: transportData['Lund'][1].Deviations !== ''}">
+                    <span class="next-ride" v-bind:class="{deviations: transportData['Lund'][1].DepTimeDeviation !== ''}">
                         <span>({{transportData['Lund'][1].Name}}</span>
                         <span>{{transportData['Lund'][1].JourneyTime}})</span>
-                        <span v-if="transportData['Lund'][1].Deviations !== ''">(+ {{transportData['Lund'][1].Deviations}} min)</span>
+                        <span v-if="transportData['Lund'][1].DepTimeDeviation !== ''">(+ {{transportData['Lund'][1].DepTimeDeviation}} min)</span>
                     </span>
-                     <span class="next-ride" v-bind:class="{deviations: transportData['Malmö'][1].Deviations !== ''}">
+                     <span class="next-ride" v-bind:class="{deviations: transportData['Malmö'][1].DepTimeDeviation !== ''}">
                         <span>({{transportData['Malmö'][1].Name}}</span>
                         <span>{{transportData['Malmö'][1].JourneyTime}})</span>
-                        <span v-if="transportData['Malmö'][1].Deviations !== ''">(+ {{transportData['Malmö'][1].Deviations}} min)</span>
+                        <span v-if="transportData['Malmö'][1].DepTimeDeviation !== ''">(+ {{transportData['Malmö'][1].DepTimeDeviation}} min)</span>
                     </span>
                 </div>
  
@@ -56,8 +56,6 @@
 </template>
 
 <script>
-
-import Vue from 'vue'; 
 
 export default {
     name: 'KommandoranFooterTransport',
@@ -81,9 +79,17 @@ export default {
                         return transportIsInCorrectDirection;
                     })
                     .map( l => {
-                            l.City = l.Towards.match(/^([^\s])+/)[0];
-                            l.JourneyTime = (new Date(l.JourneyDateTime)).toLocaleTimeString('se-SE', { hour: 'numeric', hour12: false, minute: 'numeric' });
-                            return l;
+                            let line = {
+                                "City": l.Towards.match(/^([^\s])+/)[0],
+                                "Name": l.Name,
+                                "JourneyTime": (new Date(l.JourneyDateTime)).toLocaleTimeString('se-SE', { hour: 'numeric', hour12: false, minute: 'numeric' }),
+                                "LineTypeName": l.LineTypeName,
+                                "Towards": l.Towards,
+                                "NewDepPoint": l.RealTimeInfo ? l.RealTimeInfo.NewDepPoint : "",
+                                "DepTimeDeviation": l.RealTimeInfo ? l.RealTimeInfo.DepTimeDeviation : "",
+                                "DepDeviationAffect": l.RealTimeInfo ? l.RealTimeInfo.DepDeviationAffect : ""
+                            }
+                            return line;
                         }
                     )
                     .orderBy(['JourneyDateTime'],['asc'])
@@ -95,10 +101,10 @@ export default {
     },
 	mqtt: {
 		// subscribe to this topic for updates 
-		'nodered/transport/departureTime' (data, topic) {
+		'nodered/transport/departureTime' ( data ) {
             
-			let decoded = new TextDecoder("utf-8").decode(data);
-			let decodedJSON = JSON.parse(decoded);
+			let decoded = new TextDecoder("utf-8").decode( data );
+			let decodedJSON = JSON.parse( decoded );
 			this.transportData = decodedJSON;
         }
 	}
@@ -133,7 +139,7 @@ export default {
     .next-ride > span {
         padding-left: 1rem;
     }
-    .deviations {
+    .DepTimeDeviation {
         color: red;
     }
 </style>

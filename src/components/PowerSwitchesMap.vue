@@ -22,24 +22,20 @@
 			'devices',
 		'visibleItems'],
 	watch: {
-		devicesMapSVGjsMarkup(newVal, oldVal) {		
-		
-		},
-		devices(newVal, oldVal) {
+		devices( ) {
 			if (this.svgMounted) {
 				this.updateDevicesStatuses();
 			}
 		},
 
-		visibleItems(newVal, oldVal) {		
-			if (this.svgMounted) {
+		visibleItems( ) {		
+			if ( this.svgMounted ) {
 				this.updateDevicesStatuses();
 			}
 		},
 	},
 	updated: function() {
-		if (this.svgMounted) {
-		}
+		
 		this.$nextTick(function () {
 			this.initialize();
 		})
@@ -122,7 +118,7 @@
 			let originalHeight = svgOriginalBox.height;
 
 			let divWidth = svgDivRef.clientWidth;
-			let divHeight = svgDivRef.clientHeight;
+			// let divHeight = svgDivRef.clientHeight;
 
 			let f = originalWidth > divWidth ? divWidth/originalWidth : 1;
 			f *= 1.2;

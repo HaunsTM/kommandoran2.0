@@ -2,13 +2,13 @@
 	
 	<v-app id="app" dark>
 		<v-navigation-drawer
-        clipped
-        fixed
-        v-model="drawer"
-        app
-    >	
-		<NavigationList v-on:navigateTo="navigateTo"/>
-    	</v-navigation-drawer>
+			clipped
+			fixed
+			v-model="drawer"
+			app
+		>	
+			<NavigationList v-on:navigateTo="navigateTo"/>
+		</v-navigation-drawer>
 		<v-toolbar app fixed clipped-left>
 			<v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
 			<v-toolbar-title>Kommandoran&trade; 2.0</v-toolbar-title>

@@ -77,6 +77,7 @@ export class DayPilotSchedulerHelper {
         const that = this;
         let groupedResources = _(this._bufferTelldusSchedulerOverview)
             .sortBy(['TelldusActionValueType_Name'])
+            .filter( x => _( that.scheduleableTelldusUnitType_Names ).includes( x.TelldusUnitType_Name ) )
             .groupBy(x => x.TelldusUnitLocation_Name)
             .reduce( (result0, value, key) => {
                 let resourceGroup = {
@@ -108,6 +109,7 @@ export class DayPilotSchedulerHelper {
         const that = this;
         let groupedResources = _(this._bufferTelldusSchedulerOverview)
             .sortBy(['TelldusUnitLocation_Name'])
+            .filter( x => _( that.scheduleableTelldusUnitType_Names ).includes( x.TelldusUnitType_Name ) )
             .groupBy(x => x.TelldusUnitLocation_Name)
             .reduce( (result0, value0, key0) => {
                 let resourceGroupByUnitLocation = {						
@@ -142,5 +144,15 @@ export class DayPilotSchedulerHelper {
                 return result0;
             }, []);
         return groupedResources;
+    }
+
+    get scheduleableTelldusUnitType_Names() {
+
+        const scheduleableTelldusUnitTypes = Object.freeze([
+            TelldusUnitType.Name.TELLDUS_433_MHZ_ONOFF,
+            TelldusUnitType.Name.Z_WAVE_ONOFFDIM
+        ]);
+
+        return scheduleableTelldusUnitTypes;
     }
 }

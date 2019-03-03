@@ -83,6 +83,7 @@
 
     </div>
 </template>
+
 <script>
 import RangeSlider from 'vue-range-slider'
 import 'vue-range-slider/dist/vue-range-slider.css'
@@ -133,34 +134,23 @@ export default {
     '$route': 'fetchData',
     'media.volume': {
         handler () {
+
             let requestUrl = 'http://localhost:8525/HemsamaritenWCFService/media/SetMediaVolume?value=' + this.media.volume.current;            
             
-            const promises = [
-                this.saveToLocalStoragePromise (),
-                axios.get(requestUrl)
-            ];
-            
-            Promise.all(promises)
-            .then((response) => {    
-            })
-            .catch((error) => {
-                this.loading = false;
-                console.log(error);
-            })
         },
         deep: true
     }
 },
 methods: {
     saveToLocalStoragePromise () {
-        let updatdeLocalStoragePromise = new Promise((resolve, reject) => {
+        let updatdeLocalStoragePromise = new Promise( ( resolve ) => {
             try {
-                let mediaJSON = JSON.stringify(this.media);
-                localStorage.setItem('media', mediaJSON);
+                let mediaJSON = JSON.stringify( this.media );
+                localStorage.setItem( 'media', mediaJSON );
                 resolve();
             }
-            catch (err) {
-                resolve(err);
+            catch ( err) {
+                resolve( err );
             }
         });
         return updatdeLocalStoragePromise;
@@ -168,45 +158,43 @@ methods: {
     fetchData () {
         this.loading = true
 
-        if (localStorage.getItem('media')) this.media = JSON.parse(localStorage.getItem('media'));
+        if ( localStorage.getItem( 'media' ) ) this.media = JSON.parse( localStorage.getItem( 'media' ) );
         
         const promises = [
-            axios.get('http://localhost:8525/HemsamaritenWCFService/media/InternetStreamRadioRegisteredCountries'),
-            axios.get('http://localhost:8525/HemsamaritenWCFService/media/InternetStreamRadioSourcesList')
+            axios.get( 'http://localhost:8525/HemsamaritenWCFService/media/InternetStreamRadioRegisteredCountries' ),
+            axios.get( 'http://localhost:8525/HemsamaritenWCFService/media/InternetStreamRadioSourcesList' )
         ];
-         Promise.all(promises)
-        .then((response) => {
+
+         Promise.all( promises )
+        .then( ( response ) => {
             this.loading = false;
             this.media.countries.list = response[0].data;
             this.media.sources.list = response[1].data;
-        })
-        .catch((error) => {
+        } )
+        .catch( ( ) => {
             this.loading = false;
-            console.log(error);
-        });
+        } );
     },
     playMedia: function () {
         let selectedMediaSourceUrl = this.media.sources.selected.Url
         let requestUrl = 'http://localhost:8525/HemsamaritenWCFService/media/PlayMedia?url=' + selectedMediaSourceUrl;
         axios.get(requestUrl)
-        .then((response) => {
+        .then( ( ) => {
             this.loading = false;          
-        })
-        .catch((error) => {
+        } )
+        .catch(( ) => {
             this.loading = false;
-            console.log(error);
-        });
+        } );
     },
     stopMedia: function () {
         
       axios.get('http://localhost:8525/HemsamaritenWCFService/media/StopMediaPlay')
-        .then((response) => {
+        .then( ( ) => {
             this.loading = false;          
-        })
-        .catch((error) => {
+        } )
+        .catch( ( ) => {
             this.loading = false;
-            console.log(error);
-        });
+        } );
 
     },
     mute: function() {
@@ -219,12 +207,13 @@ methods: {
     }
   },
   computed: {
-    countryDependentMediaSourcesList: function(event) {
-        if(this.media.countries.selected.ISOAlpha2 !== '' && this.media.sources.list){
+    countryDependentMediaSourcesList: function(  ) {
+        if( this.media.countries.selected.ISOAlpha2 !== '' && this.media.sources.list ) {
             let curISOAlpha2 = this.media.countries.selected.ISOAlpha2;
-            let tempRadioList =  this.media.sources.list.filter(s => s.MediaSourceCountry_ISOAlpha2 === curISOAlpha2);
+            let tempRadioList =  this.media.sources.list.filter( s => s.MediaSourceCountry_ISOAlpha2 === curISOAlpha2 );
             return tempRadioList;
         }
+        return null;
     }
   }
 }

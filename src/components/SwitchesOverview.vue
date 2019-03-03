@@ -208,7 +208,7 @@ export default {
 		},
 		telldusActionsPreparedBy: function (orderedDevices, setPointState){
 			let telldusActions = orderedDevices.map( d => {				
-				let telldusUnit = new TelldusUnit(d.name);
+				let telldusUnit = new TelldusUnit( d.name );
 				let actionTypeOption = setPointState === 'on' || 'off' ? TelldusActionType.ActionTypeOption().ON_OFF_DEVICE : null ;
 				let telldusActionType = new TelldusActionType(actionTypeOption) ;
 				//let telldusActionValue = new TelldusActionValue(TelldusActionValue.ActionValueWithType()[setPointState.toUpperCase()]);
@@ -314,8 +314,8 @@ export default {
 	},
 	mqtt: {
 		// subscribe to this topic for updates 
-		'nodered/performed_TelldusAction/listDevices' (data, topic) {
-			let decoded = new TextDecoder("utf-8").decode(data);
+		'nodered/performed_TelldusAction/listDevices' ( data ) {
+			let decoded = new TextDecoder("utf-8").decode( data );
 			let decodedJSON = JSON.parse(decoded);
 			this.devicesData = decodedJSON.successResult;			
 		}
@@ -352,7 +352,6 @@ export default {
 					break;
 				}
 				default: { 
-					console.log("Invalid choice"); 
 					break;
 				} 
 			}

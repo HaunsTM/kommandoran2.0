@@ -3,43 +3,72 @@
         <v-card-title class="headline">Event details</v-card-title>
         <v-card-text>
             <v-form ref="form" v-model="valid">
-                <div class="flex-container row">
-                    <div class="flex-container column">
-                        <h4 class="subheading">Select units</h4>
-                        <div class="grouped-resources-list">
-                            <table>
-                                <tr v-for="unitLocation in currentGroupedResources" v-bind:key="unitLocation.node.TelldusUnitLocation_Name" class="resourceGroup">
-                                    <td class="location">
-                                        <v-checkbox
-                                            @change="toggledLocation(unitLocation)"
-                                            v-model="unitLocation.node.selected"
-                                            :label="unitLocation.node.TelldusUnitLocation_Name"
-                                            color="white"
-                                            hide-details
-                                            class="checkbox"
-                                        ></v-checkbox>
-                                    </td>
-                                    <td>
-                                        <table>
-                                            <tr v-for="unitType in unitLocation.children" v-bind:key="unitType.node.TelldusUnitType_Name" class="type-unit">
-                                                <td class="type">
+                <div class="flex-container justify-content-flex-start row">
+                    <div class="flex-container column">                        
+                        
+                        <div class="section-header success">
+                            <div>
+                                <h4 class="subheading">1. Select units</h4>
+                            </div>
+                            <div>
+                                <img :src="require(`@/assets/switch32x32.png`)" />
+                            </div>
+                        </div>
+
+
+
+                        <div class="section-content">
+                            <div class="grouped-resources-list">
+                                <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Type</th>
+                                                <th>Unit</th>
+                                            </tr>
+                                        </thead>
+                                        <template v-for="(unitLocation, resourceGroupIndex)  in currentGroupedResources">
+                                            <tr v-bind:key="unitLocation.node.TelldusUnitLocation_Name">
+                                                <td colspan=2 class="location">
+                                                    <div class = "location-header-container">
+                                                        <h4 class="subheading">{{unitLocation.node.TelldusUnitLocation_Name}}</h4>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr v-bind:key="unitLocation.node.TelldusUnitLocation_Name + 'checkbox'">
+                                                <td colspan=2>
                                                     <v-checkbox
-                                                        @change="toggledType(unitType)"
-                                                        v-model="unitType.node.selected"
-                                                        :label="unitType.node.TelldusUnitType_Name"
+                                                        @change="toggledLocation(unitLocation)"
+                                                        v-model="unitLocation.node.selected"                                                
+                                                        label="All..."
                                                         color="white"
                                                         hide-details
                                                         class="checkbox"
                                                     ></v-checkbox>
                                                 </td>
-                                                <td class="unit">
+                                            </tr>
+                                            <tr v-for="(unitType, unitTypeIndex) in unitLocation.children" 
+                                                v-bind:key="unitType.node.TelldusUnitType_Name + resourceGroupIndex">
+                                                <td class="type">
+                                                    <div v-if="unitType.children.length > 1" class="type-checkbox-container">
+                                                        <div>
+                                                            <v-checkbox
+                                                                @change="toggledType(unitType)"
+                                                                v-model="unitType.node.selected"
+                                                                :title="unitType.node.TelldusUnitType_Name"
+                                                                color="white"
+                                                                class="checkbox"
+                                                            ></v-checkbox>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="unit"
+                                                    v-bind:class="{ unitTypeGroup: !unitTypeIndex % 2}">
                                                     <table>
                                                         <tr v-for="unit in unitType.children" v-bind:key="unit.Id">
-                                                            <td>
+                                                            <td v-bind:class="{ firstUnitInUnitTypeGroup: unitTypeIndex === 1}">
                                                                 <v-checkbox
                                                                     v-model="unit.selected"
-                                                                    :label="unit.Name"
-                                                                    :hint="unit.LocationDescription"
+                                                                    :label="unit.Name + ' - ' + unit.LocationDescription"
                                                                     color="white"
                                                                     persistent-hint
                                                                     class="checkbox"
@@ -49,121 +78,151 @@
                                                     </table>
                                                 </td>
                                             </tr>
-                                        </table>
-                                    </td>
-                                </tr>
-                            </table>
+                                        </template>
+                                </table>
+                            </div>
                         </div>
+
                     </div>
-                    <div class="flex-container column action-list">
-                        <!--
-                        <section>
-                            <h4 class="subheading">Selected units</h4>
-                            <p v-if="selectedUnits.length > 0">{{selectedUnits}}</p>
-                            <p v-else>NO UNIT SELECTED</p>
+
+                    <div class="flex-container column">
+                        
+                        <section class="section-container">
+
+                            <div class="section-header success">
+                                <div>
+                                    <h4 class="subheading">2. Select action time and level</h4>
+                                </div>
+                                <div>
+                                    <img :src="require(`@/assets/table-clock32x32.png`)" />
+                                </div>
+                            </div>
+                            <div class="section-content">
+                                <div>
+                                    <h4 class="subheading">Start</h4>
+                                </div>
+                                <div class="flex-container row justify-content-flex-start">
+                                    <div>
+                                        <v-text-field
+                                            label="Start time"
+                                            v-model="currentSettings.start.time"
+                                            placeholder="HH:MM"
+                                            return-masked-value
+                                            mask="##:##"
+                                            :rules="timeFormatRules"
+                                            class="time-input"
+                                        ></v-text-field>
+                                    </div>
+                                    <div class="action-level">
+                                        <div>
+                                            <img :src="require(`@/assets/indoor-on32x32.png`)" />
+                                        </div>
+                                        <div>
+                                            <v-radio-group v-model="currentSettings.start.TelldusActionValue_actionValue" row>                                        
+                                                <v-tooltip bottom>
+                                                    <v-radio flat slot="activator" label="On" value="on" color="white"></v-radio>
+                                                    <span>Meaning that the setting On applies from the beginning</span>
+                                                </v-tooltip>
+                                                <v-tooltip bottom>
+                                                    <v-radio flat slot="activator" label="30%" value="30" color="white"></v-radio>
+                                                    <span>Meaning that the setting level 30% (or On in cases where 30% is not valid) applies from the beginning</span>
+                                                </v-tooltip>
+                                                <v-tooltip bottom>
+                                                    <v-radio flat slot="activator" label="Off" value="off" color="white"></v-radio>
+                                                    <span>Meaning that the setting Off applies from the beginning</span>
+                                                </v-tooltip>
+                                            </v-radio-group>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 class="subheading">End<sup v-if="endEventTimeOccurNextDay">*)</sup></h4>
+                                </div>
+                                <div class="flex-container row">
+                                    <div>
+                                        <v-text-field
+                                            label="End time"
+                                            v-model="currentSettings.end.time"
+                                            placeholder="HH:MM"
+                                            return-masked-value
+                                            mask="##:##"
+                                            :rules="timeFormatRules"
+                                            class="time-input"
+                                        ></v-text-field>
+                                    </div>
+                                    <div class="action-level">
+                                        <div>
+                                            <img :src="require(`@/assets/indoor-off32x32.png`)" />
+                                        </div>
+                                        <div>
+                                            <v-radio-group v-model="currentSettings.end.TelldusActionValue_actionValue" row>
+                                                <v-tooltip bottom>
+                                                    <v-radio flat slot="activator" label="Off" value="off" color="white"></v-radio>
+                                                    <span>Meaning that the setting Off applies at the end</span>
+                                                </v-tooltip>
+                                            </v-radio-group>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        
                         </section>
-                        -->
-                        <section>
-                            <v-divider dark></v-divider>
-                            <h4 class="subheading">Select action time and level</h4>                            
-                            <div class="flex-container row">
-                                <div class="action-time">
-                                    <h5 class="caption">Start time</h5>
-                                    <v-text-field
-                                        v-model="currentSettings.start.time"
-                                        placeholder="HH:MM"
-                                        return-masked-value
-                                        mask="##:##"
-                                        :rules="timeFormatRules"
-                                        class="time-input"
-                                    ></v-text-field>
+
+
+
+                        <section class="section-container">
+                            
+                            <div class="section-header success">
+                                <div>
+                                    <h4 class="subheading">3. Select which days the event should occur</h4>
                                 </div>
-                                <div class="action-value">
-                                    <h5 class="caption">Level</h5>
-                                    <v-radio-group v-model="currentSettings.start.TelldusActionValue_actionValue" row>
-                                        <v-tooltip bottom>
-                                            <v-radio flat slot="activator" label="Off" value="off" color="white"></v-radio>
-                                            <span>Meaning that the setting Off applies from the beginning</span>
-                                        </v-tooltip>
-                                        <v-tooltip bottom>
-                                            <v-radio flat slot="activator" label="30%" value="30" color="white"></v-radio>
-                                            <span>Meaning that the setting level 30% (or on in cases where 30% is not valid) applies from the beginning</span>
-                                        </v-tooltip>
-                                        <v-tooltip bottom>
-                                            <v-radio flat slot="activator" label="On" value="on" color="white"></v-radio>
-                                            <span>Meaning that the setting On applies from the beginning</span>
-                                        </v-tooltip>
-                                    </v-radio-group>                                   
+                                <div>
+                                    <img :src="require(`@/assets/day32x32.png`)" />
                                 </div>
                             </div>
-                            <div class="flex-container row">
-                                <div class="action-time">
-                                    <h5 class="caption">End time<sup v-if="endEventTimeOccurNextDay">*)</sup></h5>
-                                    <v-text-field
-                                        v-model="currentSettings.end.time"
-                                        placeholder="HH:MM"
-                                        return-masked-value
-                                        mask="##:##"
-                                        :rules="timeFormatRules"
-                                        class="time-input"
-                                    ></v-text-field>
+
+                            <div class="section-content">
+
+                                <div class="flex-container row">
+                                    <div v-for="(day, index) in repeatDays" v-bind:key="day.shortName">
+                                        <v-checkbox v-if=" index < 5 " v-model="day.selected" :label="day.shortName" color="white" class="checkbox"></v-checkbox>
+                                    </div>
                                 </div>
-                                <div class="action-value">
-                                    <h5 class="caption">Level</h5>
-                                    <v-radio-group v-model="currentSettings.end.TelldusActionValue_actionValue" row>
-                                        <v-tooltip bottom>
-                                            <v-radio flat slot="activator" label="Keep" value="keep" color="white"></v-radio>
-                                            <span>Meaning that the initial setting remains</span>
-                                        </v-tooltip>
-                                        <v-tooltip bottom>
-                                            <v-radio flat slot="activator" label="Off" value="off" color="white"></v-radio>
-                                            <span>Meaning that the setting Off applies at the end</span>
-                                        </v-tooltip>
-                                    </v-radio-group>
+
+                                <div class="flex-container row">
+                                    <div v-for="(day, index) in repeatDays" v-bind:key="day.shortName">
+                                        <v-checkbox v-if=" index >= 5 " v-model="day.selected" :label="day.shortName" color="white" class="checkbox"></v-checkbox>
+                                    </div>
                                 </div>
+
                             </div>
-                            <div class="flex-container row">
-                                <small></small>
-                            </div>
-                        </section>                        
-                        <v-divider dark></v-divider>
-                        <section>
-                            <v-divider dark></v-divider>
-                            <h4 class="subheading">Select when the event should occur</h4>
-                            <div class="flex-container row">
-                                <div v-for="(day, index) in repeatDays" v-bind:key="day.shortName">
-                                    <v-checkbox v-if=" index < 5 " v-model="day.selected" :label="day.shortName" color="white" class="checkbox"></v-checkbox>
-                                </div>
-                            </div>
-                            <div class="flex-container row">
-                                <div v-for="(day, index) in repeatDays" v-bind:key="day.shortName">
-                                    <v-checkbox v-if=" index >= 5 " v-model="day.selected" :label="day.shortName" color="white" class="checkbox"></v-checkbox>
-                                </div>
-                            </div>
+
                         </section>
+
                     </div>
                 </div>
             </v-form>
         </v-card-text>
+
         <v-divider dark></v-divider>
         
         <v-card-actions>
+            <v-flex class="text-xs-right">
+                <v-btn
+                    flat="flat"
+                    @click="dismiss"
+                >
+                    Dismiss
+                </v-btn>
 
-            <v-btn
-                color="green darken-1"
-                flat="flat"
-                @click="dismiss"
-            >
-                Dismiss
-            </v-btn>
-
-            <v-btn
-                color="green darken-1"
-                flat="flat"
-                @click="submit"
-            >
-                Submit
-            </v-btn>
+                <v-btn
+                    class="success"
+                    flat="flat"
+                    @click="submit"
+                >
+                    Submit
+                </v-btn>                
+            </v-flex>
         </v-card-actions>
     </v-card>
 </template>
@@ -288,7 +347,9 @@ export default {
             this.currentGroupedResources = retVal;
         },
         submit() {
+            debugger;
             if (this.$refs.form.validate()) {
+                
                 this.$emit('submit', this.currentEvents);
             }
         },
@@ -403,20 +464,13 @@ export default {
         }
     },
     watch: {
-        endTelldusActionValue_actionValue: {
-            handler(newValue) {
-                if ( newValue === 'keep' ) {
-                    this.currentSettings.end.time = this.currentSettings.start.time;
-                }
-            }
-        },
         startTelldusActionValue_actionValue: {
             handler(newValue) {
                 if ( newValue === 'off' ) {
-                    this.currentSettings.end.TelldusActionValue_actionValue = 'keep';
+                    this.currentSettings.end.time = this.currentSettings.start.time;
                 }
             }
-        },
+        },        
         visible: {
             // watch for outer set property (indicates if the control has had 
             // its visibility property changed = if property settings should be updated)
@@ -438,37 +492,71 @@ export default {
 
     .flex-container {
         display: flex;
-        justify-content: flex-start;
-        align-items: flex-start;
     }
+
     .column {
         flex-direction: column;
     }
+
     .row {
         flex-direction: row;
     }
-    .center-row {        
-        align-items: baseline;
+    .align-items-flex-start {
+        align-items: flex-start;
+    }
+    .justify-content-flex-start {
+        justify-content: flex-start;
     }
 
     .grouped-resources-list {
         height: calc(100vh - 45vh);
 		overflow-y: scroll;
     }
+
+    .section-header > div {
+        padding-left: 2rem;
+    }
     
-    .resourceGroup:nth-child(2n+2) {
+    .resourceGroup {
        background-color: #757575;
     }
+
+    .unitTypeGroup {
+        border-left: 1px solid white;
+    }
+
+    .firstUnitInUnitTypeGroup {
+        padding-top: 2rem;
+    }
+
+    .grouped-resources-list table {
+        border-collapse: collapse;
+    }
+
     .location {
-        width: 10rem;
+        width: 30rem;
     }
+
+    .location-header-container {
+        display: flex;
+        justify-content: center;
+        background-color: #757575;
+    }
+
     .type {
+        padding-top: 2rem;
         width: 15rem;
-        border-bottom: 1px solid white;
     }
+
+    .type-checkbox-container {
+        
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+    }
+
     .unit {
         width: 15rem;
-        border-bottom: 1px solid white;
     }
 
     .checkbox {
@@ -476,26 +564,44 @@ export default {
         padding: 0 1rem 0 0;
     }
 
-
-    .action-list {
-        width: 40%;
-        padding-left: 2rem;
-        justify-content: flex-start;
+    .section-container {
+        padding-left: 0.5rem;
+        width: 30rem;
+        display: flex;
+        flex-direction: column;
         align-items: flex-start;
     }
-    .action-value {
-        padding-left: 30px;
+
+    .section-header {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
     }
-    .action-time {
-        width: 5rem;
+
+    .section-content {
+        padding-top: 1rem;
+        padding-left: 0.5rem;
+        display: flex;
+        flex-direction: column;
     }
+    
+    .action-level { 
+        width: 100%;
+        display: flex;
+        align-items: center;
+    }
+
     .time-input {
-        width: 4rem;
+        width: 6rem;
     }
+
     h4.subheading {
         padding-top: 0.5rem;
         padding-bottom: 1rem;
     }
+
     sup {
         font-size: smaller;
     }

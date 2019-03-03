@@ -14,15 +14,9 @@
 
 <script>
 
-import Vue from 'vue'; 
-
 import KommandoranFooterClimate from './KommandoranFooterClimate';
 import KommandoranFooterTime from './KommandoranFooterTime';
 import KommandoranFooterTransport from './KommandoranFooterTransport';
-
-import moment from "moment";
-import localization from 'moment/locale/sv';
-
 
 export default {
     name: 'KommandoranFooter',

@@ -2,7 +2,7 @@
 
     <article class="flex-container">
         <div class="flex-container column">
-            <div>                
+            <div>
                 <img :src="require(`@/assets/wall-clock24x24.png`)" />
             </div>
         </div>
