@@ -306,11 +306,16 @@ export default {
         },
         setInitialDaySelected() {
             const tempCurrentEvent = JSON.parse( JSON.stringify( this.initialEvent ) );
-            const startDayIndex = moment( tempCurrentEvent.start ).day() - 1;
+            const startDayIndex = moment( tempCurrentEvent.start ).day();
 
-            const tempDays = JSON.parse( JSON.stringify( this.days ) );
-            tempDays[startDayIndex].selected = true;
-            this.repeatDays = tempDays;
+            this.repeatDays = this.days.map( ( d ) => {
+                if ( d.dayOfWeek === startDayIndex ) {
+                    d.selected = true;
+                } else {
+                    d.selected = false;
+                }
+                return d;
+             });             
         },
         setInitiallySelectedTime() {
             const tempCurrentEvent = JSON.parse( JSON.stringify( this.initialEvent ) );
@@ -347,9 +352,7 @@ export default {
             this.currentGroupedResources = retVal;
         },
         submit() {
-            debugger;
             if (this.$refs.form.validate()) {
-                
                 this.$emit('submit', this.currentEvents);
             }
         },

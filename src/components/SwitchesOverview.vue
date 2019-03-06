@@ -208,12 +208,11 @@ export default {
 		},
 		telldusActionsPreparedBy: function (orderedDevices, setPointState){
 			let telldusActions = orderedDevices.map( d => {				
-				let telldusUnit = new TelldusUnit( d.name );
-				let actionTypeOption = setPointState === 'on' || 'off' ? TelldusActionType.ActionTypeOption().ON_OFF_DEVICE : null ;
-				let telldusActionType = new TelldusActionType(actionTypeOption) ;
-				//let telldusActionValue = new TelldusActionValue(TelldusActionValue.ActionValueWithType()[setPointState.toUpperCase()]);
-				debugger;
-				let telldusAction = new TelldusAction(telldusUnit, telldusActionType, telldusActionValue);
+				const telldusUnit = new TelldusUnit( d.name );
+				const actionTypeOption = setPointState === 'on' || setPointState === 'off' ? TelldusActionType.ActionTypeOption().ON_OFF_DEVICE : null ;
+				const telldusActionType = new TelldusActionType(actionTypeOption);
+				const telldusActionValue = setPointState;
+				const telldusAction = new TelldusAction(telldusUnit, telldusActionType, telldusActionValue);
 
 				return telldusAction;
 			});
@@ -243,6 +242,7 @@ export default {
 			}
 			let telldusActions = this.telldusActionsPreparedBy(orderedDevices, setPointState)
 			let jsonTelldusActions = telldusActions.map( d => { return {"TelldusAction": d.toJSONObject }; } );
+			debugger;
 			await this.postTelldusActions(jsonTelldusActions);
 		},
 		setAllComfortDevices : function(setPointState) {

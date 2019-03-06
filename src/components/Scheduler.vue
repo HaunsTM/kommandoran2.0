@@ -13,20 +13,20 @@
 			>
 			</event-selector-dialog>
 		</v-dialog>
-		<v-layout row wrap class="hidden-sm-and-down">
+		<v-layout row wrap>
 			
 			<v-flex d-flex md12>
 				<v-toolbar >
 
 					<v-tooltip bottom>
-						<v-btn v-on:click="save" flat slot="activator">
+						<v-btn v-on:click="save" flat slot="activator" :disabled="isLoading">
 							<v-icon>save</v-icon>
 						</v-btn>
 						<span>Save Schedule to database</span>
 					</v-tooltip>
 
 					<v-tooltip bottom>
-						<v-btn v-on:click="clearAllEvents" flat slot="activator">
+						<v-btn v-on:click="clearAllEvents" flat slot="activator" :disabled="isLoading">
 							<v-icon>clear</v-icon>
 						</v-btn>
 						<span>Clear entire Schedule (dont't forget to save)</span>
@@ -76,6 +76,7 @@ export default {
 			currentSelectedEvent: {},
 			dropdown_system: ["Telldus"],
 			eventSelectorDialog: false,
+			isLoading: false,
 			regValidTelldusUnitTypes_Name: /(^433 MHz - OnOff|433 MHz - Bell|Z-Wave - OnOffDim$)/,
 			config: {
 				timeHeaders: [{"groupBy":"Day","format":"dddd"},{"groupBy":"Hour", "format":"HH"}],
@@ -134,7 +135,14 @@ export default {
 					onLoad: function(args) {
 					// if event object doesn't specify "bubbleHtml" property 
 					// this onLoad handler will be called to provide the bubble HTML
-					args.html = "Event details";
+					const startTime = args.source.start().toString('HH:mm');
+					const endTime = args.source.end().toString('HH:mm');
+					const resource = args.source.resource();
+					
+					args.html = 'Event details <br />' +
+					'Start time: ' + startTime + '<br />' +
+					'End time: ' + endTime + '<br />' +
+					'Resource: ' + resource;
 					}
 				}),
 				treeEnabled: true,
@@ -159,6 +167,7 @@ export default {
 			events.forEach( event => {
 				that.scheduler.events.add( event );
 			});
+			this.scheduler.update();
 		},
 		clearAllEvents() {
 			this.scheduler.events.list = [];
@@ -193,6 +202,7 @@ export default {
 		setLoadingState: function (loading, error) {
 			let payLoad =  { "isLoading" : loading, "error" : error };
 			EventBus.$emit('loading', payLoad);
+			this.isLoading = loading;
 		},
 		async save() {
 			//disable button
@@ -208,12 +218,14 @@ export default {
 
 			try {
 				this.setLoadingState(true);
+
 				await Vue.axios.post(this.$DB_API_BASE_URL, {
-					'procedure': {
-						'name': 'RegisterTelldusAction_Scheduler',
+					"procedure": {
+						"name": "RegisterTelldusAction_Scheduler",
 						"data": telldusActionSchedulers
 					}
 				});
+				this.loadCalendarData();
 				this.setLoadingState(false);
 			} catch (ex) {				
 				this.setLoadingState(false, ex);
