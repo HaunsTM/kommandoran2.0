@@ -5,10 +5,10 @@ import TelldusActionValue from '../helpers/TelldusActionValue';
 export default class DayPilotEvent {
 
     constructor(id, startMonday, startDayIndex, startTimeHHMMSS, endDayIndex, endTimeHHMMSS, timeSeparator, resource, startActionValue, endActionValue ) {
-
+        
         const dateByDay = (index) => {
             // 0 = sunday, 6 = saturday
-            const daysToAddBasedOnIndexRelatedToStartMonday = index === 0 ? 6 : index - 1;
+            const daysToAddBasedOnIndexRelatedToStartMonday = index > 0 ? index - 1 : 6;
             const currentDate = moment(startMonday).add( daysToAddBasedOnIndexRelatedToStartMonday, 'days');
             
             return currentDate;

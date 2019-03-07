@@ -164,6 +164,7 @@ export default {
 		addNewEvents(events) {
 			this.eventSelectorDialog = false;
 			const that = this;
+			
 			events.forEach( event => {
 				that.scheduler.events.add( event );
 			});
