@@ -242,7 +242,7 @@ export default {
 			}
 			let telldusActions = this.telldusActionsPreparedBy(orderedDevices, setPointState)
 			let jsonTelldusActions = telldusActions.map( d => { return {"TelldusAction": d.toJSONObject }; } );
-			debugger;
+			
 			await this.postTelldusActions(jsonTelldusActions);
 		},
 		setAllComfortDevices : function(setPointState) {

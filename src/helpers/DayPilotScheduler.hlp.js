@@ -66,9 +66,6 @@ export class DayPilotSchedulerHelper {
             .flattenDeep()
              .union()
             .value();
-            //debugger;
-//return [{"barColor":"#FFFF00","end":"2018-07-02T07:00:00","id":"a567adda-d998-766a-d485-24e4cad2121a","resource":2,"start":"2018-07-02T06:00:00","text":"on"},
-//{"barColor":"#FFFF00","end":"2018-07-02T07:00:00","id":"a567adda-d998-766a-d485-24e4cad2121s","resource":3,"start":"2018-07-02T06:00:00","text":"on"}];
 
         return groupedResourcesEvents; 
     }

@@ -200,6 +200,6 @@
 		width: 100%;
 	} 
 	#powerSwitchesMapDiv{
-    	display: block;
+		display: block;
 	}
 </style>
