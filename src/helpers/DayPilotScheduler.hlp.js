@@ -153,13 +153,12 @@ export class DayPilotSchedulerHelper {
         return scheduleableTelldusUnitTypes;
     }
 
-    telldusUnitIdBy( name ) {
-
+    telldusUnitNameBy( id ) {
         let telldusUnit = _(this._bufferTelldusSchedulerOverview)
-            .find( ( o ) => {                
-                return o.TelldusUnit_Name === name;
+            .find( ( o ) => {
+                return o.TelldusUnit_Id === id;
             });
             
-        return telldusUnit.TelldusUnit_Id;
+        return telldusUnit.TelldusUnit_Name;
     }
 }

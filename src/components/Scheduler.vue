@@ -70,6 +70,7 @@ import { EventBus } from './event-bus.js';
 export default {
 	name: 'Scheduler',
 	data: function() {
+		let that = this;
 		return {
 			dayPilotSchedulerHelper: {},
 			bufferTelldusSchedulerOverview : {},
@@ -96,6 +97,7 @@ export default {
 				startDate: this.$DEFAULT_START_DATE_MONDAY,
 
 				onAfterRender: function( ) {
+					//that.removeCalendarBS();
 					this.rows.expandAll( );
 				},
 
@@ -121,15 +123,14 @@ export default {
 					// this onLoad handler will be called to provide the bubble HTML
 					const startTime = args.source.start().toString('HH:mm');
 					const endTime = args.source.end().toString('HH:mm');
-					debugger;
-					const resource = this.dayPilotSchedulerHelper.telldusUnitIdBy( args.source.resource() );
+					const unitName = that.dayPilotSchedulerHelper.telldusUnitNameBy( args.source.resource() );
 					
 					args.html = '<b>Event details</b> <br />' +
 					'Start time: ' + startTime + '<br />' +
 					'End time: ' + endTime + '<br />' +
-					'Resource: ' + resource;
+					'Unit: ' + unitName;
 					}
-				}).bind(this),
+				}),
 				treeEnabled: true,
 			},
 		}
@@ -166,7 +167,7 @@ export default {
 			this.setLoadingState(true);
 
 			const that = this;
-			const promises = [         
+			const promises = [
 				Vue.axios.get(that.$DB_API_BASE_URL + '?procedure=GetRepetitiveOnlyTelldusSchedulerOverview')
 			];
 			Promise.all(promises)
@@ -179,11 +180,24 @@ export default {
 
 				Vue.set(that.config, "resources", that.dayPilotSchedulerHelper.groupResourcesByLocation);
 				const events = that.dayPilotSchedulerHelper.groupResourcesEvents;
+				
 				that.addNewEvents( events );
 			})
 			.catch((error) => {
 				that.setLoadingState(false, error);
 			});
+		},
+		removeCalendarBS() {			
+			window.alert = function() {};
+			
+			try {
+				const xpathDemo = '//div[contains(text(),"DEMO")]';
+				var divDemo = document.evaluate( xpathDemo , document, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null  ).snapshotItem(0);
+				divDemo.parentNode.removeChild( divDemo );
+			}
+			catch( err ) {
+				return;
+			}
 		},
 		setLoadingState: function (loading, error) {
 			let payLoad =  { "isLoading" : loading, "error" : error };
@@ -222,12 +236,10 @@ export default {
 			this.eventSelectorDialog = true;
 		}
 	},
-	mounted: function() {
-		window.alert = function() {};
-		
+	mounted: function() {		
 		this.loadCalendarData();
-		//this.scheduler.message("Welcomes!");
 		//add event handlers for calendar
+
 		this.scheduler.onTimeRangeSelected = this.timeRangeSelected;
 	}
 }
@@ -241,9 +253,10 @@ export default {
 	}
 
 	
-#dp >>> ::-webkit-scrollbar { 
-    display: block !important; 
-	visibility: visible !important;
-} 
-	
+	#dp >>> ::-webkit-scrollbar { 
+		display: block !important; 
+		visibility: visible !important;
+	} 
+
+	/*göm den här från början div.scheduler_default_corner > div:nth-child(2) */
 </style>
