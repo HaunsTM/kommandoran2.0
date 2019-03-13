@@ -46,7 +46,11 @@ export default {
         margin-bottom: -4px;
         border-bottom: 2px solid blue;
 
-        
         height: 32px;
+    }
+    @media only screen and (max-width: 400px) {
+        footer {
+            font-size: small;
+        }
     }
 </style>

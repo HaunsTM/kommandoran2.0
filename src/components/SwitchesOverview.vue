@@ -71,31 +71,31 @@
 										<div class="caption">All</div>
 										<v-spacer></v-spacer>
 										<v-btn-toggle v-model="multi_switch">
-											<v-btn color="success" value="all_on">On</v-btn>
-											<v-btn color="error" value="all_off">Off</v-btn>
+											<v-btn color="success" value="all_on" :disabled="isLoading">On</v-btn>
+											<v-btn color="error" value="all_off" :disabled="isLoading">Off</v-btn>
 										</v-btn-toggle>
-									</v-card-actions>								
+									</v-card-actions>
 									<v-card-actions>
 										<div class="caption">Comfort</div>
 										<v-spacer></v-spacer>
 										<v-btn-toggle v-model="multi_switch">
-											<v-btn color="success" value="comfort_on">On</v-btn>
+											<v-btn color="success" value="comfort_on" :disabled="isLoading">On</v-btn>
 										</v-btn-toggle>
 									</v-card-actions>
 									<v-card-actions>
 										<div class="caption">All Z-Wawe</div>
 										<v-spacer></v-spacer>
 										<v-btn-toggle v-model="multi_switch">
-											<v-btn color="success" value="all_zwave_on">On</v-btn>
-											<v-btn color="error" value="all_zwave_off">Off</v-btn>
+											<v-btn color="success" value="all_zwave_on" :disabled="isLoading">On</v-btn>
+											<v-btn color="error" value="all_zwave_off" :disabled="isLoading">Off</v-btn>
 										</v-btn-toggle>
 									</v-card-actions>
 									<v-card-actions>
 										<div class="caption">All 433 MHz</div>
 										<v-spacer></v-spacer>
 										<v-btn-toggle v-model="multi_switch">
-											<v-btn color="success" value="all_433_on">On</v-btn>
-											<v-btn color="error" value="all_433_off">Off</v-btn>
+											<v-btn color="success" value="all_433_on" :disabled="isLoading">On</v-btn>
+											<v-btn color="error" value="all_433_off" :disabled="isLoading">Off</v-btn>
 										</v-btn-toggle>
 									</v-card-actions>
 								</v-card>
@@ -130,6 +130,7 @@ export default {
 		baseUrl: process.env.BASE_URL,
 		bufferDevicesData: {},
 		devicesMapSVGjsMarkup: "",
+		isLoading: false,
 		visiblePowerswitchMapItems: ["telldus433MHz"],
 
 		multi_switch : {}
@@ -182,7 +183,7 @@ export default {
 					that.devicesData = that.devicesData.map( (d) => {
 							if (d.name === performedTelldusAction.TelldusUnit.Name) {
 								let state = performedTelldusAction.TelldusActionValue.ActionValue === 'on' ? 1 : 2;
-
+debugger;
 								d.state = state;
 								d.color = TelldusActionValue.getColor(state);
 								d.hoverText = TelldusUnit.getHoverText(state);
@@ -218,39 +219,49 @@ export default {
 			});
 			return telldusActions;
 		},
+
 		setLoadingState: function (loading, error) {
 			let payLoad =  { "isLoading" : loading, "error" : error };
 			EventBus.$emit('loading', payLoad);
-		},		
+			this.isLoading = loading;
+		},
+
 		setReceivedMQTTState: function (receiving, error) {
 			let payLoad =  { "isReceiving" : receiving, "error" : error };
 			EventBus.$emit('loading', payLoad);
-		},		
+		},
+
 		setAllDevices : async function (setPointState) {
 			// setPointState = ['on','off']
 			let orderedDevices;
 
-			switch (setPointState) {				
+			switch (setPointState) {
 				case "on": {
-					orderedDevices = [...this.offDevices, ...this.onDevices];
+					orderedDevices = this.offDevices.concat(this.onDevices);
 					break;
 				}
 				case "off": {
-					orderedDevices = [...this.onDevices, ...this.offDevices];					
+					orderedDevices = this.onDevices.concat(this.offDevices);
 					break;
 				}
 			}
-			let telldusActions = this.telldusActionsPreparedBy(orderedDevices, setPointState)
-			let jsonTelldusActions = telldusActions.map( d => { return {"TelldusAction": d.toJSONObject }; } );
 			
+			let telldusActions = this.telldusActionsPreparedBy(orderedDevices, setPointState)
+			let jsonTelldusActions = telldusActions.map( d => {
+				return { "TelldusAction": d.toJSONObject }; 
+			});
+
 			await this.postTelldusActions(jsonTelldusActions);
 		},
+
 		setAllComfortDevices : function(setPointState) {
 
 		},
+
 		setAllZwaveDevices : function(setPointState) {
 
 		},
+
 		setAll433MHzDevices : function(setPointState) {
 
 		},

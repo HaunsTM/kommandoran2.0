@@ -99,24 +99,7 @@ export default {
 					this.rows.expandAll( );
 				},
 
-				/*timeRangeSelectedHandling: "Enabled",
-				onTimeRangeSelected: function (args) {
-					var dp = this;
-					
-					DayPilot.Modal.prompt("Create a new event:", "Event 1")
-						.then(function(modal) {
-							dp.clearSelection();
-							if (!modal.result) { return; }
-							dp.events.add(new DayPilot.Event({
-								start: args.start,
-								end: args.end,
-								id: DayPilot.guid(),
-								resource: args.resource,
-								text: modal.result
-							}));
-						});
-					
-				},*/
+				/*
 				eventMoveHandling: "Update",
 				onEventMoved: function (args) {
 					this.message("Event moved: " + args.e.text());
@@ -125,6 +108,7 @@ export default {
 				onEventResized: function (args) {
 					this.message("Event resized: " + args.e.text());
 				},
+				*/
 				eventDeleteHandling: "Update",
 				onEventDeleted: function (args) {
 					this.message("Event deleted: " + args.e.text());
@@ -137,14 +121,15 @@ export default {
 					// this onLoad handler will be called to provide the bubble HTML
 					const startTime = args.source.start().toString('HH:mm');
 					const endTime = args.source.end().toString('HH:mm');
-					const resource = args.source.resource();
+					debugger;
+					const resource = this.dayPilotSchedulerHelper.telldusUnitIdBy( args.source.resource() );
 					
-					args.html = 'Event details <br />' +
+					args.html = '<b>Event details</b> <br />' +
 					'Start time: ' + startTime + '<br />' +
 					'End time: ' + endTime + '<br />' +
 					'Resource: ' + resource;
 					}
-				}),
+				}).bind(this),
 				treeEnabled: true,
 			},
 		}
@@ -238,6 +223,8 @@ export default {
 		}
 	},
 	mounted: function() {
+		window.alert = function() {};
+		
 		this.loadCalendarData();
 		//this.scheduler.message("Welcomes!");
 		//add event handlers for calendar

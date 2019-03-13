@@ -152,4 +152,14 @@ export class DayPilotSchedulerHelper {
 
         return scheduleableTelldusUnitTypes;
     }
+
+    telldusUnitIdBy( name ) {
+
+        let telldusUnit = _(this._bufferTelldusSchedulerOverview)
+            .find( ( o ) => {                
+                return o.TelldusUnit_Name === name;
+            });
+            
+        return telldusUnit.TelldusUnit_Id;
+    }
 }

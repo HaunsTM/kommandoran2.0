@@ -35,11 +35,11 @@
             </div>
         </v-carousel-item>
         <v-carousel-item transition="fade">
-            <div disabled="outsideClimate.icon" v-if="outsideClimate.icon" class="flex-container">
+            <div disabled="outsideClimate.icon" v-if="outsideClimate.icon" class="flex-container outdoors">
                 <div class="column">
                     <img v-bind:src="require(`@/assets/open_weather_icons/${outsideClimate.icon}.png`)" alt="" class="weather-icon">
                 </div>
-                <div class="column">
+                <div class="column outdoor-text">
                     <div>
                         Out
                     </div>
@@ -114,13 +114,23 @@ export default {
     .column {
         flex-direction: column;
     }
-    .outdoors {
-        padding-left: 1rem;
-    }
     .indoor-icon {
         padding-right: 0.2rem;
     }
-    .weather-icon {
-        width: 32px;
+    @media only screen and (max-width: 400px) {
+        .weather-icon {
+            width: 30px;
+        }
+        .outdoor-text {
+            padding-bottom: 0.4rem;
+        }
+    }
+    @media only screen and (min-width: 401px) {
+        .outdoors {
+            padding-left: 1rem;
+        }
+        .weather-icon {
+            width: 32px;
+        }
     }
 </style>

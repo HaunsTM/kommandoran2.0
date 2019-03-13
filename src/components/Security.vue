@@ -4,21 +4,21 @@
             <v-flex xs12 sm6 class="video-card-container">
                 <v-card dark class="video-card">
                     <v-card-media primary class="title">Fågelmatare</v-card-media>
-                    <img src="http://10.0.0.2:1021/mjpegfeed?oid=2&full">
+                    <img src="http://10.0.0.2:8100/Mjpeg/0?authToken=dae53dc0-f8c9-4ff3-b959-e92558530b9a"  width="1280" height="720"/>
                     <v-card-text>Den här bilden visar en vy</v-card-text>
                 </v-card>
             </v-flex>
             <v-flex xs12 sm6 class="video-card-container">
                 <v-card dark class="video-card">
                     <v-card-media primary class="title">Uterum</v-card-media>
-                    <v-card-media primary><img src="http://10.0.0.2:1021/mjpegfeed?oid=1&full"></v-card-media>
+                    <v-card-media primary><img src="http://10.0.0.2:8100/Mjpeg/1?authToken=dae53dc0-f8c9-4ff3-b959-e92558530b9a"  width="1280" height="720"/></v-card-media>
                     <v-card-text>{{ lorem }}</v-card-text>
                 </v-card>
             </v-flex>
             <v-flex xs12 sm6 class="video-card-container">
                 <v-card dark class="video-card">
                     <v-card-media primary class="title">Garage</v-card-media>
-                    <v-card-media primary><img src="http://10.0.0.2:1021/mjpegfeed?oid=3&full"></v-card-media>
+                    <v-card-media primary><img src="http://10.0.0.2:8100/Mjpeg/2?authToken=dae53dc0-f8c9-4ff3-b959-e92558530b9a"  width="1280" height="720"/></v-card-media>
                     <v-card-text>{{ lorem }}</v-card-text>
                 </v-card>
             </v-flex>
