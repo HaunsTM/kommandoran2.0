@@ -183,7 +183,7 @@ export default {
 					that.devicesData = that.devicesData.map( (d) => {
 							if (d.name === performedTelldusAction.TelldusUnit.Name) {
 								let state = performedTelldusAction.TelldusActionValue.ActionValue === 'on' ? 1 : 2;
-debugger;
+
 								d.state = state;
 								d.color = TelldusActionValue.getColor(state);
 								d.hoverText = TelldusUnit.getHoverText(state);

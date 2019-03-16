@@ -7,15 +7,15 @@
         </div>
         <div class="column">
             <div>
-                {{dwellingTemperature}} °C 
+                {{climate.indoors.main.temp.value}} °C 
             </div>
         </div>
-        <div v-if="outsideClimate.icon" class="flex-container outdoors">
+        <div v-if="climate.outside.icon" class="flex-container outdoors">
             <div class="column">
-                <img v-bind:src="require(`@/assets/open_weather_icons/${outsideClimate.icon}.png`)" alt="" class="weather-icon">
+                <img v-bind:src="require(`@/assets/open_weather_icons/${climate.outside.icon}.png`)" alt="" class="weather-icon">
             </div>
             <div class="column">
-                {{outsideClimate.tempc}} °C
+                {{climate.outside.tempc}} °C
             </div>        
         </div>
     </article>
@@ -30,21 +30,21 @@
                     <div>
                         In
                     </div>
-                    {{dwellingTemperature}} °C 
+                    {{climate.indoors.main.temp.value}} °C 
                 </div>        
             </div>
         </v-carousel-item>
         <v-carousel-item transition="fade">
-            <div disabled="outsideClimate.icon" v-if="outsideClimate.icon" class="flex-container outdoors">
+            <div disabled="outsideClimate.icon" v-if="climate.outside.icon" class="flex-container outdoors">
                 <div class="column">
-                    <img v-bind:src="require(`@/assets/open_weather_icons/${outsideClimate.icon}.png`)" alt="" class="weather-icon">
+                    <img v-bind:src="require(`@/assets/open_weather_icons/${climate.outside.icon}.png`)" alt="" class="weather-icon">
                 </div>
                 <div class="column outdoor-text">
                     <div>
                         Out
                     </div>
                     <div>                        
-                        {{outsideClimate.tempc}} °C
+                        {{climate.outside.tempc}} °C
                     </div>
                 </div>        
             </div>
@@ -59,21 +59,32 @@ import Vue from 'vue';
 export default {
     name: 'KommandoranFooterClimate',
     data: () => ({
-        bufferOutsideClimate: {},
-        dwellingTemperature: ""
+
+        climate: {
+            indoors: {
+                utilityRoom: {
+                    telldusUnit_Name: '',
+                    effect: {},
+                    temp: {}
+                },
+                main: {
+                    telldusUnit_Name: '',
+                    effect: {},
+                    temp: {}
+                },
+                outdoorRoom: {
+                    telldusUnit_Name: '',
+                    effect: {},
+                    temp: {}
+                }
+            },
+            outside: {}
+        }
     }),
     computed: {
         mediaWidthMoreThan400px: () => {            
             return window.matchMedia("(min-width: 400px)").matches;
-        },
-        outsideClimate : {
-			get : function ()  {
-				return this.bufferOutsideClimate;
-			},
-			set : function (newClimateData)  {                
-                this.bufferOutsideClimate = newClimateData;
-			}
-		}
+        }
     },
     methods: {
 		fetchTemperatureData : function () {
@@ -82,19 +93,69 @@ export default {
 				Vue.axios.get(this.$TELLDUS_API_BASE_URL + '?telldusActionTypeActionTypeOption=getSensorInfo&telldusUnitName=Huvudtermostat')
 			];
 			Promise.all(promises)
-			.then((response) => {                
-				that.dwellingTemperature = response[0].data.successResult.data[0].value;
+			.then((response) => {
+                that.climate.indoors.main = {
+                    'temp': {
+                        'unit': response[0].data.successResult.data[0].name,
+                        'value': response[0].data.successResult.data[0].value
+                    }
+                }
 			});
-		}
+        },
+
+        status:  ( json ) => {
+
+            const telldusUnit_Name = json.successResult.name;
+
+            const effect = json.successResult.data
+                .find( ( d ) => { return d.name === 'watt' } );
+
+            const temp = json.successResult.data
+                .find( ( d ) => { return d.name === 'temp' } );            
+
+            return {
+                'telldusUnit_Name': telldusUnit_Name,
+                'effect': {
+                        'unit': effect ? effect.name : null,
+                        'value': effect ? effect.value : null
+                    },
+                'temp': {
+                        'unit': temp ? temp.name : null,
+                        'value': temp ? temp.value : null
+                    }		
+            }
+        }
     },
 	mqtt: {
 		// subscribe to this topic for updates 
 		'nodered/climate/dalby_outside' ( data ) {
-            
 			let decoded = new TextDecoder("utf-8").decode( data );
 			let decodedJSON = JSON.parse( decoded );
-			this.outsideClimate = decodedJSON;
-        }
+			this.climate.outside = decodedJSON;
+        }, 
+		// subscribe to this topic for updates 
+		'nodered/performed_TelldusAction/getSensorInfo' ( data ) {
+			const decoded = new TextDecoder("utf-8").decode( data );
+            const decodedJSON = JSON.parse( decoded );
+            const currentStatus = this.status( decodedJSON )
+
+            switch (currentStatus.telldusUnit_Name) {
+                case 'Grovkök golvtermostat':
+                    this.climate.indoors.utilityRoom = currentStatus;
+                    break;
+                case 'Huvudtermostat':
+                    
+                    this.climate.indoors.main = currentStatus;
+                    break;
+                case 'Uterum golvtermostat':
+                    
+                    this.climate.indoors.outdoorRoom = currentStatus;
+                    break;
+            
+                default:
+                    break;
+            }
+		}
 	},
     mounted() {
 		this.fetchTemperatureData();

@@ -24,7 +24,11 @@ export default {
         KommandoranFooterClimate,
         KommandoranFooterTime,
         KommandoranFooterTransport
-    }
+    },
+    methods: {
+		fetchTemperatureData: () => {
+		}
+    },
 }
 </script>
 
@@ -48,6 +52,9 @@ export default {
 
         height: 32px;
     }
+    .center-column {
+        padding-bottom: 2.4rem;
+    }
     @media only screen and (max-width: 400px) {
         footer {
             font-size: small;
@@ -57,7 +64,6 @@ export default {
         }
         .center-column {
             min-width: 30%;
-            padding-bottom: 2.4rem;
         }
         .right-column {
             min-width: 30%;        
