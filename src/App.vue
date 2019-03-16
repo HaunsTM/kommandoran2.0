@@ -7,7 +7,7 @@
 			v-model="drawer"
 			app
 		>	
-			<NavigationList v-on:navigateTo="navigateTo"/>
+		<navigation-list v-on:navigateTo="navigateTo"/>
 		</v-navigation-drawer>
 		<v-toolbar app fixed clipped-left>
 			<v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>

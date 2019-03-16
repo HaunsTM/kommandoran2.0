@@ -97,7 +97,7 @@ export default {
 				startDate: this.$DEFAULT_START_DATE_MONDAY,
 
 				onAfterRender: function( ) {
-					//that.removeCalendarBS();
+					that.removeCalendarBS();
 					this.rows.expandAll( );
 				},
 

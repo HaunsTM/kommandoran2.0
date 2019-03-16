@@ -1,12 +1,12 @@
 <template>
     <footer class="flex-container">
-        <div>
-            <kommandoran-footer-climate />
+        <div class='left-column'>
+            <kommandoran-footer-climate/>
         </div>
-        <div>
+        <div class='center-column'>
             <kommandoran-footer-transport />
         </div>
-        <div>
+        <div class='right-column'>
             <kommandoran-footer-time />
         </div>
     </footer>
@@ -51,6 +51,16 @@ export default {
     @media only screen and (max-width: 400px) {
         footer {
             font-size: small;
+        }
+        .left-column {
+            width: 25%;
+        }
+        .center-column {
+            min-width: 30%;
+            padding-bottom: 2.4rem;
+        }
+        .right-column {
+            min-width: 30%;        
         }
     }
 </style>
