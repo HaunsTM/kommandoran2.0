@@ -134,7 +134,7 @@ export default {
 			this.climate.outside = decodedJSON;
         }, 
 		// subscribe to this topic for updates 
-		'nodered/performed_TelldusAction/getSensorInfo' ( data ) {
+		'nodered/climate/dalby_indoor' ( data ) {
 			const decoded = new TextDecoder("utf-8").decode( data );
             const decodedJSON = JSON.parse( decoded );
             const currentStatus = this.status( decodedJSON )

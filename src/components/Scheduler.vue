@@ -97,7 +97,7 @@ export default {
 				startDate: this.$DEFAULT_START_DATE_MONDAY,
 
 				onAfterRender: function( ) {
-					that.removeCalendarBS();
+					//that.removeCalendarBS();
 					this.rows.expandAll( );
 				},
 
@@ -133,6 +133,7 @@ export default {
 				}),
 				treeEnabled: true,
 			},
+			originalAlertFunction: {}
 		}
 	},
 	components: {
@@ -187,8 +188,7 @@ export default {
 				that.setLoadingState(false, error);
 			});
 		},
-		removeCalendarBS() {			
-			window.alert = function() {};
+		removeCalendarBS() {
 			
 			try {
 				const xpathDemo = '//div[contains(text(),"DEMO")]';
@@ -236,12 +236,20 @@ export default {
 			this.eventSelectorDialog = true;
 		}
 	},
+	beforeCreate: function() {
+		this.originalAlertFunction = window.alert;
+		window.alert = function() {};
+	},
 	mounted: function() {		
 		this.loadCalendarData();
 		//add event handlers for calendar
 
 		this.scheduler.onTimeRangeSelected = this.timeRangeSelected;
+	},
+	beforeDestroy: function() {
+		window.alert = this.originalAlertFunction;
 	}
+	
 }
 </script>
 
@@ -259,4 +267,7 @@ export default {
 	} 
 
 	/*göm den här från början div.scheduler_default_corner > div:nth-child(2) */
+	#dp >>> div:nth-child(1) > div.scheduler_default_corner > div:nth-child(2) {
+		display: none;
+	}
 </style>

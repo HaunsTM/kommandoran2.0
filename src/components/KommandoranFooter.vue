@@ -1,7 +1,14 @@
 <template>
     <footer class="flex-container">
         <div class='left-column'>
-            <kommandoran-footer-climate/>
+  <v-bottom-sheet v-model="sheet">
+      
+   <kommandoran-footer-climate
+     slot="activator"
+    ></kommandoran-footer-climate>
+   <v-date-picker autosave style="" v-model="date"></v-date-picker>
+  </v-bottom-sheet>
+            <!--<kommandoran-footer-climate/>-->
         </div>
         <div class='center-column'>
             <kommandoran-footer-transport />
@@ -20,6 +27,12 @@ import KommandoranFooterTransport from './KommandoranFooterTransport';
 
 export default {
     name: 'KommandoranFooter',
+  data () {
+    return {
+       date:'',
+       sheet:null,
+    }
+  },
     components: {
         KommandoranFooterClimate,
         KommandoranFooterTime,
@@ -52,21 +65,21 @@ export default {
 
         height: 32px;
     }
-    .center-column {
-        padding-bottom: 2.4rem;
+    @media only screen and (min-width: 401px) {
+        .center-column {
+            padding-bottom: 2.4rem;
+        }
+
     }
     @media only screen and (max-width: 400px) {
         footer {
             font-size: small;
         }
         .left-column {
-            width: 25%;
+            width: 20%;
         }
         .center-column {
-            min-width: 30%;
-        }
-        .right-column {
-            min-width: 30%;        
+            padding-bottom: 0.05rem;
         }
     }
 </style>
