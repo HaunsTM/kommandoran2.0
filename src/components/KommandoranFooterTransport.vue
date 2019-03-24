@@ -2,9 +2,7 @@
 	
     <article class="flex-container" v-if="transportData['Lund'] && transportData['Malmö']">
         <div class="flex-container column">
-            <div>                
                 <img :src="require(`@/assets/bus32x32.png`)" />
-            </div>
         </div>
         <div class="flex-container column">
             <div class="flex-container">
@@ -110,9 +108,6 @@ export default {
 <style scope>
     .flex-container {
         display: flex;
-    }
-    .space-around {
-        justify-content: space-around;
     }
     .column {
         flex-direction: column;

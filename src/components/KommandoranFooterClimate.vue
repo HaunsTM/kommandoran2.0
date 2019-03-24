@@ -54,117 +54,14 @@
 
 <script>
 
-import Vue from 'vue';
-
 export default {
     name: 'KommandoranFooterClimate',
-    data: () => ({
-
-        climate: {
-            indoors: {
-                utilityRoom: {
-                    telldusUnit_Name: '',
-                    effect: {},
-                    temp: {}
-                },
-                main: {
-                    telldusUnit_Name: '',
-                    effect: {},
-                    temp: {}
-                },
-                outdoorRoom: {
-                    telldusUnit_Name: '',
-                    effect: {},
-                    temp: {}
-                }
-            },
-            outside: {}
-        }
-    }),
-    computed: {
-        mediaWidthMoreThan400px: () => {            
-            return window.matchMedia("(min-width: 400px)").matches;
-        }
-    },
-    methods: {
-		fetchTemperatureData : function () {
-			let that = this;
-			const promises = [         
-				Vue.axios.get(this.$TELLDUS_API_BASE_URL + '?telldusActionTypeActionTypeOption=getSensorInfo&telldusUnitName=Huvudtermostat')
-			];
-			Promise.all(promises)
-			.then((response) => {
-                that.climate.indoors.main = {
-                    'temp': {
-                        'unit': response[0].data.successResult.data[0].name,
-                        'value': response[0].data.successResult.data[0].value
-                    }
-                }
-			});
-        },
-
-        status:  ( json ) => {
-
-            const telldusUnit_Name = json.successResult.name;
-
-            const effect = json.successResult.data
-                .find( ( d ) => { return d.name === 'watt' } );
-
-            const temp = json.successResult.data
-                .find( ( d ) => { return d.name === 'temp' } );            
-
-            return {
-                'telldusUnit_Name': telldusUnit_Name,
-                'effect': {
-                        'unit': effect ? effect.name : null,
-                        'value': effect ? effect.value : null
-                    },
-                'temp': {
-                        'unit': temp ? temp.name : null,
-                        'value': temp ? temp.value : null
-                    }		
-            }
-        }
-    },
-	mqtt: {
-		// subscribe to this topic for updates 
-		'nodered/climate/dalby_outside' ( data ) {
-			let decoded = new TextDecoder("utf-8").decode( data );
-			let decodedJSON = JSON.parse( decoded );
-			this.climate.outside = decodedJSON;
-        }, 
-		// subscribe to this topic for updates 
-		'nodered/climate/dalby_indoor' ( data ) {
-			const decoded = new TextDecoder("utf-8").decode( data );
-            const decodedJSON = JSON.parse( decoded );
-            const currentStatus = this.status( decodedJSON )
-
-            switch (currentStatus.telldusUnit_Name) {
-                case 'Grovkök golvtermostat':
-                    this.climate.indoors.utilityRoom = currentStatus;
-                    break;
-                case 'Huvudtermostat':
-                    
-                    this.climate.indoors.main = currentStatus;
-                    break;
-                case 'Uterum golvtermostat':
-                    
-                    this.climate.indoors.outdoorRoom = currentStatus;
-                    break;
-            
-                default:
-                    break;
-            }
-		}
-	},
-    mounted() {
-		this.fetchTemperatureData();
-        this.intervalFetchTemperatureData = setInterval( this.fetchTemperatureData, 5*60*1000 );
-    },
-    beforeDestroy() {
-        clearInterval( this.fetchTemperatureData );
+    props: {
+        'climate': Object,
+        'mediaWidthMoreThan400px': Boolean
     }
 }
+
 </script>
 
 <style scope>
@@ -174,6 +71,9 @@ export default {
     }
     .column {
         flex-direction: column;
+    }
+    .justify-content-center {
+        align-items: center;
     }
     .indoor-icon {
         padding-right: 0.2rem;
