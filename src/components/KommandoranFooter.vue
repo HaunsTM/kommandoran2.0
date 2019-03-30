@@ -1,22 +1,24 @@
 <template>
     <footer class="flex-container">
-        <div class='left-column'>
-  <v-bottom-sheet v-model="sheet" inset>
-      
-   <kommandoran-footer-climate
-     slot="activator"
-     :climate = "climate"
-     :mediaWidthMoreThan400px = "mediaWidthMoreThan400px"
-    ></kommandoran-footer-climate>
-   <kommandoran-footer-climate-details
-        :climate="climate" 
-        :mediaWidthMoreThan400px = "mediaWidthMoreThan400px"        
-    ></kommandoran-footer-climate-details>
-  </v-bottom-sheet>
-            <!--<kommandoran-footer-climate/>-->
+        <div class='left-column' v-on:click="showClimateDetailsDialog = true">
+            <kommandoran-footer-climate
+                :climate = "climate"
+                :mediaWidthMoreThan400px = "mediaWidthMoreThan400px" />
+            <v-dialog v-model="showClimateDetailsDialog" >                    
+                <kommandoran-footer-climate-details
+                    :climate="climate" 
+                    :mediaWidthMoreThan400px = "mediaWidthMoreThan400px"  />
+            </v-dialog>
         </div>
-        <div class='center-column'>
-            <kommandoran-footer-transport />
+        <div class='center-column' v-on:click="showTransportDetailsDialog = true">
+                <kommandoran-footer-transport
+                    :transportData="transportData" 
+                    :mediaWidthMoreThan400px = "mediaWidthMoreThan400px" />
+
+                <v-dialog v-model="showTransportDetailsDialog" >                    
+                    <kommandoran-footer-transport-details />
+                </v-dialog>
+                
         </div>
         <div class='right-column'>
             <kommandoran-footer-time />
@@ -35,52 +37,91 @@ import KommandoranFooterClimate from './KommandoranFooterClimate';
 import KommandoranFooterClimateDetails from './KommandoranFooterClimateDetails';
 import KommandoranFooterTime from './KommandoranFooterTime';
 import KommandoranFooterTransport from './KommandoranFooterTransport';
+import KommandoranFooterTransportDetails from './KommandoranFooterTransportDetails';
 
 export default {
     name: 'KommandoranFooter',
     data: () => ({
-
-        date:'',
-        sheet:null,
+        bufferTransportData: {},
+        date: '',
+        sheet: null,        
         climate: {
             indoors: {
                 utilityRoom: {
+                    name: 'Grovkök golvtermostat',
                     effect: {},
-                    temp: {},
-                    time: {}
+                    temp: {}
                 },
                 main: {
+                    name: 'Huvudtermostat',
                     effect: {},
-                    temp: {},
-                    time: {}
+                    temp: {}
                 },
                 outdoorRoom: {
+                    name: 'Uterum golvtermostat',
                     effect: {},
-                    temp: {},
-                    time: {}
+                    temp: {}
                 }
             },
             outside: {}
-        }
+        },
+        showClimateDetailsDialog: false,
+        showTransportDetailsDialog: false
+        
     }),
     components: {
         KommandoranFooterClimate,
         KommandoranFooterClimateDetails,
         KommandoranFooterTime,
-        KommandoranFooterTransport
+        KommandoranFooterTransport,
+        KommandoranFooterTransportDetails
     },
     computed: {
         mediaWidthMoreThan400px: () => {            
             return window.matchMedia("(min-width: 400px)").matches;
-        }
+        },
+        
+        transportData()  {
+            if ( !this.bufferTransportData ) {
+                return;
+            }
+
+			let transportData = this.$_( this.bufferTransportData.lines )
+                    .filter( l => {
+                        let transportIsInCorrectDirection = /(Malmö|Lund)/g.test(l.Towards);
+                        return transportIsInCorrectDirection;
+                    })
+                    .map( l => {
+                            let line = {
+                                "City": l.Towards.match(/^([^\s])+/)[0],
+                                "Name": l.Name,
+                                "JourneyTime": (new Date(l.JourneyDateTime)).toLocaleTimeString('se-SE', { hour: 'numeric', hour12: false, minute: 'numeric' }),
+                                "LineTypeName": l.LineTypeName,
+                                "Towards": l.Towards,
+                                "NewDepPoint": l.RealTimeInfo ? l.RealTimeInfo.NewDepPoint : "",
+                                "DepTimeDeviation": l.RealTimeInfo ? l.RealTimeInfo.DepTimeDeviation : "",
+                                "DepDeviationAffect": l.RealTimeInfo ? l.RealTimeInfo.DepDeviationAffect : ""
+                            }
+                            return line;
+                        }
+                    )
+                    .orderBy(['JourneyDateTime'],['asc'])
+                    .groupBy(l => l.City)
+                    .value();
+                return transportData;
+		}
     },
     methods: {
+
         currentTime: function() {            
             return this.momentLocalized().format('YYYY-MM-DD HH:mm');
         },
-        momentLocalized: () => {
-            let momentLocalized = moment().locale("sv", localization);
+        momentLocalized: ( utc ) => {
+            const momentLocalized = moment( utc ).locale("sv", localization);
             return momentLocalized;
+        },
+        displayTime: function( utc ) {            
+            return this.momentLocalized( utc ).format('YYYY-MM-DD HH:mm');
         },
 		fetchInitialIndoorTemperatureData : function () {
 			let that = this;
@@ -89,11 +130,9 @@ export default {
 			];
 			Promise.all(promises)
 			.then((response) => {
-                that.climate.indoors.main = {
-                    'temp': {
-                        'value': response[0].data.successResult.data[0].value,
-                        'time': that.currentTime()
-                    }
+                that.climate.indoors.main.temp = {
+                    'value': response[0].data.successResult.data[0].value,
+                    'time': that.currentTime()
                 }
 			});
         },
@@ -105,7 +144,7 @@ export default {
             const tempValue = d.TelldusActionValueTypes_Name === 'temp' ? d.TelldusActionValues_ActionValue : null;
 
             switch ( telldusUnit_Name ) {
-                    case 'Grovkök golvtermostat':
+                    case this.climate.indoors.utilityRoom.name:
                         this.climate.indoors.utilityRoom.effect = effectValue ? {
                             'value': effectValue,
                             'time': telldusActionsPerformed_PerformedTime
@@ -115,7 +154,7 @@ export default {
                             'time': telldusActionsPerformed_PerformedTime
                         } : this.climate.indoors.utilityRoom.temp;
                         break;
-                    case 'Huvudtermostat':
+                    case this.climate.indoors.main.name:
                         this.climate.indoors.main.effect = effectValue ? {
                             'value': effectValue,
                             'time': telldusActionsPerformed_PerformedTime
@@ -125,7 +164,7 @@ export default {
                             'time': telldusActionsPerformed_PerformedTime
                         } : this.climate.indoors.main.temp;
                         break;
-                    case 'Uterum golvtermostat': 
+                    case this.climate.indoors.outdoorRoom.name: 
                         this.climate.indoors.outdoorRoom.effect = effectValue ? {
                             'value': effectValue,
                             'time': telldusActionsPerformed_PerformedTime
@@ -142,9 +181,19 @@ export default {
         }
     },
 	mqtt: {
+        'nodered/transport/departureTime' ( data ) {
+            
+			let decoded = new TextDecoder("utf-8").decode( data );
+            let decodedJSON = JSON.parse( decoded );
+			this.bufferTransportData = decodedJSON;
+        },
 		'nodered/climate/dalby_outside' ( data ) {
 			let decoded = new TextDecoder("utf-8").decode( data );
-			let decodedJSON = JSON.parse( decoded );
+            let decodedJSON = JSON.parse( decoded );
+            decodedJSON.weatherUpdateTime = this.displayTime( decodedJSON.weatherUpdateTime );
+            decodedJSON.sunrise = this.displayTime( decodedJSON.sunrise );
+            decodedJSON.sunset = this.displayTime( decodedJSON.sunset );
+
 			this.climate.outside = decodedJSON;
         },
 		'nodered/climate/dalby_indoor' ( data ) {
