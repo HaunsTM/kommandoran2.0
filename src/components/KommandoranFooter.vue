@@ -4,7 +4,8 @@
             <kommandoran-footer-climate
                 :climate = "climate"
                 :mediaWidthMoreThan400px = "mediaWidthMoreThan400px" />
-            <v-dialog v-model="showClimateDetailsDialog" >                    
+            <v-dialog v-model="showClimateDetailsDialog"
+                max-width="70%">                    
                 <kommandoran-footer-climate-details
                     :climate="climate" 
                     :mediaWidthMoreThan400px = "mediaWidthMoreThan400px"  />
@@ -15,8 +16,11 @@
                     :transportData="transportData" 
                     :mediaWidthMoreThan400px = "mediaWidthMoreThan400px" />
 
-                <v-dialog v-model="showTransportDetailsDialog" >                    
-                    <kommandoran-footer-transport-details />
+                <v-dialog v-model="showTransportDetailsDialog"
+                    max-width="70%">
+                    <kommandoran-footer-transport-details 
+                    :transportData="transportData" 
+                    :mediaWidthMoreThan400px = "mediaWidthMoreThan400px" />
                 </v-dialog>
                 
         </div>

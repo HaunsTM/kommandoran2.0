@@ -165,7 +165,7 @@ export default {
                     value: 'indoorLocation'
                 },
                 { text: '', value: 'indoorLocation'},
-            ],            
+            ],
             outdoorHeadersTemp: [
                 {
                     text: 'Temperature',
@@ -173,7 +173,7 @@ export default {
                     value: 'outdoorMeasurementName'
                 },
                 { text: '', value: 'outdoorMeasurementValue' },
-            ],            
+            ],
             outdoorHeadersAir: [
                 {
                     text: 'Air',
@@ -181,7 +181,7 @@ export default {
                     value: 'outdoorMeasurementName'
                 },
                 { text: '', value: 'outdoorMeasurementValue' },
-            ],            
+            ],
             outdoorHeadersWind: [
                 {
                     text: 'Wind',
