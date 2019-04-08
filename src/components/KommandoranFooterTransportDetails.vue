@@ -125,15 +125,21 @@ export default {
         align-items: center;
         justify-content: space-between;
     }
-    .title-row > div {
-        padding-right: 2rem;
-    }
-    .transport {
-        padding: 1rem;
-    }
+    
+    @media only screen and (min-width: 401px) {  
+        .title-row > div {
+            padding-right: 2rem;
+        }
+        .transport {
+            padding: 1rem;
+        }
 
-    .transport-wrapper {
-        padding: 1rem;
+        .transport-wrapper {
+            padding: 1rem;
+        }
+    }
+    @media only screen and (max-width: 400px) {
+ 
     }
 
 </style>

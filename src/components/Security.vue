@@ -44,7 +44,7 @@ export default {
             return window.matchMedia("(min-width: 400px)").matches;
         },
         videoSize () {
-            const baseWidth=1280;
+            const baseWidth=1280; 
             const baseHeight=720;
             switch (this.$vuetify.breakpoint.name) {
                 case 'xs': return { width: baseWidth * 0. , height: baseHeight * 0.2 };
