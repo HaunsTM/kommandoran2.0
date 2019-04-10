@@ -1,24 +1,15 @@
 <template>
-    <div>
-
-    </div>  
+    
+            <div class="container">
+                <img :src="require(`@/assets/Photos/IMG_20190330_104033037.jpg`)" />   
+            </div>
 </template>
 <script>
 
-import Vue from 'vue';
 
 export default {
-    name: 'Security',
-    data: () => ({
-        birdFeederCam: {},
-        outdoorRoomCam: {},
-        garageCam: {}
-    }),
-    computed: {
-        mediaWidthMoreThan400px: () => {            
-            return window.matchMedia("(min-width: 400px)").matches;
-        },
-    },
+    name: 'Screensaver',
+    computed: { },
     mounted() {
     },
     beforeDestroy() {
@@ -26,17 +17,43 @@ export default {
 }
 </script>
 <style scoped>
-    img {
+
+    img, div {
         padding: 0;
         margin: 0;
-        height: 100%;
-        width: 100%;
     }
-    .video-card-container {
-        padding: 1rem;
+    
+    .container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    @media (max-width: 400px) {
+        .container {
+            width: 100%;
+            height: calc(95vh - 60px - 40px);
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            width: auto;
+            max-height: calc(95vh - 60px - 40px);
+        }
     }
 
-    .video-card {
-        padding: 1rem;
+   @media (min-width: 401px) {
+        .container {
+            width: 100%;
+            height: calc(93vh - 60px - 40px);
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            width: auto;
+            max-height: calc(93vh - 60px - 40px);
+        }
+
     }
 </style>

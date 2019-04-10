@@ -23,7 +23,6 @@
 				<router-view></router-view>
 			</v-container>
 		</v-content>
-
 		<v-footer app fixed>
 			<kommandoran-footer />
 		</v-footer>
@@ -61,6 +60,13 @@ export default {
 			this.loading = data.isLoading;
 			this.loadingError=JSON.stringify(data.error);
 		}
+	},
+	
+	onIdle() {
+		//this.navigateTo('screensaver');
+	},
+	onActive() {
+		//this.navigateTo('/');		
 	},
 	mounted () {
 		this.$mqtt.subscribe('nodered/#')

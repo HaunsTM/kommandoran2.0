@@ -4,6 +4,7 @@ import Router from 'vue-router'
 import MainNavigation from '@/components/MainNavigation'
 import MediaController from '@/components/MediaController'
 import SwitchesOverview from '@/components/SwitchesOverview'
+import Screensaver from '@/components/Screensaver'
 import Security from '@/components/Security'
 import Scheduler from '@/components/Scheduler'
 
@@ -22,11 +23,6 @@ export default new Router({
       component: MediaController
     },
     {
-      path: '/switches-overview',
-      name: 'switches-overview',
-      component: SwitchesOverview
-    },
-    {
       path: '/security',
       name: 'security',
       component: Security
@@ -35,6 +31,16 @@ export default new Router({
       path: '/scheduler',
       name: 'scheduler',
       component: Scheduler
-    }
+    },
+    {
+      path: '/screensaver',
+      name: 'screensaver',
+      component: Screensaver
+    },
+    {
+      path: '/switches-overview',
+      name: 'switches-overview',
+      component: SwitchesOverview
+    },
   ]
 })

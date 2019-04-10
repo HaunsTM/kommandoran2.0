@@ -13,6 +13,7 @@
     "core-js": "^2.6.3",
     "daypilot-pro-vue": "https://npm.daypilot.org/daypilot-pro-vue/trial/2018.4.3487.tar.gz",
     "flv.js": "^1.5.0",
+    "idle-vue": "^2.0.5",
     "lodash": "^4.17.11",
     "moment": "^2.22.2",
     "terser": "^3.14.1",
@@ -21,7 +22,7 @@
     "vue-mqtt": "^2.0.3",
     "vue-range-slider": "^0.6.0",
     "vue-router": "^3.0.1",
-    "vuetify": "^1.4.3"
+    "vuetify": "^1.5.10"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.1.1",

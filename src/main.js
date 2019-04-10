@@ -3,6 +3,7 @@ import './plugins/vuetify'
 import App from './App.vue'
 import VueRouter from 'vue-router'
 import router from './router.js'
+import IdleVue from 'idle-vue'
 
 import axios from 'axios'
 import VueAxios from 'vue-axios'
@@ -16,6 +17,10 @@ import "./assets/scroll.css";
 Vue.use(VueRouter);
 Vue.use(VueAxios, axios);
 Vue.use(VueMqtt, "ws://10.0.0.4:9001", {clientId: 'WebClient-' + parseInt(Math.random() * 100000)});
+Vue.use(IdleVue, {
+  eventEmitter: new Vue(),
+  idleTime: 10 * 1000
+});
 
 Vue.config.productionTip = false;
 Vue.prototype.$TELLDUS_API_BASE_URL = 'http://10.0.0.4/iot/kommandoran2.0/telldus-api';
