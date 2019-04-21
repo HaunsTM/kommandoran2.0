@@ -23,8 +23,9 @@ Vue.use(IdleVue, {
 });
 
 Vue.config.productionTip = false;
-Vue.prototype.$TELLDUS_API_BASE_URL = 'http://10.0.0.4/iot/kommandoran2.0/telldus-api';
+Vue.prototype.$API_BASE_URL = 'http://10.0.0.4/iot/kommandoran2.0';
 Vue.prototype.$DB_API_BASE_URL = 'http://10.0.0.4/iot/kommandoran2.0/db-api';
+Vue.prototype.$TELLDUS_API_BASE_URL = 'http://10.0.0.4/iot/kommandoran2.0/telldus-api';
 
 Vue.prototype.$DEFAULT_START_DATE_MONDAY = '2018-07-02';
 

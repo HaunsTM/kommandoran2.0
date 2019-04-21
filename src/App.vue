@@ -63,10 +63,10 @@ export default {
 	},
 	
 	onIdle() {
-		//this.navigateTo('screensaver');
+		this.navigateTo('screensaver');
 	},
 	onActive() {
-		//this.navigateTo('/');		
+		this.navigateTo('/');
 	},
 	mounted () {
 		this.$mqtt.subscribe('nodered/#')

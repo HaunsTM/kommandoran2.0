@@ -1,18 +1,36 @@
 <template>
-    
-            <div class="container">
-                <img :src="require(`@/assets/Photos/IMG_20190330_104033037.jpg`)" />   
-            </div>
+    <div class="container">
+        <img :src="imgSrc" />  
+        <!--<img :src="`${this.$API_BASE_URL}/screensaver-image.jpg`" alt="" class=""/> -->
+    </div>
 </template>
 <script>
 
 
 export default {
     name: 'Screensaver',
-    computed: { },
+    data: () => {
+        return {
+            nonsenseNoCacheKey: -1
+        }        
+    },
+    computed: {
+        
+        imgSrc() {
+            const src = this.$API_BASE_URL + "/screensaver-image.jpg?" + this.nonsenseNoCacheKey;
+            return src;
+        },
+     },
+    methods: {
+        updateNonsenseNoCacheKey() {
+            this.nonsenseNoCacheKey = new Date().getTime();
+        }
+    },
     mounted() {
+        this.intervalUpdateNonsenseNoCacheKey = setInterval(this.updateNonsenseNoCacheKey, 11 * 1000);
     },
     beforeDestroy() {
+        clearInterval( this.intervalUpdateNonsenseNoCacheKey );
     }
 }
 </script>
