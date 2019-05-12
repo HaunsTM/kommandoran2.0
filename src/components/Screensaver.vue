@@ -1,7 +1,6 @@
 <template>
     <div class="container">
-        <img :src="imgSrc" />  
-        <!--<img :src="`${this.$API_BASE_URL}/screensaver-image.jpg`" alt="" class=""/> -->
+        <img :src="imgSrc" /> 
     </div>
 </template>
 <script>
@@ -15,7 +14,6 @@ export default {
         }        
     },
     computed: {
-        
         imgSrc() {
             const src = this.$API_BASE_URL + "/screensaver-image.jpg?" + this.nonsenseNoCacheKey;
             return src;
@@ -27,7 +25,7 @@ export default {
         }
     },
     mounted() {
-        this.intervalUpdateNonsenseNoCacheKey = setInterval(this.updateNonsenseNoCacheKey, 11 * 1000);
+        this.intervalUpdateNonsenseNoCacheKey = setInterval(this.updateNonsenseNoCacheKey, this.$SCREENSAVER_SWITCH_INTERVAL_MS);
     },
     beforeDestroy() {
         clearInterval( this.intervalUpdateNonsenseNoCacheKey );
