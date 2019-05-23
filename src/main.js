@@ -12,6 +12,7 @@ import _ from 'lodash';
 
 import VueMqtt from 'vue-mqtt';
 
+import "./assets/common.css";
 import "./assets/scroll.css";
 
 

@@ -32,6 +32,22 @@
                 <v-list-tile-title>Radio</v-list-tile-title>
             </v-list-tile-content>
         </v-list-tile>
+        <v-list-tile v-on:click="routeLinkClick('sjostorpsvagen-drive')">
+            <v-list-tile-action>
+                <img :src="require(`@/assets/google-drive32x32.png`)" />
+            </v-list-tile-action>
+            <v-list-tile-content>
+                <v-list-tile-title>Sjöstorpsvägen 3A</v-list-tile-title>
+            </v-list-tile-content>
+        </v-list-tile>        
+        <v-list-tile v-on:click="routeLinkClick('surveillance-video')">
+            <v-list-tile-action>
+                <img :src="require(`@/assets/television32x32.png`)" />
+            </v-list-tile-action>
+            <v-list-tile-content>
+                <v-list-tile-title>Library for recorded surveillance video</v-list-tile-title>
+            </v-list-tile-content>
+        </v-list-tile>
     </v-list>
 </template>
 

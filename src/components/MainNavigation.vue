@@ -3,44 +3,44 @@
         <v-flex xs12>
             <v-layout justify-center row>
                 <v-flex xs3>
-                    <nav class="container">
-                        <router-link to="scheduler" >
+                    <router-link to="scheduler" >
+                        <nav class="container">
                             <img :src="require(`@/assets/event128x128.png`)" />
-                        </router-link>
-                        <h6 class="headline">Schedulers</h6>
-                    </nav>   
+                            <h6 class="headline">Schedulers</h6>
+                        </nav>
+                    </router-link>
                 </v-flex>
             </v-layout>
         </v-flex>
         <v-flex xs12>
             <v-layout justify-space-around row>
                 <v-flex xs3>
-                    <nav class="container">
-                        <router-link to="security" >
+                    <router-link to="security" >
+                        <nav class="container">
                             <img :src="require(`@/assets/cctv128x128.png`)" />
-                        </router-link>
-                        <h6 class="headline">Camera</h6>
-                    </nav>
+                            <h6 class="headline">Camera</h6>
+                        </nav>
+                    </router-link>
                 </v-flex>
                 <v-flex xs3>
-                    <nav class="container">
-                        <router-link to="switches-overview" >
+                    <router-link to="switches-overview" >
+                        <nav class="container">
                             <img :src="require(`@/assets/switch128x128.png`)" />
-                        </router-link>
-                        <h6 class="headline">Switches</h6>
-                    </nav>
+                            <h6 class="headline">Switches</h6>
+                        </nav>
+                    </router-link>
                 </v-flex>
             </v-layout>
         </v-flex>
         <v-flex xs12>
             <v-layout justify-center row>
                 <v-flex xs3>
-                    <nav class="container">
-                        <router-link to="media-controller" >
+                    <router-link to="media-controller" >
+                        <nav class="container">
                             <img :src="require(`@/assets/cassette128x128.png`)" />
-                        </router-link>
-                        <h6 class="headline">Radio</h6>
-                    </nav>  
+                            <h6 class="headline">Radio</h6>
+                        </nav>
+                    </router-link>
                 </v-flex>
             </v-layout>
         </v-flex>
