@@ -1,8 +1,61 @@
 <template>
     <article class="menu" >
 
-        <v-layout row wrap>
-            <v-flex sm12 md6 class="indoor-wrapper">
+        <v-layout hidden-sm-and-up>
+            <v-flex>
+                <div class="small-climate-container">
+                    <div class="small-indoor-climate-container">
+                        <div class="small-climate-container-header">
+
+                            <div>
+                                <h3 class="headline">Indoor</h3>
+                            </div>
+                            <div>
+                                <v-img
+                                    :src="require(`@/assets/air-conditioner24x24.png`)"
+                                    class="climate-icon"
+                                ></v-img>
+                            </div>
+                        </div>                        
+                        <div class="small-climate-content"
+                            v-for="data in indoorData"
+                            v-bind:key="data.indoorLocation">
+
+                            <div class="small-climate-content-location">
+                                {{data.indoorLocation}}
+                            </div>
+
+                            <div class="small-climate-content-data">
+                            
+                                <div class="small-climate-update-time">
+                                    {{data.indoorUpdateTime}}
+                                </div>
+
+                                <div class="small-climate-measurement">
+
+                                    <v-carousel active-class="" hide-controls hide-delimiters interval="4000" height="20">
+                                        <v-carousel-item v-if="data.indoorTempC" transition="fade">
+                                            {{data.indoorTempC}}
+                                        </v-carousel-item>
+                                        <v-carousel-item v-if="data.indoorEffectW" transition="fade">
+                                            {{data.indoorEffectW}}
+                                        </v-carousel-item>
+                                    </v-carousel>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="small-outdoor-climate-container">
+
+                    </div>
+                </div>
+            </v-flex>
+        </v-layout>
+        
+        <v-layout hidden-xs-only row wrap>
+            <v-flex class="indoor-wrapper">
                 <v-card dark class="indoor">
                     <v-card-title class="title-row" primary-title>
                         <div>
@@ -37,7 +90,7 @@
                             </template>
                             <template v-slot:items="props">
                                 <td>{{ props.item.indoorLocation }}<br /><small>{{ props.item.indoorUpdateTime }}</small></td>
-                                <td class="text-xs-right">
+                                <td>
                                     {{ props.item.indoorTempC }}
                                     <span>
                                         <br />
@@ -53,7 +106,7 @@
                     </v-card-text>
                 </v-card>
             </v-flex>
-            <v-flex sm12 md6 class="outoor-wrapper">
+            <v-flex class="outoor-wrapper">
                 <v-card dark class="outoor">
                     <v-card-title class="title-row" primary-title>
                         <div>
@@ -85,8 +138,8 @@
                                 </v-tooltip>
                             </template>
                             <template v-slot:items="props">
-                                <td class="text-xs-right">{{ props.item.outdoorMeasurementName }}</td>
-                                <td class="text-xs-right">{{ props.item.outdoorMeasurementValue }}</td>
+                                <td>{{ props.item.outdoorMeasurementName }}</td>
+                                <td>{{ props.item.outdoorMeasurementValue }}</td>
                             </template>
                         </v-data-table>
 
@@ -109,8 +162,8 @@
                                 </v-tooltip>
                             </template>
                             <template v-slot:items="props">
-                                <td class="text-xs-right">{{ props.item.outdoorMeasurementName }}</td>
-                                <td class="text-xs-right">{{ props.item.outdoorMeasurementValue }}</td>
+                                <td>{{ props.item.outdoorMeasurementName }}</td>
+                                <td>{{ props.item.outdoorMeasurementValue }}</td>
                             </template>
                         </v-data-table>
                         
@@ -133,8 +186,8 @@
                                 </v-tooltip>
                             </template>
                             <template v-slot:items="props">
-                                <td class="text-xs-right">{{ props.item.outdoorMeasurementName }}</td>
-                                <td class="text-xs-right">{{ props.item.outdoorMeasurementValue }}</td>
+                                <td>{{ props.item.outdoorMeasurementName }}</td>
+                                <td>{{ props.item.outdoorMeasurementValue }}</td>
                             </template>
                         </v-data-table>
                     </v-card-text>
@@ -146,9 +199,6 @@
 </template>
 
 <script>
-
-import moment from "moment";
-import localization from 'moment/locale/sv';
 
 export default {
     name: 'KommandoranFooterClimateDetails',
@@ -284,7 +334,7 @@ export default {
 
 </script>
 
-<style scope>
+<style>
     .menu{
         padding: 1rem;
         background-color: #212121;
@@ -318,5 +368,35 @@ export default {
         width: 24px;
     }
     
+    .small-climate-container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .small-indoor-climate-container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .small-climate-container-header {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .small-climate-content {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .small-climate-content-data {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    ::v-deep .v-carousel {
+        -webkit-box-shadow: 0 !important;
+        box-shadow: 0 !important;
+    }
 
 </style>

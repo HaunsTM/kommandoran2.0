@@ -20,7 +20,7 @@
         </div>
     </article>
 
-    <v-carousel v-else hide-controls hide-delimiters interval="6000">
+    <v-carousel active-class="" v-else hide-controls hide-delimiters interval="6000">
         <v-carousel-item transition="fade">
             <div class="flex-container">
                 <div class="column">

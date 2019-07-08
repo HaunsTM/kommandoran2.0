@@ -14,6 +14,7 @@ import VueMqtt from 'vue-mqtt';
 
 import "./assets/common.css";
 import "./assets/scroll.css";
+import './registerServiceWorker'
 
 
 Vue.config.productionTip = false;
