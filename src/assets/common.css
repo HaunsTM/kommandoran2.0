@@ -3,3 +3,10 @@ a {
     text-decoration: none !important;
     color: inherit !important;
 }
+
+
+
+.v-carousel {
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}

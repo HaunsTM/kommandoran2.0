@@ -32,8 +32,7 @@
                                 </div>
 
                                 <div class="small-climate-measurement">
-
-                                    <v-carousel active-class="" hide-controls hide-delimiters interval="4000" height="20">
+                                    <v-carousel hide-controls hide-delimiters interval="4000" height="20">
                                         <v-carousel-item v-if="data.indoorTempC" transition="fade">
                                             {{data.indoorTempC}}
                                         </v-carousel-item>
@@ -47,7 +46,49 @@
                         </div>
 
                     </div>
+
+
+
+
+
+
+
                     <div class="small-outdoor-climate-container">
+
+                        <div class="small-climate-container-header">
+
+                            <div>
+                                <h3 class="headline">Outdoor</h3>
+                                {{climate.outside.weatherUpdateTime}}
+                            </div>
+                            <div>
+                                <img v-bind:src="require(`@/assets/open_weather_icons/${climate.outside.icon}.png`)" alt="" class="weather-icon">
+                            </div>
+                        </div>                        
+                        <div class="small-climate-content">
+
+                            <div class="small-climate-content-location">
+                            </div>
+
+                            <div class="small-climate-content-data">
+                            
+   
+
+                                <div class="small-climate-measurement">
+                                    
+                                </div>
+                            </div>
+
+                        </div>
+
+
+
+
+
+
+
+
+
 
                     </div>
                 </div>
@@ -334,7 +375,7 @@ export default {
 
 </script>
 
-<style>
+<style scope>
     .menu{
         padding: 1rem;
         background-color: #212121;
@@ -376,27 +417,25 @@ export default {
     .small-indoor-climate-container {
         display: flex;
         flex-direction: column;
+        padding-bottom: 1.5rem;
     }
 
     .small-climate-container-header {
         display: flex;
         flex-direction: row;
+        padding-bottom: 1rem;
     }
 
     .small-climate-content {
         display: flex;
         flex-direction: column;
+        padding-bottom: 0.5rem;
     }
 
     .small-climate-content-data {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
-    }
-
-    ::v-deep .v-carousel {
-        -webkit-box-shadow: 0 !important;
-        box-shadow: 0 !important;
     }
 
 </style>
