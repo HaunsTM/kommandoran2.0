@@ -46,13 +46,7 @@
                         </div>
 
                     </div>
-
-
-
-
-
-
-
+                    
                     <div class="small-outdoor-climate-container">
 
                         <div class="small-climate-container-header">
@@ -64,31 +58,67 @@
                             <div>
                                 <img v-bind:src="require(`@/assets/open_weather_icons/${climate.outside.icon}.png`)" alt="" class="weather-icon">
                             </div>
-                        </div>                        
-                        <div class="small-climate-content">
-
-                            <div class="small-climate-content-location">
-                            </div>
-
-                            <div class="small-climate-content-data">
-                            
-   
-
-                                <div class="small-climate-measurement">
-                                    
-                                </div>
-                            </div>
-
                         </div>
 
+                        <div class="small-climate-content">
 
+                            <div class="small-climate-content-header">
+                                {{outdoorHeadersTemp.text}}
+                            </div>
 
+                            <div class="small-climate-content-data"
+                                v-for="data in outdoorTemp"
+                                v-bind:key="data.outdoorMeasurementName">
 
+                                <div class="small-climate-measurement">
+                                    {{data.outdoorMeasurementName}}
+                                </div>
+                                <div class="small-climate-value">
+                                    {{data.outdoorMeasurementValue}}
+                                </div>
 
+                            </div>
+                        </div>
 
+                        <div class="small-climate-content">
 
+                            <div class="small-climate-content-header">
+                                {{outdoorHeadersAir.text}}
+                            </div>
 
+                            <div class="small-climate-content-data"
+                                v-for="data in outdoorAir"
+                                v-bind:key="data.outdoorMeasurementName">
 
+                                <div class="small-climate-measurement">
+                                    {{data.outdoorMeasurementName}}
+                                </div>
+                                <div class="small-climate-value">
+                                    {{data.outdoorMeasurementValue}}
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="small-climate-content">
+
+                            <div class="small-climate-content-header">
+                                {{outdoorHeadersWind.text}}
+                            </div>
+
+                            <div class="small-climate-content-data"
+                                v-for="data in outdoorWind"
+                                v-bind:key="data.outdoorMeasurementName">
+
+                                <div class="small-climate-measurement">
+                                    {{data.outdoorMeasurementName}}
+                                </div>
+                                <div class="small-climate-value">
+                                    {{data.outdoorMeasurementValue}}
+                                </div>
+
+                            </div>
+                        </div>
 
                     </div>
                 </div>

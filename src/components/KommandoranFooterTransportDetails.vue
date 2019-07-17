@@ -1,7 +1,71 @@
 <template>
     <article class="menu" >
 
-        <v-layout row wrap>
+        <v-layout hidden-sm-and-up>
+            <v-flex>
+                <div class="small-transport-container">
+                    <div class="small-transport-destination-container">
+                        <div class="title-row">
+                            <h3 class="headline">Mot Lund</h3>
+                        </div>
+                        <div class="every-odd-transport-option-color"
+                            v-for="data in transportData.Lund"
+                            v-bind:key="data.JourneyTime">
+                            
+                            <div class="small-transport-option-container">
+                                <div class="small-transport-option-line-location-container">
+                                    <div class="title">
+                                        {{data.Name}}
+                                    </div>
+                                    <div class="caption">
+                                        {{data.LineTypeName}}&nbsp;&rarr;&nbsp;{{data.Towards}}
+                                    </div>
+                                </div>
+                                <div class="small-transport-option-time">
+                                    <div>
+                                        <h4 class="title">
+                                            {{data.JourneyTime}}
+                                        </h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="small-transport-container">
+                    <div class="small-transport-destination-container">
+                        <div class="title-row">
+                            <h3 class="headline">Mot Malmö</h3>
+                        </div>
+                        <div class="every-odd-transport-option-color"
+                            v-for="data in transportData.Malmö"
+                            v-bind:key="data.JourneyTime">
+                            
+                            <div class="small-transport-option-container">
+                                <div class="small-transport-option-line-location-container">
+                                    <div class="title">
+                                        {{data.Name}}
+                                    </div>
+                                    <div class="caption">
+                                        {{data.LineTypeName}}&nbsp;&rarr;&nbsp;{{data.Towards}}
+                                    </div>
+                                </div>
+                                <div class="small-transport-option-time">
+                                    <div>
+                                        <h4 class="title">
+                                            {{data.JourneyTime}}
+                                        </h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </v-flex>
+        </v-layout>
+
+        <v-layout hidden-xs-only row wrap>
             <v-flex sm12 md6 class="transport-wrapper">
                 <v-card dark class="transport">
                     <v-card-title class="title-row" primary-title>
@@ -79,8 +143,7 @@
 export default {
     name: 'KommandoranFooterTransportDetails',
     props: {
-        'transportData': Object,
-        'mediaWidthMoreThan400px': Boolean
+        'transportData': Object
     },
     data () {
         return {
@@ -120,26 +183,50 @@ export default {
         background-color: #212121;
         opacity: 1;
     }
+
     .title-row {
         display: flex;
         align-items: center;
         justify-content: space-between;
     }
     
-    @media only screen and (min-width: 401px) {  
-        .title-row > div {
-            padding-right: 2rem;
-        }
-        .transport {
-            padding: 1rem;
-        }
-
-        .transport-wrapper {
-            padding: 1rem;
-        }
+    .small-transport-container {
+        display: flex;
+        flex-direction: column;
+        padding-bottom: 2rem;
     }
-    @media only screen and (max-width: 400px) {
- 
+
+    .small-transport-destination-container {
+        display: flex;
+        flex-direction: column;        
+    }
+    
+    .small-transport-option-container {        
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 0.5rem;
+    }
+
+    .every-odd-transport-option-color:nth-child(even) {
+        background: #424242;
+    }
+
+    .small-transport-option-line-location-container {
+        display: flex;
+        flex-direction: column;
+        align-items: space-around;
+    }
+
+    .small-transport-option-line-location-container > div {
+        
+        padding-bottom: 0.5rem;
+    }
+
+    .small-transport-option-time {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
 
 </style>
