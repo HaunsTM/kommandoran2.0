@@ -4,120 +4,111 @@
         <v-layout hidden-sm-and-up>
             <v-flex>
                 <div class="small-climate-container">
-                    <div class="small-indoor-climate-container">
-                        <div class="small-climate-container-header">
-
-                            <div>
-                                <h3 class="headline">Indoor</h3>
-                            </div>
-                            <div>
-                                <v-img
-                                    :src="require(`@/assets/air-conditioner24x24.png`)"
-                                    class="climate-icon"
-                                ></v-img>
-                            </div>
-                        </div>                        
-                        <div class="small-climate-content"
-                            v-for="data in indoorData"
-                            v-bind:key="data.indoorLocation">
-
-                            <div class="small-climate-content-location">
-                                {{data.indoorLocation}}
-                            </div>
-
-                            <div class="small-climate-content-data">
+                    <div class="small-climate-location-container">
+                        <div class="title-row">
+                            <h3 class="headline">Indoor</h3>
+                        </div>
+                        <div class="every-odd-climate-measurement-color"
+                             v-for="data in indoorData"
+                             v-bind:key="data.indoorLocation">
                             
-                                <div class="small-climate-update-time">
-                                    {{data.indoorUpdateTime}}
+                            <div class="small-climate-measurement-container">
+                                <div class="small-climate-measurement-place-and-time-container">
+                                    <div class="caption">
+                                        {{data.indoorLocation}}
+                                    </div>
+                                    <div class="caption">
+                                        {{data.indoorUpdateTime}}
+                                    </div>
                                 </div>
-
-                                <div class="small-climate-measurement">
-                                    <v-carousel hide-controls hide-delimiters interval="4000" height="20">
-                                        <v-carousel-item v-if="data.indoorTempC" transition="fade">
-                                            {{data.indoorTempC}}
-                                        </v-carousel-item>
-                                        <v-carousel-item v-if="data.indoorEffectW" transition="fade">
-                                            {{data.indoorEffectW}}
-                                        </v-carousel-item>
-                                    </v-carousel>
+                                <div class="small-climate-measurement-value">
+                                    <div class="body-1 font-weight-black">
+                                        <v-carousel hide-controls hide-delimiters interval="4000" height="20">
+                                            <v-carousel-item v-if="data.indoorTempC" transition="fade">
+                                                {{data.indoorTempC}}
+                                            </v-carousel-item>
+                                            <v-carousel-item v-if="data.indoorEffectW" transition="fade">
+                                                {{data.indoorEffectW}}
+                                            </v-carousel-item>
+                                        </v-carousel>                                        
+                                    </div>
                                 </div>
                             </div>
-
                         </div>
-
                     </div>
-                    
-                    <div class="small-outdoor-climate-container">
+                </div>
 
-                        <div class="small-climate-container-header">
-
-                            <div>
-                                <h3 class="headline">Outdoor</h3>
-                                {{climate.outside.weatherUpdateTime}}
-                            </div>
-                            <div>
-                                <img v-bind:src="require(`@/assets/open_weather_icons/${climate.outside.icon}.png`)" alt="" class="weather-icon">
-                            </div>
+                <div class="small-climate-container">
+                    <div class="small-climate-location-container">
+                        
+                        <div class="title-row">
+                            <h3 class="headline">Outdoor</h3>
                         </div>
-
-                        <div class="small-climate-content">
-
-                            <div class="small-climate-content-header">
-                                {{outdoorHeadersTemp.text}}
-                            </div>
-
-                            <div class="small-climate-content-data"
-                                v-for="data in outdoorTemp"
-                                v-bind:key="data.outdoorMeasurementName">
-
-                                <div class="small-climate-measurement">
-                                    {{data.outdoorMeasurementName}}
-                                </div>
-                                <div class="small-climate-value">
-                                    {{data.outdoorMeasurementValue}}
-                                </div>
-
-                            </div>
+                        
+                        <div class="small-climate-content-header">
+                            {{outdoorHeadersTemp[0].text}}
                         </div>
-
-                        <div class="small-climate-content">
-
-                            <div class="small-climate-content-header">
-                                {{outdoorHeadersAir.text}}
-                            </div>
-
-                            <div class="small-climate-content-data"
-                                v-for="data in outdoorAir"
-                                v-bind:key="data.outdoorMeasurementName">
-
-                                <div class="small-climate-measurement">
-                                    {{data.outdoorMeasurementName}}
+                        <div class="every-odd-climate-measurement-color"
+                             v-for="data in outdoorTemp"
+                             v-bind:key="data.outdoorMeasurementName">
+                            
+                            <div class="small-climate-measurement-container">
+                                <div class="small-climate-measurement-place-and-time-container">
+                                    <div class="caption">
+                                        {{data.outdoorMeasurementName}}
+                                    </div>
                                 </div>
-                                <div class="small-climate-value">
-                                    {{data.outdoorMeasurementValue}}
+                                <div class="small-climate-measurement-value">
+                                    <div class="body-1 font-weight-black">
+                                        {{data.outdoorMeasurementValue}}
+                                    </div>
                                 </div>
-
-                            </div>
+                                
+                            </div>                            
                         </div>
-
-                        <div class="small-climate-content">
-
-                            <div class="small-climate-content-header">
-                                {{outdoorHeadersWind.text}}
-                            </div>
-
-                            <div class="small-climate-content-data"
-                                v-for="data in outdoorWind"
-                                v-bind:key="data.outdoorMeasurementName">
-
-                                <div class="small-climate-measurement">
-                                    {{data.outdoorMeasurementName}}
+                        
+                        <div class="small-climate-content-header">
+                            {{outdoorHeadersAir[0].text}}
+                        </div>
+                        <div class="every-odd-climate-measurement-color"
+                             v-for="data in outdoorAir"
+                             v-bind:key="data.outdoorMeasurementName">
+                            
+                            <div class="small-climate-measurement-container">
+                                <div class="small-climate-measurement-place-and-time-container">
+                                    <div class="caption">
+                                        {{data.outdoorMeasurementName}}
+                                    </div>
                                 </div>
-                                <div class="small-climate-value">
-                                    {{data.outdoorMeasurementValue}}
+                                <div class="small-climate-measurement-value">
+                                    <div class="body-1 font-weight-black">
+                                        {{data.outdoorMeasurementValue}}
+                                    </div>
                                 </div>
-
-                            </div>
+                                
+                            </div>                            
+                        </div>
+                        
+                        <div class="small-climate-content-header">
+                            {{outdoorHeadersWind[0].text}}
+                        </div>
+                        <div class="every-odd-climate-measurement-color"
+                             v-for="data in outdoorWind"
+                             v-bind:key="data.outdoorMeasurementName">
+                            
+                            <div class="small-climate-measurement-container">
+                                <div class="small-climate-measurement-place-and-time-container">
+                                    <div class="caption">
+                                        {{data.outdoorMeasurementName}}
+                                    </div>
+                                </div>
+                                <div class="small-climate-measurement-value">
+                                    <div class="body-1 font-weight-black">
+                                        {{data.outdoorMeasurementValue}}
+                                    </div>
+                                </div>
+                                
+                            </div>                            
                         </div>
 
                     </div>
@@ -411,14 +402,17 @@ export default {
         background-color: #212121;
         opacity: 1;
     }
+
     .title-row {
         display: flex;
         align-items: center;
         justify-content: space-between;
     }
+
     .title-row > div {
         padding-right: 2rem;
     }
+
     .indoor {
         padding: 1rem;
     }
@@ -438,34 +432,48 @@ export default {
     .climate-icon {
         width: 24px;
     }
-    
+
+    .measurement-value {
+        display: flex;
+        flex-direction: column;
+        padding-bottom: 2rem;
+    }
+
     .small-climate-container {
         display: flex;
         flex-direction: column;
+        padding-bottom: 2rem;
     }
 
-    .small-indoor-climate-container {
+    .every-odd-climate-measurement-color:nth-child(even) {
+        background: #424242;
+    }
+
+    .small-climate-location-container {
         display: flex;
-        flex-direction: column;
-        padding-bottom: 1.5rem;
+        flex-direction: column;        
     }
 
-    .small-climate-container-header {
-        display: flex;
-        flex-direction: row;
-        padding-bottom: 1rem;
-    }
-
-    .small-climate-content {
-        display: flex;
-        flex-direction: column;
-        padding-bottom: 0.5rem;
-    }
-
-    .small-climate-content-data {
+    .small-climate-measurement-container {        
         display: flex;
         flex-direction: row;
         justify-content: space-between;
+        
+        align-items: center;
+        height: 100%;
+        padding-bottom: 0.5rem;
+    }
+
+    .small-climate-measurement-place-and-time-container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .small-climate-measurement-value {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
 
 </style>
