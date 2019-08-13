@@ -15,7 +15,7 @@ export default {
     },
     computed: {
         imgSrc() {
-            const src = this.$API_BASE_URL + "/screensaver-image.jpg?" + this.nonsenseNoCacheKey;
+            const src = this.$API_BASE_URL + "/img/screensaver_image.jpg?" + this.nonsenseNoCacheKey;
             return src;
         },
      },

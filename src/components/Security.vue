@@ -12,14 +12,14 @@
                 <v-card dark class="video-card">
                     <v-card-media primary class="title">Uterum</v-card-media>
                     <img src="http://10.0.0.2:8100/Mjpeg/1?authToken=f1eecedb-c882-4a79-b604-1fa8d402fa4f"  width="1280" height="720"/>
-                    <v-card-text>{{ lorem }}</v-card-text>
+                    <v-card-text></v-card-text>
                 </v-card>
             </v-flex>
             <v-flex xs12 sm6 class="video-card-container">
                 <v-card dark class="video-card">
                     <v-card-media primary class="title">Garage</v-card-media>
                     <img src="http://10.0.0.2:8100/Mjpeg/2?authToken=f1eecedb-c882-4a79-b604-1fa8d402fa4f"  width="1280" height="720"/>
-                    <v-card-text>{{ lorem }}</v-card-text>
+                    <v-card-text></v-card-text>
                 </v-card>
             </v-flex>
         </v-layout>

@@ -25,7 +25,7 @@
                                     <div class="body-1 font-weight-black">
                                         <v-carousel hide-controls hide-delimiters interval="4000" height="20">
                                             <v-carousel-item v-if="data.indoorTempC" transition="fade">
-                                                {{data.indoorTempC}}
+                                                
                                             </v-carousel-item>
                                             <v-carousel-item v-if="data.indoorEffectW" transition="fade">
                                                 {{data.indoorEffectW}}
@@ -468,12 +468,14 @@ export default {
         display: flex;
         flex-direction: column;
         height: 100%;
+        padding-left: 0.5rem;
     }
 
     .small-climate-measurement-value {
         display: flex;
         flex-direction: column;
         justify-content: center;
+        padding-right: 0.5rem;
     }
 
 </style>

@@ -14,11 +14,10 @@ import VueMqtt from 'vue-mqtt';
 
 import "./assets/common.css";
 import "./assets/scroll.css";
-import './registerServiceWorker'
 
 
 Vue.config.productionTip = false;
-Vue.prototype.$API_BASE_URL = 'http://10.0.0.4/iot/kommandoran2.0';
+Vue.prototype.$API_BASE_URL = 'http://10.0.0.4/kommandoran2.0';
 Vue.prototype.$DB_API_BASE_URL = 'http://10.0.0.4/iot/kommandoran2.0/db-api';
 Vue.prototype.$TELLDUS_API_BASE_URL = 'http://10.0.0.4/iot/kommandoran2.0/telldus-api';
 
