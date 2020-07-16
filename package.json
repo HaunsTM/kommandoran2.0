@@ -16,7 +16,7 @@
     "daypilot-pro-vue": "https://npm.daypilot.org/daypilot-pro-vue/trial/2018.4.3487.tar.gz",
     "flv.js": "^1.5.0",
     "idle-vue": "^2.0.5",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "moment": "^2.22.2",
     "terser": "^3.14.1",
     "vue": "^2.6.0",
