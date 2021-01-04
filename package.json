@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@vue/cli": "^3.7.0",
-    "axios": "^0.18.1",
+    "axios": "^0.21.1",
     "core-js": "^2.6.3",
     "daypilot-pro-vue": "https://npm.daypilot.org/daypilot-pro-vue/trial/2018.4.3487.tar.gz",
     "flv.js": "^1.5.0",
